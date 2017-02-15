@@ -29,7 +29,8 @@
 
 # Operators:
   
-  # num
+# num
+```
     ()   grouping,
     \**  exponentiation,
     //   natural log,
@@ -38,26 +39,37 @@
     %    modulo,
     \+   addition,
     \-   subtraction
-  
-  ## bool
+```
+ 
+## bool
+```
     and  conjunction
     or   disjunction
     not  negation
     xor  exclusive disjunction
-  
-  ## bitwise (given Latin names for their obscurity and few use cases)
+```
+
+## bitwise (given Latin names for their obscurity and few use cases)
+```
     et   bitwise and
     aut  bitwise or
     non  bitwise not
     xaut bitwise xor
-  
-  # str
+```
+
+# str
+```
     .    concatenation,
     \*   string multiplication,
     []   character access (substring of length 1 at a given character index)
+```
 
-  # Compounds
+# Compounds
+```
     @    member access (e.g. y@x S.T. y belongs to x)
-    
-  # arrays
+```
+ 
+# arrays
+```
     []   element access
+```
