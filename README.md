@@ -2,29 +2,30 @@
 
 # Types:
 
-  num (int and float)
+###num (int, float, bool)
   ```
-  num x = 0;
-  num x = 0.0;
+  num i = 0;
+  num f = 0.0;
+  num b = true;
   ```
   
   str
-  `str x = "hello world!"`
+  `str s = "hello world!"`
   
-  func
+###func
   ```
   func add : int(int a, int b) {
     return a + b;
   }
   
-  OR
+  OR (still deciding)
   
   add : int(int a, int b) {
     return a + b;
   }
 ```
 
-  compound
+###compound
   
 
 # Operators:
@@ -32,9 +33,9 @@
 # num
 ```
     ()   grouping,
-    \**  exponentiation,
+    **  exponentiation,
     //   natural log,
-    \*   multiplication,
+    *   multiplication,
     /    division,
     %    modulo,
     \+   addition,
@@ -60,7 +61,7 @@
 # str
 ```
     .    concatenation,
-    \*   string multiplication,
+    *   string multiplication,
     []   character access (substring of length 1 at a given character index)
 ```
 
