@@ -4,9 +4,9 @@
 
 ###num (int, float, bool)
   ```
-  num i = 0;
-  num f = 0.0;
-  num b = true;
+  int i = 0;
+  float f = 0.0;
+  bool b = true; (Don't know if we'll keep this)
   ```
   
   str
@@ -39,15 +39,16 @@
     /    division,
     %    modulo,
     \+   addition,
-    \-   subtraction
+    -   subtraction
 ```
  
 ## bool
 ```
-    and  conjunction
-    or   disjunction
-    not  negation
-    xor  exclusive disjunction
+    and   conjunction
+    or    disjunction
+    not   negation
+    xor   exclusive disjunction
+    then  material implication
 ```
 
 ## bitwise (given Latin names for their obscurity and few use cases)
@@ -56,6 +57,7 @@
     aut  bitwise or
     non  bitwise not
     xaut bitwise xor
+    imp  bitwise then (I know, weird, right?)
 ```
 
 # str
