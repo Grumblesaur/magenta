@@ -28,6 +28,26 @@
 ###compound
   
 
+# Keywords
+```
+	func      declare a function
+    int       declare an integer
+    str       declare a string
+    flt       declare a floating point number
+    compound  describe a new data structure
+    
+    if
+    elif
+    else
+    
+    while
+    for
+    
+    print
+    input
+```
+
+
 # Operators:
   
 # num
@@ -40,6 +60,13 @@
     %    modulo,
     \+   addition,
     -   subtraction
+    
+    >   greater than
+    <   less than
+    ==  equal
+    !=  not equal
+    >=  greater equal
+    <=  less equal
 ```
  
 ## bool
