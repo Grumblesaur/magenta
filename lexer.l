@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include "tokens.h" // temporary until tab.parser.h becomes available
 
 %}
 
@@ -18,6 +19,7 @@
 "{"        {return BRACE_OPEN;    }
 "}"        {return BRACE_CLOSE;   }
 "="        {return ASSIGN;        }
+":"        {return COLON;         }
 
 "func"     {return TYPE_FUNCTION; }
 "int"      {return TYPE_INTEGER;  }
