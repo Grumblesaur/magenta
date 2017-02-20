@@ -75,8 +75,12 @@
 	return IDENTIFIER;
 }
 
-[0-9]*\.?[0-9]+ {
-	return NUMERIC_LITERAL;
+0|[1-9]+[0-9]* {
+	return INTEGER_LITERAL;
+}
+
+[0-9]*\.[0-9]+ {
+	return FLOAT_LITERAL;
 }
 
 \".*\"     {return STRING_LITERAL;}
