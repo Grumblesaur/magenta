@@ -13,7 +13,7 @@
 #define TYPE_INTEGER    111
 #define TYPE_STRING     112
 #define TYPE_FLOAT      113
-#define TYPE_COMPOUND   114
+#define TYPE_TYPE       114
 #define OPTION_STMT     115
 #define CASE_STMT       116
 #define IF_STMT         117

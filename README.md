@@ -3,7 +3,7 @@ https://trello.com/b/LEAOTeYg/magenta
 
 # Types:
 
-###num (int, float, bool)
+### num (int, float, bool)
   ```
   int i = 0;
   float f = 0.0;
@@ -13,33 +13,48 @@ https://trello.com/b/LEAOTeYg/magenta
   str
   `str s = "hello world!"`
   
-###func
+  type
   ```
-  func add : int(int a, int b) {
+  type Person {
+    str name;
+    int age;
+    bool is_female;
+  }
+  
+  ```
+  
+  
+### func & meth
+  ```
+  # func-declared procedures have no side effects
+  func add(int a, int b) : int {
     return a + b;
   }
   
-  OR (still deciding)
-  
-  add : int(int a, int b) {
+  # meth-declared procedures can have side effects
+  meth add_debug(int a, int b) : int {
+    print a + b;
     return a + b;
   }
+  
 ```
 
-###compound
+###type
   
 
 # Keywords
 ```
-	func      declare a function
-    int       declare an integer
-    str       declare a string
-    flt       declare a floating point number
-    compound  describe a new data structure
+	func  declare a function
+    int   declare an integer
+    str   declare a string
+    flt   declare a floating point number
+    type  describe a new data structure
     
     if
     elif
     else
+    option
+    case
     
     while
     for

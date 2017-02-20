@@ -22,10 +22,11 @@
 ":"        {return COLON;         }
 
 "func"     {return TYPE_FUNCTION; }
+"meth"     {return TYPE_METHOD;   }
 "int"      {return TYPE_INTEGER;  }
 "str"      {return TYPE_STRING;   }
 "flt"      {return TYPE_FLOAT;    }
-"compound" {return TYPE_COMPOUND; }
+"type    " {return TYPE_COMPOUND; }
 
 "option"   {return OPTION_STMT;   }
 "case"     {return CASE_STMT;     }
@@ -78,7 +79,7 @@
 	return NUMERIC_LITERAL;
 }
 
-\".*\"     {return STR_LITERAL;   }
+\".*\"     {return STRING_LITERAL;}
 
 "#".*      {/* comment */         }
 [ \t\n]+   {/* whitespace */      }
