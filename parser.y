@@ -79,13 +79,13 @@
 
 %token STATEMENT 
 
-%type<node> prog statements statement elif_statment expression disjunction conjunction relation addend factor exponent term num id return_type type
+%type<node> program statements statement elif_statment expression disjunction conjunction relation addend factor exponent term num id return_type type
 
 %error-verbose
 
 %%
 
-prog: statements { result = make_node(STATEMENT, NULL);
+program: statements { result = make_node(STATEMENT, NULL);
 					attach(result, $1);
 					}
 
@@ -256,8 +256,10 @@ id: IDENTIFIER { mg_obj* value = make_mg_obj(STRING_LITERAL, $1);
 				$$ = make_node(IDENTIFIER, , value); 
 				}
 
+
 return_type: TYPE_VOID { $$ = make_node(TYPE_VOID, NULL); }
 			| type { }
+
 
 type: TYPE_INTEGER { $$ = make_node(TYPE_INTEGER, NULL); }
 	| TYPE_FLOAT { $$ = make_node(TYPE_FLOAT, NULL); }
@@ -265,8 +267,6 @@ type: TYPE_INTEGER { $$ = make_node(TYPE_INTEGER, NULL); }
 	| TYPE_FUNCTION { $$ = make_node(TYPE_FUNCTION, NULL); }
 	| TYPE_METHOD { $$ = make_node(TYPE_METHOD, NULL); }
 	| TYPE_TYPE { $$ make_node(TYPE_TYPE, NULL); }
-
-
 
 %%
 
