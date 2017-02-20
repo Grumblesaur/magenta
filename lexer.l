@@ -26,7 +26,7 @@
 "int"      {return TYPE_INTEGER;  }
 "str"      {return TYPE_STRING;   }
 "flt"      {return TYPE_FLOAT;    }
-"type    " {return TYPE_COMPOUND; }
+"type"     {return TYPE_COMPOUND; }
 
 "option"   {return OPTION_STMT;   }
 "case"     {return CASE_STMT;     }
