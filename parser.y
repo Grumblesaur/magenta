@@ -1,5 +1,6 @@
 %{
 	#include <stdio.h>
+	#include "tree.h"
 	#define YYDEBUG 1
 	int yywrap();
 	int yylex();
@@ -7,8 +8,11 @@
 %}
 
 %union {
-	struct Node* node;
-	int var;
+	node* node;
+	int i_val;
+	float f_val;
+	char* str;
+	char* id;
 }
 
 %token BRACE_OPEN      
@@ -66,19 +70,24 @@
 %token BIT_XOR         
 %token BIT_IMPLIES     
 
-%token IDENTIFIER      
-%token NUMERIC_LITERAL 
-%token STRING_LITERAL 
+%token<id> IDENTIFIER      
+%token<i_val> INT_LITERAL
+%token<f_val> FLOAT_LITERAL 
+%token<str> STRING_LITERAL 
 
-%token <var> STMT 
+%token STMT 
 
-%type <node> prog
+%type <node> prog, num
 
 %error-verbose
 
 %%
 
-prog: STMT { int x = 0; }
+prog: num { int x = 0; }
+
+
+num: INT_LITERAL {}
+	| FLOAT_LITERAL {}
 
 %%
 
