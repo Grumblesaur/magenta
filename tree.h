@@ -17,4 +17,6 @@ node* make_node(int token, mg_obj* value);
 
 void attach(node* parent, node* child);
 
+void print(node* root);
+
 #endif

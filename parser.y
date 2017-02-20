@@ -79,7 +79,7 @@
 
 %token STATEMENT 
 
-%type<node> program statements statement elif_statment expression disjunction conjunction relation addend factor exponent term num id return_type type
+%type<node> program statements statement elif_statement expression disjunction conjunction relation addend factor exponent term num id return_type type
 
 %error-verbose
 
@@ -112,7 +112,7 @@ statement: type id ASSIGN expression SEMICOLON { $$ = make_node(ASSIGN, NULL);
 								attach($$, $2);
 								attach($$, $3);
 								}
-	| IF expression statement ELIF elif_statment { $$ = make_node(IF, NULL);
+	| IF expression statement ELIF elif_statement { $$ = make_node(IF, NULL);
 													attach($$, $2);
 													attact($$, $3)
 													attach($$, $5);
@@ -127,7 +127,7 @@ statement: type id ASSIGN expression SEMICOLON { $$ = make_node(ASSIGN, NULL);
 											}
 
 
-elif_statment: expression statement ELIF elif_statment { $$ = make_node(ELIF, NULL);
+elif_statement: expression statement ELIF elif_statement { $$ = make_node(ELIF, NULL);
 														attach($$, $1);
 														attach($$, $2);
 														attach($$, $4);
@@ -185,7 +185,7 @@ conjunction: conjunction LESS_THAN relation { $$ = make_node(LESS_THAN, NULL);
 											attach($$, $1);
 											attach($$, $3);
 											}
-		| conjunction { }
+		| relation { }
 
 
 relation: relation PLUS addend { $$ = make_node(PLUS, NULL);
@@ -222,7 +222,7 @@ factor: factor POWER exponent { $$ = make_node(POWER, NULL);
 								attach($$, $1);
 								attach($$, $3);
 								}
-		| factor { }
+		| exponent { }
 
 
 exponent: LOG_NOT exponent { $$ = make_node(LOG_NOT, NULL);

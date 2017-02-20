@@ -1,3 +1,4 @@
+#include <iostream>
 #include "tree.h"
 
 node* make_node(int token, mg_obj* value) {
@@ -16,4 +17,13 @@ void attach(node* parent, node* child) {
 
 	parent->children[parent->num_children] = child;
 	parent->num_children++;
+}
+
+void print(node* node, int tabs) {
+	if(!node) return;
+
+	/* print leading tabs */
+	for(int i = 0; i < tabs; i++) {
+		std::cout << "\t";
+ 	}
 }
