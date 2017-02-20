@@ -26,12 +26,12 @@
 "flt"      {return TYPE_FLOAT;    }
 "type"     {return TYPE_TYPE;     }
 
-"option"   {return OPTION_STMT;   }
-"case"     {return CASE_STMT;     }
+"option"   {return OPTION;        }
+"case"     {return CASE;          }
 
-"if"       {return IF_STMT;       }
-"elif"     {return ELIF_STMT;     }
-"else"     {return ELSE_STMT;     }
+"if"       {return IF;       	  }
+"elif"     {return ELIF;     	  }
+"else"     {return ELSE;     	  }
 
 "for"      {return FOR_LOOP;      }
 "while"    {return WHILE_LOOP;    }

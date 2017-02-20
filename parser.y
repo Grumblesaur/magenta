@@ -5,6 +5,7 @@
 	int yywrap();
 	int yylex();
 	void yyerror(const char* str);
+	node* result;
 %}
 
 %union {
@@ -26,11 +27,11 @@
 %token TYPE_STRING     
 %token TYPE_FLOAT      
 %token TYPE_COMPOUND   
-%token OPTION_STMT     
-%token CASE_STMT       
-%token IF_STMT         
-%token ELIF_STMT       
-%token ELSE_STMT       
+%token OPTION    
+%token CASE       
+%token IF         
+%token ELIF      
+%token ELSE       
 %token FOR_LOOP        
 %token WHILE_LOOP      
 
@@ -76,16 +77,76 @@
 
 %token STMT 
 
-%type <node> prog, num
+%type <node> prog, stmts, stmt, expr, num
 
 %error-verbose
 
 %%
 
-prog: num { int x = 0; }
+prog: stms { result = make_node(STMT, "", NULL);
+			attach(result, $1);
+			}
 
 
-num: INT_LITERAL {}
+stmts: stmt stmts { $$ = make_node(STMT, "", NULL);
+					attach($$, $1);
+					attach($$, $2);
+					}
+	| stmt { $$ = make_node(STMT, "", NULL);
+			attach($$, $1);
+			}
+
+
+stmt: IDENTIFIER ASSIGN expr SEMICOLON { $$ = make_node(ASSIGN, "", NULL);
+										attach($$, $1);
+										attach($$, $3);
+										}
+	| WHILE_LOOP expr stmt { $$ = make_node(WHILE_LOOP, "", NULL) {
+							attach($$, $1);
+							attach($$, $3);
+							}
+	| IF expr stmt { $$ = make_node(IF_STMT, "", NULL);
+						attach($$, $2);
+						attach($$, $3);
+						}
+	| IF expr stmt ELIF elif_stmt { $$ = make_node(IF, "", NULL);
+								attach($$, $2);
+								attact($$, $3)
+								attach($$, $5);
+								}
+	| IF expr stmt ELSE stmt { $$ = make_node(IF, "", NULL);
+								attach($$, $2);
+								attach($$, $3);
+								attach($$, $5);
+								}
+	| BRACE_OPEN stmts BRACE_CLOSE { $$ = make_node(STMT, "", NULL);
+									attach($$, $2);
+									}
+
+
+elif_stmt: expr stmt ELIF elif_stmt { $$ = make_node(ELIF, "", NULL);
+										attach($$, $1);
+										attach($$, $2);
+										attach($$, $4);
+										}
+		| expr stmt ELSE stmt { $$ = make_node(ELIF, "", NULL);
+								attach($$, $1);
+								attach($$, $2);
+								attach($$, $4);
+								}
+		| expr stmt { $$ = make_node(ELIF, "", NULL);
+						attach($$, $1);
+						attach($$, $2);
+						}
+
+
+
+not_term: PAREN_OPEN expr PAREN_CLOSE {}
+		| num {}
+		| STRING_LITERAL {} 
+		| //what goes here?
+
+num: INT_LITERAL { $$ = make_node()}
 	| FLOAT_LITERAL {}
 
 %%
@@ -104,7 +165,7 @@ int main(int argc, char **argv) {
 	stdin = fopen(argv[1], "r");
 
 	int token;
-	do {
+	do {	
 		token = yylex( );
 		
 		printf("%d\n", token);
