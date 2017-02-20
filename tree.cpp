@@ -1,11 +1,10 @@
 #include "tree.h"
 
-node* make_node(int token, mg_obj* value, std::string id) {
+node* make_node(int token, mg_obj* value) {
 
 	node* n = new node;
 	n->token = token;
 	n->value = value;
-	n->id = id;
 	n->num_children = 0;
 	for (int i = 0; i <= MAX_CHILDREN; i++) {
 		n->children[i] = NULL;
