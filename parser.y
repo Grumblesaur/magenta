@@ -15,7 +15,7 @@
 	char* str, id;
 }
 
-%token BRACE_OPEN      
+%precedence BRACE_OPEN      
 %token BRACE_CLOSE     
 %token ASSIGN          
 %token COLON 
@@ -26,12 +26,12 @@
 %token TYPE_INTEGER    
 %token TYPE_STRING     
 %token TYPE_FLOAT      
-%token TYPE_COMPOUND   
+%token TYPE_TYPE
 %token OPTION    
 %token CASE       
 %token IF         
-%token ELIF      
-%token ELSE       
+%precedence ELIF      
+%precedence ELSE       
 %token FOR_LOOP        
 %token WHILE_LOOP      
 
@@ -77,13 +77,13 @@
 
 %token STMT 
 
-%type <node> prog, stmts, stmt, expr, num
+%type <node> prog stmts stmt elif_stmt expr or_term and_term comp_term addend factor exponent term num id type
 
 %error-verbose
 
 %%
 
-prog: stms { result = make_node(STMT, "", NULL);
+prog: stmts { result = make_node(STMT, "", NULL);
 			attach(result, $1);
 			}
 
@@ -97,12 +97,13 @@ stmts: stmt stmts { $$ = make_node(STMT, "", NULL);
 			}
 
 
-stmt: IDENTIFIER ASSIGN expr SEMICOLON { $$ = make_node(ASSIGN, "", NULL);
+stmt: type id ASSIGN expr SEMICOLON { $$ = make_node(ASSIGN, "", NULL);
 										attach($$, $1);
-										attach($$, $3);
+										attach($$, $2);
+										attach($$, $4);
 										}
-	| WHILE_LOOP expr stmt { $$ = make_node(WHILE_LOOP, "", NULL) {
-							attach($$, $1);
+	| WHILE_LOOP expr stmt { $$ = make_node(WHILE_LOOP, "", NULL)
+							attach($$, $2);
 							attach($$, $3);
 							}
 	| IF expr stmt { $$ = make_node(IF_STMT, "", NULL);
@@ -140,16 +141,115 @@ elif_stmt: expr stmt ELIF elif_stmt { $$ = make_node(ELIF, "", NULL);
 						}
 
 //TODO
-expr:
+expr: expr LOG_OR or_term { $$ = make_node(LOG_OR, "", NULL);
+							attach($$, $1);
+							attach($$, $3);
+							}
+	| expr LOG_XOR or_term { $$ = make_node(LOG_XOR, "", NULL);
+							attach($$, $1);
+							attach($$, $3);
+							}
+	| or_term { }
 
-not_term: PAREN_OPEN expr PAREN_CLOSE { $$ = make_node(PAREN_OPEN, "", NULL);
-										attach($$, $2);}
-		| INT_LITERAL { $$ = make_node(INT_LITERAL, "", $1); }
-		| STRING_LITERAL { $$ = make_node(STRING_LITERAL, "", $1); } 
-		| //should we allow function calls here?
+
+or_term: or_term LOG_AND and_term { $$ = make_node(LOG_AND, "", NULL);
+									attach($$, $1);
+									attach($$, $3);
+									}
+		| and_term { }
+
+
+and_term: and_term LESS_THAN comp_term { $$ = make_node(LESS_THAN, "", NULL);
+										attach($$, $1);
+										attach($$, $3);
+										}
+		| and_term LESS_EQUAL comp_term { $$ = make_node(LESS_EQUAL, "", NULL);
+										attach($$, $1);
+										attach($$, $3);
+										}
+		| and_term EQUAL comp_term { $$ = make_node(EQUAL, "", NULL);
+										attach($$, $1);
+										attach($$, $3);
+										}
+		| and_term GREATER_THAN comp_term { $$ = make_node(GREATER_THAN, "", NULL);
+											attach($$, $1);
+											attach($$, $3);
+											}
+		| and_term GREATER_EQUAL comp_term { $$ = make_node(GREATER_EQUAL, "", NULL);
+										attach($$, $1);
+										attach($$, $3);
+										}
+		| and_term NOT_EQUAL comp_term { $$ = make_node(NOT_EQUAL, "", NULL);
+										attach($$, $1);
+										attach($$, $3);
+										}
+		| and_term { }
+
+
+comp_term: comp_term PLUS addend { $$ = make_node(PLUS, "", NULL);
+									attach($$, $1);
+									attach($$, $3);
+									}
+		| comp_term MINUS addend { $$ = make_node(MINUS, "", NULL);
+									attach($$, $1);
+									attach($$, $3);
+									}
+
+
+addend: addend TIMES factor { $$ = make_node(TIMES, "", NULL);
+								attach($$, $1);
+								attach($$, $3);
+								}
+		| addend DIVIDE factor { $$ = make_node(DIVIDE, "", NULL);
+								attach($$, $1);
+								attach($$, $3);
+								}
+		| addend MODULO factor { $$ = make_node(MODULO, "", NULL);
+								attach($$, $1);
+								attach($$, $3);
+								}
+		| factor { }
+
+
+factor: factor POWER exponent { $$ = make_node(POWER, "", NULL);
+								attach($$, $1);
+								attach($$, $3);
+								}
+		| factor LOG exponent { $$ = make_node(LOG, "", NULL);
+								attach($$, $1);
+								attach($$, $3);
+								}
+		| factor { }
+
+
+exponent: LOG_NOT exponent { $$ = make_node(LOG_NOT, "", NULL);
+							attach($$, $2);
+							}
+		| MINUS exponent { $$ = make_node(MINUS, "", NULL);
+							attach($$, $2);
+							}
+		| term { }
+
+
+term: PAREN_OPEN expr PAREN_CLOSE { $$ = make_node(PAREN_OPEN, "", NULL);
+									attach($$, $2);
+									}
+	| STRING_LITERAL { $$ = make_node(STRING_LITERAL, "", $1); }
+	| id { }
+	| num { }
+		
 
 num: INT_LITERAL { $$ = make_node(INT_LITERAL, "", $1); }
 	| FLOAT_LITERAL { $$ = make_node(FLOAT_LITERAL, "", $1); }
+
+id: IDENTIFIER { $$ = make_node(IDENTIFIER, $1, NULL); }
+
+type: TYPE_INTEGER { $$ = make_node(TYPE_INTEGER, "", NULL); }
+	| TYPE_FLOAT { $$ = make_node(TYPE_FLOAT, "", NULL); }
+	| TYPE_STRING { $$ = make_node(TYPE_STRING, "", NULL); }
+	| TYPE_FUNCTION { $$ = make_node(TYPE_FUNCTION, "", NULL); }
+	| TYPE_METHOD { $$ = make_node(TYPE_METHOD, "", NULL); }
+	| TYPE_TYPE { $$ make_node(TYPE_TYPE, "", NULL); }
 
 %%
 
@@ -166,13 +266,15 @@ int main(int argc, char **argv) {
 	FILE* orig_stdin = stdin;
 	stdin = fopen(argv[1], "r");
 
-	int token;
-	do {	
-		token = yylex( );
-		
-		printf("%d\n", token);
+	yyparse();
 
-  	} while(token != 0);
+	// int token;
+	// do {	
+	// 	token = yylex( );
+		
+	// 	printf("%d\n", token);
+
+  	// } while(token != 0);
 	
 
 	fclose(stdin);
