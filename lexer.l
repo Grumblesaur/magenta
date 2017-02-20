@@ -49,6 +49,8 @@
 "+"        {return PLUS;          }
 "."        {return CONCAT;        }
 "-"        {return MINUS;         }
+"<<"       {return LEFT_SHIFT;    }
+">>"       {return RIGHT_SHIFT;   }
 
 "<"        {return LESS_THAN;     }
 ">"        {return GREATER_THAN;  }
