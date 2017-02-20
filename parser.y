@@ -11,8 +11,7 @@
 	node* node;
 	int i_val;
 	float f_val;
-	char* str;
-	char* id;
+	char* str, id;
 }
 
 %token BRACE_OPEN      
