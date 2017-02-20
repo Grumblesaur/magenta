@@ -5,10 +5,7 @@
 // magenta lexer
 
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include "tokens.h" // temporary until tab.parser.h becomes available
+#include "parser.tab.h"
 
 %}
 
@@ -20,6 +17,7 @@
 "}"        {return BRACE_CLOSE;   }
 "="        {return ASSIGN;        }
 ":"        {return COLON;         }
+";"        {return SEMICOLON;     }
 
 "func"     {return TYPE_FUNCTION; }
 "meth"     {return TYPE_METHOD;   }
