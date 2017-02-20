@@ -25,6 +25,7 @@
 "str"      {return TYPE_STRING;   }
 "flt"      {return TYPE_FLOAT;    }
 "type"     {return TYPE_TYPE;     }
+"void"     {return TYPE_VOID;     }
 
 "option"   {return OPTION;        }
 "case"     {return CASE;          }
