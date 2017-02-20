@@ -1,20 +1,24 @@
 %{
 	#include <stdio.h>
-	#define YYDEBUG 101
+	#define YYDEBUG 1
 	int yywrap();
 	int yylex();
+	void yyerror(const char* str);
 %}
 
 %union {
-
+	struct Node* node;
+	int var;
 }
 
 %token BRACE_OPEN      
 %token BRACE_CLOSE     
 %token ASSIGN          
-%token COLON           
+%token COLON 
+%token SEMICOLON          
 
-%token TYPE_FUNCTION   
+%token TYPE_FUNCTION
+%token TYPE_METHOD   
 %token TYPE_INTEGER    
 %token TYPE_STRING     
 %token TYPE_FLOAT      
@@ -62,10 +66,17 @@
 
 %token IDENTIFIER      
 %token NUMERIC_LITERAL 
-%token STRING_LITERAL  
+%token STRING_LITERAL 
+
+%token <var> STMT 
+
+%type <node> prog
+
+%error-verbose
 
 %%
 
+prog: STMT { int x = 0; }
 
 %%
 
@@ -78,13 +89,20 @@ void yyerror(const char* str) {
 }
 
 int main(int argc, char **argv) {
+
+	FILE* orig_stdin = stdin;
+	stdin = fopen(argv[1], "r");
+
 	int token;
 	do {
-    token = yylex( );
-    
-    printf(token);
+		token = yylex( );
+		
+		printf("%d\n", token);
 
-  } while(token != 0);
+  	} while(token != 0);
 	
+
+	fclose(stdin);
+	stdin = orig_stdin;
 	return 0;
 }
