@@ -139,15 +139,17 @@ elif_stmt: expr stmt ELIF elif_stmt { $$ = make_node(ELIF, "", NULL);
 						attach($$, $2);
 						}
 
+//TODO
+expr:
 
+not_term: PAREN_OPEN expr PAREN_CLOSE { $$ = make_node(PAREN_OPEN, "", NULL);
+										attach($$, $2);}
+		| INT_LITERAL { $$ = make_node(INT_LITERAL, "", $1); }
+		| STRING_LITERAL { $$ = make_node(STRING_LITERAL, "", $1); } 
+		| //should we allow function calls here?
 
-not_term: PAREN_OPEN expr PAREN_CLOSE {}
-		| num {}
-		| STRING_LITERAL {} 
-		| //what goes here?
-
-num: INT_LITERAL { $$ = make_node()}
-	| FLOAT_LITERAL {}
+num: INT_LITERAL { $$ = make_node(INT_LITERAL, "", $1); }
+	| FLOAT_LITERAL { $$ = make_node(FLOAT_LITERAL, "", $1); }
 
 %%
 
