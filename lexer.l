@@ -24,7 +24,7 @@
 "int"      {return TYPE_INTEGER;  }
 "str"      {return TYPE_STRING;   }
 "flt"      {return TYPE_FLOAT;    }
-"type"     {return TYPE_COMPOUND; }
+"type"     {return TYPE_TYPE;     }
 
 "option"   {return OPTION_STMT;   }
 "case"     {return CASE_STMT;     }
@@ -75,8 +75,12 @@
 	return IDENTIFIER;
 }
 
-[0-9]*\.?[0-9]+ {
-	return NUMERIC_LITERAL;
+0|[1-9]+[0-9]* {
+	return INTEGER_LITERAL;
+}
+
+[0-9]*\.[0-9]+ {
+	return FLOAT_LITERAL;
 }
 
 \".*\"     {return STRING_LITERAL;}
