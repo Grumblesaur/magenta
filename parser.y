@@ -43,7 +43,9 @@
 %token MODULO          
 %token PLUS            
 %token CONCAT          
-%token MINUS           
+%token MINUS
+%token LEFT_SHIFT
+%token RIGHT_SHIFT
 
 %token LESS_THAN       
 %token GREATER_THAN    
