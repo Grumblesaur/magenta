@@ -7,7 +7,6 @@ https://trello.com/b/LEAOTeYg/magenta
   ```
   int i = 0;
   float f = 0.0;
-  bool b = true; (Don't know if we'll keep this)
   ```
   
   str
@@ -18,7 +17,6 @@ https://trello.com/b/LEAOTeYg/magenta
   type Person {
     str name;
     int age;
-    bool is_female;
   }
   
   ```
@@ -105,9 +103,9 @@ https://trello.com/b/LEAOTeYg/magenta
 
 # str
 ```
-    .    concatenation,
-    *   string multiplication,
-    []   character access (substring of length 1 at a given character index)
+     +    concatenation,
+     *    string multiplication,
+    []    character access (substring of length 1 at a given character index)
 ```
 
 # Compounds
