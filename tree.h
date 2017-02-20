@@ -16,6 +16,6 @@ typedef struct node {
 
 node* make_node(int token, std::string id, mg_obj* value);
 
-void attach_node(node* parent, node* child);
+void attach(node* parent, node* child);
 
 #endif

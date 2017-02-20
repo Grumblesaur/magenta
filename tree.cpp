@@ -13,7 +13,7 @@ node* make_node(int token, mg_obj* value, std::string id) {
 	return n;
 }
 
-void attach_node(node* parent, node* child) {
+void attach(node* parent, node* child) {
 
 	parent->children[parent->num_children] = child;
 	parent->num_children++;
