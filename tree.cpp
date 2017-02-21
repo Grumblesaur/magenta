@@ -2,9 +2,9 @@
 #include "tree.h"
 #include "parser.tab.h"
 
-node* make_node(int token, mg_obj* value) {
+struct node* make_node(int token, mg_obj* value) {
 
-	node* n = new node;
+	struct node* n = new node;
 	n->token = token;
 	n->value = value;
 	n->num_children = 0;
@@ -14,13 +14,13 @@ node* make_node(int token, mg_obj* value) {
 	return n;
 }
 
-void attach(node* parent, node* child) {
+void attach(struct node* parent, struct node* child) {
 
 	parent->children[parent->num_children] = child;
 	parent->num_children++;
 }
 
-void print(node* node, int tabs) {
+void print(struct node* node, int tabs) {
 	if(!node) return;
 
 	/* print leading tabs */

@@ -8,15 +8,12 @@
 	int yywrap();
 	int yylex();
 
-	typedef struct mg_obj mg_obj;
-	typedef struct node node;
-
 	void yyerror(const char* str);
-	node * result;
+	struct node * result;
 %}
 
 %union {
-	node * n;
+	struct node * n;
 	int i_val;
 	double f_val;
 	char * str, * id;
@@ -247,23 +244,23 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 		$$ = make_node(PAREN_OPEN, NULL);
 		attach($$, $2);
 	} | STRING_LITERAL {
-		mg_obj* value = mg_alloc(&$1);
+		struct mg_obj* value = mg_alloc(STR, &$1, "");
 		$$ = make_node(STRING_LITERAL, value);
 	} | id {
 	} | num { }
 		
 
 num: INTEGER_LITERAL {
-		mg_obj* value = mg_alloc(INT, &$1, "");
+		struct mg_obj* value = mg_alloc(INT, &$1, "");
 		$$ = make_node(INTEGER_LITERAL, value);
 	} | FLOAT_LITERAL {
-		mg_obj* value = mg_alloc(FLT, &$1, "");
+		struct mg_obj* value = mg_alloc(FLT, &$1, "");
 		$$ = make_node(FLOAT_LITERAL, value); 
 	}
 
 
 id: IDENTIFIER {
-		mg_obj* value = mg_alloc(STR, &$1, "");
+		struct mg_obj* value = mg_alloc(STR, &$1, "");
 		$$ = make_node(IDENTIFIER, value);
 	}
 
