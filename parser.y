@@ -10,7 +10,7 @@
 %}
 
 %union {
-	node* node;
+	node* n;
 	int i_val;
 	double f_val;
 	char* str, id;
@@ -73,13 +73,13 @@
 %token BIT_IMPLIES     
 
 %token<id> IDENTIFIER      
-%token<i_val> INT_LITERAL
+%token<i_val> INTEGER_LITERAL
 %token<f_val> FLOAT_LITERAL 
 %token<str> STRING_LITERAL 
 
 %token STATEMENT 
 
-%type<node> program statements statement elif_statement expression disjunction conjunction relation addend factor exponent term num id return_type type
+%type<n> program statements statement elif_statement expression disjunction conjunction relation addend factor exponent term num id return_type type
 
 %error-verbose
 
@@ -107,17 +107,17 @@ statement: type id ASSIGN expression SEMICOLON {
 		attach($$, $2);
 		attach($$, $4);
 	} | WHILE_LOOP expression statement {
-		$$ = make_node(WHILE_LOOP, NULL)
+		$$ = make_node(WHILE_LOOP, NULL);
 		attach($$, $2);
 		attach($$, $3);
 	} | IF expression statement {
-		$$ = make_node(IF_STMT, NULL);
+		$$ = make_node(IF, NULL);
 		attach($$, $2);
 		attach($$, $3);
 	} | IF expression statement ELIF elif_statement {
 		$$ = make_node(IF, NULL);
 		attach($$, $2);
-		attact($$, $3)
+		attach($$, $3);
 		attach($$, $5);
 	} | IF expression statement ELSE statement {
 		$$ = make_node(IF, NULL);
@@ -140,7 +140,8 @@ elif_statement: expression statement ELIF elif_statement {
 		attach($$, $1);
 		attach($$, $2);
 		attach($$, $4);
-	} | expression statement { $$ = make_node(ELIF, NULL);
+	} | expression statement {
+		$$ = make_node(ELIF, NULL);
 		attach($$, $1);
 		attach($$, $2);
 	}
@@ -241,23 +242,23 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 		attach($$, $2);
 	} | STRING_LITERAL {
 		mg_obj* value = make_mg_obj(STRING_LITERAL, $1);
-		$$ = make_node(STRING_LITERAL, NULL, $1);
+		$$ = make_node(STRING_LITERAL, value);
 	} | id {
 	} | num { }
 		
 
-num: INT_LITERAL {
-		mg_obj* value = make_mg_obj(INT_LITERAL, $1);
-		$$ = make_node(INT_LITERAL, value);
+num: INTEGER_LITERAL {
+		mg_obj* value = make_mg_obj(INTEGER_LITERAL, $1);
+		$$ = make_node(INTEGER_LITERAL, value);
 	} | FLOAT_LITERAL {
-		mg_obj* value = make_mg_obj(INT_LITERAL, $1);
-		$$ = make_node(FLOAT_LITERAL, NULL, $1); 
+		mg_obj* value = make_mg_obj(INTEGER_LITERAL, $1);
+		$$ = make_node(FLOAT_LITERAL, value); 
 	}
 
 
 id: IDENTIFIER {
 		mg_obj* value = make_mg_obj(STRING_LITERAL, $1);
-		$$ = make_node(IDENTIFIER, , value); 
+		$$ = make_node(IDENTIFIER, value); 
 	}
 
 
@@ -277,7 +278,7 @@ type: TYPE_INTEGER {
 	} | TYPE_METHOD {
 		$$ = make_node(TYPE_METHOD, NULL);
 	} | TYPE_TYPE {
-		$$ make_node(TYPE_TYPE, NULL);
+		$$ = make_node(TYPE_TYPE, NULL);
 	}
 
 %%

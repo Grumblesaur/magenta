@@ -1,5 +1,5 @@
 magenta: lex.yy.c parser.tab.c
-	gcc lex.yy.c parser.tab.c -o magenta
+	g++ lex.yy.c parser.tab.c -o magenta
 
 lex.yy.c: lexer.l parser.tab.h
 	flex lexer.l

@@ -10,9 +10,11 @@ enum obj_type {
 	TYPE  // 5
 };
 
-typedef struct mg_obj {
+struct mg_obj {
 	void * value;
 	obj_type type;
-} mg_obj;
+};
+
+typedef struct mg_obj mg_obj;
 
 #endif
