@@ -6,14 +6,14 @@
 	int yywrap();
 	int yylex();
 	void yyerror(const char* str);
-	node* result;
+	node * result;
 %}
 
 %union {
-	node* n;
+	node * n;
 	int i_val;
 	double f_val;
-	char* str, id;
+	char * str, * id;
 }
 
 %token BRACE_OPEN      
@@ -241,24 +241,23 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 		$$ = make_node(PAREN_OPEN, NULL);
 		attach($$, $2);
 	} | STRING_LITERAL {
-		mg_obj* value = make_mg_obj(STRING_LITERAL, $1);
+		mg_obj* value = mg_alloc_str($1);
 		$$ = make_node(STRING_LITERAL, value);
 	} | id {
 	} | num { }
 		
 
 num: INTEGER_LITERAL {
-		mg_obj* value = make_mg_obj(INTEGER_LITERAL, $1);
+		mg_obj* value = mg_alloc_int($1);
 		$$ = make_node(INTEGER_LITERAL, value);
 	} | FLOAT_LITERAL {
-		mg_obj* value = make_mg_obj(INTEGER_LITERAL, $1);
+		mg_obj* value = mg_alloc_flt($1);
 		$$ = make_node(FLOAT_LITERAL, value); 
 	}
 
 
 id: IDENTIFIER {
-		mg_obj* value = make_mg_obj(STRING_LITERAL, $1);
-		$$ = make_node(IDENTIFIER, value); 
+		// retrieve value from stack/IDENTIFIER table and spit it out here?
 	}
 
 
