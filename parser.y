@@ -6,16 +6,15 @@
 
 	int yywrap();
 	int yylex();
-
+	struct node* make_node(int token, char* value);
+	// void attach(struct node* parent, struct node* child);
 	void yyerror(const char* str);
 	struct node * result;
 %}
 
 %union {
 	struct node * n;
-	int i_val;
-	double f_val;
-	char * str, * id;
+	char * val;
 }
 
 %token BRACE_OPEN      
@@ -74,10 +73,10 @@
 %token BIT_XOR         
 %token BIT_IMPLIES     
 
-%token<id> IDENTIFIER      
-%token<i_val> INTEGER_LITERAL
-%token<f_val> FLOAT_LITERAL 
-%token<str> STRING_LITERAL 
+%token<val> IDENTIFIER      
+%token<val> INTEGER_LITERAL
+%token<val> FLOAT_LITERAL 
+%token<val> STRING_LITERAL 
 
 %token STATEMENT 
 
