@@ -1,20 +1,28 @@
 #ifndef TREE_H
 #define TREE_H
 
-#include "mg_obj.h"
-#include <string>
+#ifdef __cplusplus
+extern "C" {
 
-#define MAX_CHILDREN 3
+	#include "mg_obj.h"
 
-typedef struct node {
-	int token;
-	mg_obj* value;
-	int num_children;
-	struct node* children[3];
-} node;
+	#define MAX_CHILDREN 3
 
-node* make_node(int token, mg_obj* value);
-void attach(node* parent, node* child);
-void print(node* root);
+	struct node {
+		int token;
+		mg_obj* value;
+		int num_children;
+		struct node* children[MAX_CHILDREN];
+	};
 
+	typedef struct node node;
+
+	node* make_node(int token, mg_obj* value);
+
+	void attach(node* parent, node* child);
+
+	void print(node* node, int tabs);
+};
+
+#endif
 #endif

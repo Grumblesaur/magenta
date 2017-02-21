@@ -1,2 +1,2 @@
 # very simple program
-print(1 + 1);
+int x = (1 + 1);

@@ -1,10 +1,16 @@
 %{
 	#include <stdio.h>
-	#include "tree.h"
 	#include "mg_obj.h"
+	#include "tree.h"
+
 	#define YYDEBUG 1
+
 	int yywrap();
 	int yylex();
+
+	typedef struct mg_obj mg_obj;
+	typedef struct node node;
+
 	void yyerror(const char* str);
 	node * result;
 %}
@@ -297,6 +303,7 @@ int main(int argc, char **argv) {
 
 	yyparse();
 
+	print(result, 0);
 	// int token;
 	// do {	
 	// 	token = yylex( );

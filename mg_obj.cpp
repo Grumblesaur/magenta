@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <iostream>
 #include "mg_obj.h"
 #include "tree.h"
 
@@ -65,8 +66,7 @@ mg_obj * mg_alloc_type(
 		delete m;
 		return NULL;
 	}
-	
-	
+
 	for (int i = 0; i < members_size; i++) {
 		// fields can be left uninitialized
 		// TODO: ensure that each unclarified member gets its default value
