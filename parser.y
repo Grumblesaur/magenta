@@ -85,188 +85,200 @@
 
 %%
 
-program: statements { result = make_node(STATEMENT, NULL);
-					attach(result, $1);
-					}
+program: statements {
+	result = make_node(STATEMENT, NULL);
+	attach(result, $1);
+}
 
 
-statements: statement statements { $$ = make_node(STATEMENT, NULL);
-									attach($$, $1);
-									attach($$, $2);
-									}
-	| statement { $$ = make_node(STATEMENT, NULL);
-					attach($$, $1);
-					}
+statements: statement statements {
+		$$ = make_node(STATEMENT, NULL);
+		attach($$, $1);
+		attach($$, $2);
+	} | statement {
+		$$ = make_node(STATEMENT, NULL);
+		attach($$, $1);
+	}
 
 
-statement: type id ASSIGN expression SEMICOLON { $$ = make_node(ASSIGN, NULL);
-												attach($$, $1);
-												attach($$, $2);
-												attach($$, $4);
-												}
-	| WHILE_LOOP expression statement { $$ = make_node(WHILE_LOOP, NULL)
-										attach($$, $2);
-										attach($$, $3);
-										}
-	| IF expression statement { $$ = make_node(IF_STMT, NULL);
-								attach($$, $2);
-								attach($$, $3);
-								}
-	| IF expression statement ELIF elif_statement { $$ = make_node(IF, NULL);
-													attach($$, $2);
-													attact($$, $3)
-													attach($$, $5);
-													}
-	| IF expression statement ELSE statement { $$ = make_node(IF, NULL);
-												attach($$, $2);
-												attach($$, $3);
-												attach($$, $5);
-												}
-	| BRACE_OPEN statements BRACE_CLOSE { $$ = make_node(STATEMENT, NULL);
-											attach($$, $2);
-											}
+statement: type id ASSIGN expression SEMICOLON {
+		$$ = make_node(ASSIGN, NULL);
+		attach($$, $1);
+		attach($$, $2);
+		attach($$, $4);
+	} | WHILE_LOOP expression statement {
+		$$ = make_node(WHILE_LOOP, NULL)
+		attach($$, $2);
+		attach($$, $3);
+	} | IF expression statement {
+		$$ = make_node(IF_STMT, NULL);
+		attach($$, $2);
+		attach($$, $3);
+	} | IF expression statement ELIF elif_statement {
+		$$ = make_node(IF, NULL);
+		attach($$, $2);
+		attact($$, $3)
+		attach($$, $5);
+	} | IF expression statement ELSE statement {
+		$$ = make_node(IF, NULL);
+		attach($$, $2);
+		attach($$, $3);
+		attach($$, $5);
+	} | BRACE_OPEN statements BRACE_CLOSE {
+		$$ = make_node(STATEMENT, NULL);
+		attach($$, $2);
+	}
 
 
-elif_statement: expression statement ELIF elif_statement { $$ = make_node(ELIF, NULL);
-														attach($$, $1);
-														attach($$, $2);
-														attach($$, $4);
-														}
-		| expression statement ELSE statement { $$ = make_node(ELIF, NULL);
-												attach($$, $1);
-												attach($$, $2);
-												attach($$, $4);
-												}
-		| expression statement { $$ = make_node(ELIF, NULL);
-								attach($$, $1);
-								attach($$, $2);
-								}
+elif_statement: expression statement ELIF elif_statement {
+		$$ = make_node(ELIF, NULL);
+		attach($$, $1);
+		attach($$, $2);
+		attach($$, $4);
+	} | expression statement ELSE statement {
+		$$ = make_node(ELIF, NULL);
+		attach($$, $1);
+		attach($$, $2);
+		attach($$, $4);
+	} | expression statement { $$ = make_node(ELIF, NULL);
+		attach($$, $1);
+		attach($$, $2);
+	}
 
 
-expression: expression LOG_OR disjunction { $$ = make_node(LOG_OR, NULL);
-											attach($$, $1);
-											attach($$, $3);
-											}
-	| expression LOG_XOR disjunction { $$ = make_node(LOG_XOR, NULL);
-										attach($$, $1);
-										attach($$, $3);
-										}
-	| disjunction { }
+expression: expression LOG_OR disjunction {
+		$$ = make_node(LOG_OR, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | expression LOG_XOR disjunction {
+		$$ = make_node(LOG_XOR, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | disjunction { }
 
 
-disjunction: disjunction LOG_AND conjunction { $$ = make_node(LOG_AND, NULL);
-												attach($$, $1);
-												attach($$, $3);
-												}
-		| conjunction { }
+disjunction: disjunction LOG_AND conjunction {
+		$$ = make_node(LOG_AND, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | conjunction { }
 
 
-conjunction: conjunction LESS_THAN relation { $$ = make_node(LESS_THAN, NULL);
-												attach($$, $1);
-												attach($$, $3);
-												}
-		| conjunction LESS_EQUAL relation { $$ = make_node(LESS_EQUAL, NULL);
-											attach($$, $1);
-											attach($$, $3);
-											}
-		| conjunction EQUAL relation { $$ = make_node(EQUAL, NULL);
-										attach($$, $1);
-										attach($$, $3);
-										}
-		| conjunction GREATER_THAN relation { $$ = make_node(GREATER_THAN, NULL);
-												attach($$, $1);
-												attach($$, $3);
-												}
-		| conjunction GREATER_EQUAL relation { $$ = make_node(GREATER_EQUAL, NULL);
-												attach($$, $1);
-												attach($$, $3);
-												}
-		| conjunction NOT_EQUAL relation { $$ = make_node(NOT_EQUAL, NULL);
-											attach($$, $1);
-											attach($$, $3);
-											}
-		| relation { }
+conjunction: conjunction LESS_THAN relation {
+		$$ = make_node(LESS_THAN, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | conjunction LESS_EQUAL relation {
+		$$ = make_node(LESS_EQUAL, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | conjunction EQUAL relation { $$ = make_node(EQUAL, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | conjunction GREATER_THAN relation {
+		$$ = make_node(GREATER_THAN, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | conjunction GREATER_EQUAL relation {
+		$$ = make_node(GREATER_EQUAL, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | conjunction NOT_EQUAL relation {
+		$$ = make_node(NOT_EQUAL, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | relation { }
 
 
-relation: relation PLUS addend { $$ = make_node(PLUS, NULL);
-								attach($$, $1);
-								attach($$, $3);
-								}
-		| relation MINUS addend { $$ = make_node(MINUS, NULL);
-									attach($$, $1);
-									attach($$, $3);
-									}
-		| addend { }
+relation: relation PLUS addend {
+		$$ = make_node(PLUS, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | relation MINUS addend {
+		$$ = make_node(MINUS, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | addend { }
 
 
-addend: addend TIMES factor { $$ = make_node(TIMES, NULL);
-								attach($$, $1);
-								attach($$, $3);
-								}
-		| addend DIVIDE factor { $$ = make_node(DIVIDE, NULL);
-								attach($$, $1);
-								attach($$, $3);
-								}
-		| addend MODULO factor { $$ = make_node(MODULO, NULL);
-								attach($$, $1);
-								attach($$, $3);
-								}
-		| factor { }
+addend: addend TIMES factor {
+		$$ = make_node(TIMES, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | addend DIVIDE factor {
+		$$ = make_node(DIVIDE, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | addend MODULO factor {
+		$$ = make_node(MODULO, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | factor { }
 
 
-factor: factor POWER exponent { $$ = make_node(POWER, NULL);
-								attach($$, $1);
-								attach($$, $3);
-								}
-		| factor LOG exponent { $$ = make_node(LOG, NULL);
-								attach($$, $1);
-								attach($$, $3);
-								}
-		| exponent { }
+factor: factor POWER exponent {
+		$$ = make_node(POWER, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | factor LOG exponent {
+		$$ = make_node(LOG, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | exponent { }
 
 
-exponent: LOG_NOT exponent { $$ = make_node(LOG_NOT, NULL);
-							attach($$, $2);
-							}
-		| MINUS exponent { $$ = make_node(MINUS, NULL);
-							attach($$, $2);
-							}
-		| term { }
+exponent: LOG_NOT exponent {
+		$$ = make_node(LOG_NOT, NULL);
+		attach($$, $2);
+	} | MINUS exponent {
+		$$ = make_node(MINUS, NULL);
+		attach($$, $2);
+	} | term { }
 
 
-term: PAREN_OPEN expression PAREN_CLOSE { $$ = make_node(PAREN_OPEN, NULL);
-											attach($$, $2);
-											}
-	| STRING_LITERAL { mg_obj* vlaue = make_mg_obj(STRING_LITERAL, $1);
-						$$ = make_node(STRING_LITERAL, NULL, $1);
-						}
-	| id { }
-	| num { }
+term: PAREN_OPEN expression PAREN_CLOSE {
+		$$ = make_node(PAREN_OPEN, NULL);
+		attach($$, $2);
+	} | STRING_LITERAL {
+		mg_obj* value = make_mg_obj(STRING_LITERAL, $1);
+		$$ = make_node(STRING_LITERAL, NULL, $1);
+	} | id {
+	} | num { }
 		
 
-num: INT_LITERAL { mg_obj* value = make_mg_obj(INT_LITERAL, $1);
-					$$ = make_node(INT_LITERAL, value);
-					}
-	| FLOAT_LITERAL { mg_obj* value = make_mg_obj(INT_LITERAL, $1);
-						$$ = make_node(FLOAT_LITERAL, NULL, $1); 
-						}
+num: INT_LITERAL {
+		mg_obj* value = make_mg_obj(INT_LITERAL, $1);
+		$$ = make_node(INT_LITERAL, value);
+	} | FLOAT_LITERAL {
+		mg_obj* value = make_mg_obj(INT_LITERAL, $1);
+		$$ = make_node(FLOAT_LITERAL, NULL, $1); 
+	}
 
 
-id: IDENTIFIER { mg_obj* value = make_mg_obj(STRING_LITERAL, $1);
-				$$ = make_node(IDENTIFIER, , value); 
-				}
+id: IDENTIFIER {
+		mg_obj* value = make_mg_obj(STRING_LITERAL, $1);
+		$$ = make_node(IDENTIFIER, , value); 
+	}
 
 
-return_type: TYPE_VOID { $$ = make_node(TYPE_VOID, NULL); }
-			| type { }
+return_type: TYPE_VOID {
+		$$ = make_node(TYPE_VOID, NULL);
+	} | type { }
 
 
-type: TYPE_INTEGER { $$ = make_node(TYPE_INTEGER, NULL); }
-	| TYPE_FLOAT { $$ = make_node(TYPE_FLOAT, NULL); }
-	| TYPE_STRING { $$ = make_node(TYPE_STRING, NULL); }
-	| TYPE_FUNCTION { $$ = make_node(TYPE_FUNCTION, NULL); }
-	| TYPE_METHOD { $$ = make_node(TYPE_METHOD, NULL); }
-	| TYPE_TYPE { $$ make_node(TYPE_TYPE, NULL); }
+type: TYPE_INTEGER {
+		$$ = make_node(TYPE_INTEGER, NULL);
+	} | TYPE_FLOAT {
+		$$ = make_node(TYPE_FLOAT, NULL);
+	} | TYPE_STRING {
+		$$ = make_node(TYPE_STRING, NULL);
+	} | TYPE_FUNCTION {
+		$$ = make_node(TYPE_FUNCTION, NULL);
+	} | TYPE_METHOD {
+		$$ = make_node(TYPE_METHOD, NULL);
+	} | TYPE_TYPE {
+		$$ make_node(TYPE_TYPE, NULL);
+	}
 
 %%
 
