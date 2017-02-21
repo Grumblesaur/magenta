@@ -1,8 +1,7 @@
 %{
 	#include <stdio.h>
-	#include "mg_obj.h"
 	#include "tree.h"
-
+	#include "mg_obj.h"
 	#define YYDEBUG 1
 
 	int yywrap();
