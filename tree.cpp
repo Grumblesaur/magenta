@@ -25,12 +25,12 @@ void print(node* node, int tabs) {
 
 	/* print leading tabs */
 	for(int i = 0; i < tabs; i++) {
-		cout << "    ";
+		std::cout << "    ";
  	}
 	
 	switch (node->token) {
 		// unholy
-		using std::cout, std::endl;
+		using std::cout; using std::endl;
 		case BRACE_OPEN: cout << "BRACE_OPEN" << endl; break;
 		case BRACE_CLOSE: cout << "BRACE_CLOSE" << endl; break;
 		case ASSIGN: cout << "ASSIGN" << endl; break;
@@ -43,7 +43,7 @@ void print(node* node, int tabs) {
 		case TYPE_STRING: cout << "STRING" << endl; break;
 		case TYPE_FLOAT: cout << "FLOAT" << endl; break;
 		case TYPE_TYPE: cout << "USER TYPE" << endl; break;
-		case TYPE_VOID: cout << "VOID" << endl; break
+		case TYPE_VOID: cout << "VOID" << endl; break;
 		case OPTION: cout << "OPTION" << endl; break;
 		case CASE: cout << "CASE" << endl; break;
 		case IF: cout << "IF" << endl; break;
@@ -87,8 +87,8 @@ void print(node* node, int tabs) {
 		case BIT_XOR: cout << "BIT_XOR" << endl; break;
 		case BIT_IMPLIES: cout << "BIT_IMPLIES" << endl; break;
 		
-		case IDENTIFIER: cout << "IDENTIFIER: " << node->id << endl; break;
-		case INT_LITERAL:
+		case IDENTIFIER: cout << "IDENTIFIER: " << node->value << endl; break;
+		case INTEGER_LITERAL:
 		case FLOAT_LITERAL:
 		case STRING_LITERAL:
 			cout << node->value << endl;
