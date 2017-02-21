@@ -1,5 +1,6 @@
 // Write code for creating and destroying mg_objects
 #include <string>
+#include <map>
 #include "mg_obj.h"
 #include "tree.h"
 
@@ -35,9 +36,14 @@ mg_obj * make_mg_obj(obj_type o, void * value) {
 			break;
 		
 		case TYPE:
-			//TODO
+			// Objects of user-defined types map their field names to
+			// other magenta objects, which allows for nested data types.
+			m->type = TYPE;
+			m->value = new std::map<std::string, mg_obj>;
 			break;
-
+		
+		default:
+			std::cout << "invalid data type" << std::endl;
 	}
 	return m;
 }
