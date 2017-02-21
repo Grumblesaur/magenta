@@ -5,8 +5,12 @@
 #include "mg_obj.h"
 #include "tree.h"
 
-mg_obj * mg_alloc(obj_type o, void * value, std::string name_of_type) {
-	mg_obj * m = new mg_obj;
+struct mg_obj * mg_alloc(
+	obj_type o,
+	void * value,
+	std::string name_of_type
+) {
+	struct mg_obj * m = new struct mg_obj;
 	switch (o) {
 		case FUNC:
 			break;
@@ -35,12 +39,12 @@ mg_obj * mg_alloc(obj_type o, void * value, std::string name_of_type) {
 // Allocate memory for a user-defined type instance using the name of the
 // type, the names of each member of an instance of this type, and the
 // values corresponding to each member.
-mg_format * mg_alloc_type(
+struct mg_format * mg_alloc_type(
 	std::string name_of_type,
 	std::string members[],
 	mg_obj values[]
 ) {
-	mg_format * m = new mg_format;
+	struct mg_format * m = new struct mg_format;
 	m->name_of_type = name_of_type;
 
 	size_t members_size = sizeof(members) / sizeof(members[0]);
