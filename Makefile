@@ -7,12 +7,6 @@ lex.yy.o: lex.yy.c parser.tab.h
 lex.yy.c: lexer.l parser.tab.h
 	flex lexer.l
 
-parser.tab.o: parser.tab.c tree.h mg_obj.h
-	gcc -c parser.tab.c
-
-mg_obj.o: mg_obj.h mg_obj.cpp tree.h
-	g++ -c mg_obj.cpp
-
 tree.o: tree.h tree.cpp mg_obj.h parser.tab.h
 	g++ -c tree.cpp
 
