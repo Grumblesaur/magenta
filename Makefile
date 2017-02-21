@@ -10,10 +10,10 @@ lex.yy.c: lexer.l parser.tab.h
 parser.tab.h: parser.tab.c
 parser.tab.c: parser.y tree.h mg_obj.h
 	bison -d parser.y
-parser.tab.o: parser.tab.c tree.h
+parser.tab.o: parser.tab.c tree.h mg_obj.h
 	g++ -c parser.tab.c
 
-tree.o: tree.cpp tree.h
+tree.o: tree.cpp tree.h parser.tab.h
 	g++ -c tree.cpp
 
 mg_obj.o: mg_obj.cpp mg_obj.h

@@ -15,7 +15,7 @@ typedef int obj_type;
 
 #ifdef __cplusplus
 extern "C" {
-
+	
 	struct mg_obj {
 		void * value;
 		obj_type type;
@@ -28,6 +28,7 @@ extern "C" {
 
 	struct mg_obj * mg_alloc(obj_type, void *, std::string);
 	struct mg_format * mg_alloc_type(std::string, struct mg_format);
+
 };
 #endif
 
