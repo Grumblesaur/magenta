@@ -247,23 +247,24 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 		$$ = make_node(PAREN_OPEN, NULL);
 		attach($$, $2);
 	} | STRING_LITERAL {
-		mg_obj* value = mg_alloc_str($1);
+		mg_obj* value = mg_alloc(&$1);
 		$$ = make_node(STRING_LITERAL, value);
 	} | id {
 	} | num { }
 		
 
 num: INTEGER_LITERAL {
-		mg_obj* value = mg_alloc_int($1);
+		mg_obj* value = mg_alloc(INT, &$1, "");
 		$$ = make_node(INTEGER_LITERAL, value);
 	} | FLOAT_LITERAL {
-		mg_obj* value = mg_alloc_flt($1);
+		mg_obj* value = mg_alloc(FLT, &$1, "");
 		$$ = make_node(FLOAT_LITERAL, value); 
 	}
 
 
 id: IDENTIFIER {
-		// retrieve value from stack/IDENTIFIER table and spit it out here?
+		mg_obj* value = mg_alloc(STR, &$1, "");
+		$$ = make_node(IDENTIFIER, value);
 	}
 
 
