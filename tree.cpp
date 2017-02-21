@@ -2,8 +2,7 @@
 #include "tree.h"
 #include "parser.tab.h"
 
-struct node* make_node(int token, struct mg_obj* value) {
-
+struct node* make_node(int token, char* value) {
 	struct node* n = new struct node;
 	n->token = token;
 	n->value = value;

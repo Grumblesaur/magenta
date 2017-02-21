@@ -4,7 +4,6 @@
 #include <map>
 #include <string>
 #include "tree.h"
-	
 #define FUNC 1000
 #define METH 1001
 #define INT  1002
@@ -26,6 +25,5 @@ struct mg_format {
 
 struct mg_obj * mg_alloc(obj_type, void *, std::string);
 struct mg_format * mg_alloc_type(std::string, struct mg_format);
-
 
 #endif
