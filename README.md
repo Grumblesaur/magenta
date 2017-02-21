@@ -66,21 +66,21 @@ https://trello.com/b/LEAOTeYg/magenta
   
 # num
 ```
-    ()   grouping,
-    **  exponentiation,
-    //   natural log,
-    *   multiplication,
-    /    division,
-    %    modulo,
-    \+   addition,
-    -   subtraction
+    ()    grouping,
+    **    exponentiation,
+    //    natural log,
+    *     multiplication,
+    /     division,
+    %     modulo,
+    +     addition,
+    -     subtraction
     
-    >   greater than
-    <   less than
-    ==  equal
-    !=  not equal
-    >=  greater equal
-    <=  less equal
+    >     greater than
+    <     less than
+    ==    equal
+    !=    not equal
+    >=    greater equal
+    <=    less equal
 ```
  
 ## bool
@@ -94,11 +94,11 @@ https://trello.com/b/LEAOTeYg/magenta
 
 ## bitwise (given Latin names for their obscurity and few use cases)
 ```
-    et   bitwise and
-    aut  bitwise or
-    non  bitwise not
-    xaut bitwise xor
-    imp  bitwise then (I know, weird, right?)
+    et    bitwise and
+    aut   bitwise or
+    non   bitwise not
+    xaut  bitwise xor
+    imp   bitwise then (I know, weird, right?)
 ```
 
 # str
