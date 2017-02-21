@@ -1,12 +1,12 @@
 #ifndef TREE_H
 #define TREE_H
 
-#include "mg_obj.h"
-
-#define MAX_CHILDREN 3
-
 #ifdef __cplusplus
 extern "C" {
+
+	#define MAX_CHILDREN 3
+	
+	#include "mg_obj.h"
 
 	struct node {
 		int token;
