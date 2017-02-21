@@ -1,6 +1,5 @@
 %{
 	#include <stdio.h>
-	#include "mg_obj.h"
 	#include "tree.h"
 
 	#define YYDEBUG 1
@@ -245,24 +244,20 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 		$$ = make_node(PAREN_OPEN, NULL);
 		attach($$, $2);
 	} | STRING_LITERAL {
-		struct mg_obj* value = mg_alloc(STR, $1, "");
-		$$ = make_node(STRING_LITERAL, value);
+		$$ = make_node(STRING_LITERAL, $1);
 	} | id {
 	} | num { }
 		
 
 num: INTEGER_LITERAL {
-		struct mg_obj* value = mg_alloc(INT, $1, "");
-		$$ = make_node(INTEGER_LITERAL, value);
+		$$ = make_node(INTEGER_LITERAL, $1);
 	} | FLOAT_LITERAL {
-		struct mg_obj* value = mg_alloc(FLT, $1, "");
-		$$ = make_node(FLOAT_LITERAL, value); 
+		$$ = make_node(FLOAT_LITERAL, $1); 
 	}
 
 
 id: IDENTIFIER {
-		struct mg_obj* value = mg_alloc(STR, $1, "");
-		$$ = make_node(IDENTIFIER, value);
+		$$ = make_node(IDENTIFIER, $1);
 	}
 
 

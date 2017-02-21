@@ -6,17 +6,15 @@ extern "C" {
 
 	#define MAX_CHILDREN 3
 	
-	#include "mg_obj.h"
-
 	struct node {
 		int token;
-		struct mg_obj* value;
+		char* value;
 		int num_children;
 		struct node* children[MAX_CHILDREN];
 	};
 
 
-	struct node* make_node(int token, struct mg_obj* value);
+	struct node* make_node(int token, char* value);
 
 	void attach(struct node* parent, struct node* child);
 
