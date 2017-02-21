@@ -20,17 +20,17 @@ struct mg_obj * mg_alloc(
 		
 		case INT:
 			m->type = INT;
-			m->value = new int(*value);
+			m->value = new int(*(int*)value);
 			break;
 		
 		case FLT:
 			m->type = FLT;
-			m->value = new double(*value);
+			m->value = new double(*(double*)value);
 			break;
 		
 		case STR:
 			m->type = STR;
-			m->value = new std::string(*value);
+			m->value = new std::string(*(std::string*)value);
 			break;
 	}
 	return m;
@@ -42,7 +42,7 @@ struct mg_obj * mg_alloc(
 struct mg_format * mg_alloc_type(
 	std::string name_of_type,
 	std::string members[],
-	mg_obj values[]
+	struct mg_obj values[]
 ) {
 	struct mg_format * m = new struct mg_format;
 	m->name_of_type = name_of_type;
@@ -59,14 +59,16 @@ struct mg_format * mg_alloc_type(
 		delete m;
 		return NULL;
 	}
-
+	struct mg_obj * x;
 	for (int i = 0; i < members_size; i++) {
 		// fields can be left uninitialized
 		// TODO: ensure that each unclarified member gets its default value
 		if (i >= values_size) {
 			m->data[members[i]] = NULL;
 		} else {
-			m->data[members[i]] = values[i];
+			x = new mg_obj;
+			*x = values[i];
+			m->data[members[i]] = x;
 		}
 	}
 	return m;

@@ -105,7 +105,8 @@ https://trello.com/b/LEAOTeYg/magenta
 ```
      +    concatenation,
      *    string multiplication,
-    []    character access (substring of length 1 at a given character index)
+    []    character access (substring of length 1 at a character index)
+           (slice operations to come later?)
 ```
 
 # Compounds
