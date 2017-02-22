@@ -13,6 +13,8 @@
 %union {
 	struct node * n;
 	char* str;
+	int ival;
+	double fval;
 }
 
 %token BRACE_OPEN      
