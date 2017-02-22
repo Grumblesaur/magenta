@@ -105,6 +105,7 @@ statements: statement statements {
 		$$ = make_node(STATEMENT, NULL);
 		attach($$, $1);
 	}
+	
 
 statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		$$ = make_node(ASSIGN, NULL);
