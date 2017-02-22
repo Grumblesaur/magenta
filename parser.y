@@ -13,6 +13,8 @@
 %union {
 	struct node * n;
 	char* str;
+	int ival;
+	double fval;
 }
 
 %token BRACE_OPEN      
@@ -32,7 +34,6 @@
 %token OPTION    
 %token CASE       
 %precedence IF         
-%precedence ELIF      
 %precedence ELSE       
 %token FOR_LOOP        
 %token WHILE_LOOP
