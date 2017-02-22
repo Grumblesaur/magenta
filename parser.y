@@ -37,7 +37,10 @@
 %token ELIF      
 %token ELSE       
 %token FOR_LOOP        
-%token WHILE_LOOP      
+%token WHILE_LOOP
+%token IN
+%token BREAK
+%token NEXT
 
 %token ACCESS          
 %token BRACKET_OPEN    
@@ -168,6 +171,12 @@ expression: expression LOG_OR disjunction {
 		attach($$, $1);
 		attach($$, $3);
 	} | disjunction { }
+
+function_call: IDENTIFIER PAREN_OPEN arguments PAREN_CLOSE {
+		$$ = make_node(IDENTIFIER, NULL);
+		attach($$, $1);
+		attach($$, $3); // more below to come
+	}
 
 
 disjunction: disjunction LOG_AND conjunction {

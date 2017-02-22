@@ -30,13 +30,14 @@
 
 "option"   {return OPTION;        }
 "case"     {return CASE;          }
-
 "if"       {return IF;       	  }
 "elif"     {return ELIF;     	  }
 "else"     {return ELSE;     	  }
-
 "for"      {return FOR_LOOP;      }
 "while"    {return WHILE_LOOP;    }
+"in"       {return IN;            }
+"break"    {return BREAK;         }
+"next"     {return NEXT;          }
 
 "@"        {return ACCESS;        }
 "["        {return BRACKET_OPEN;  }
