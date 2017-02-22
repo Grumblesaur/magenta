@@ -27,9 +27,53 @@ void eval_stmt(struct node* node) {
 }
 
 
-double eval_expr(struct node* node) {
+mg_obj eval_expr(struct node* node) {
 
 	switch (node->token) {
 
+		case IDENTIFIER:
+			break;
+		case INTEGER_LITERAL:
+			break;
+		case FLOAT_LITERAL:
+			break;
+		case STRING_LITERAL:
+			break;
+		case PAREN_OPEN:
+			break;
+		case LOG_NOT:
+			break;
+		case LOG_OR:
+			break;
+		case LOG_XOR:
+			break;
+		case LOG_AND:
+			break;
+		case LESS_THAN:
+			break;
+		case LESS_EQUAL:
+			break;
+		case EQUAL:
+			break;
+		case NOT_EQUAL:
+			break;
+		case GREATER_THAN:
+			break;
+		case GREATER_EQUAL:
+			break;
+		case TIMES:
+			break;
+		case DIVIDE:
+			break;
+		case MODULO:
+			break;
+		case PLUS:
+			break;
+		case MINUS:
+			break;
+		case POWER:
+			break;
+		case LOG:
+			break;
 	}
 }

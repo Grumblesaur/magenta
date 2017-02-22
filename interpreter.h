@@ -2,10 +2,11 @@
 #define INTERP_H
 
 #include "tree.h"
+#include "mg_obj.h"
 
 #ifdef __cplusplus
 extern "C" {
-	double eval_expr(struct node* node);
+	mg_obj eval_expr(struct node* node);
 	void eval_stmt(struct node* node);
 	void printVars();
 };
