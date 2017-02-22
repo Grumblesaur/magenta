@@ -103,5 +103,9 @@ void print(struct node* node, int tabs) {
 		default:
 			cout << "Invalid token: " << node->token << endl; break;
 	}
+
+	for(int i = 0; i < node->num_children; i++) {
+    	print(node->children[i], tabs + 1);
+  	}
 	
 }

@@ -7,7 +7,8 @@
 	int yywrap();
 	int yylex();
 	struct node* make_node(int token, char* value);
-	// void attach(struct node* parent, struct node* child);
+	void attach(struct node* parent, struct node* child);
+	void print(struct node* node, int tabs);
 	void yyerror(const char* str);
 	struct node * result;
 %}
@@ -114,8 +115,8 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		attach($$, $4);
 	} | id ASSIGN expression SEMICOLON { // re-assign a var w/value
 		$$ = make_node(ASSIGN, NULL);
-		attach($$, $2);
-		attach($$, $4);
+		attach($$, $1);
+		attach($$, $3);
 	} | type id SEMICOLON { // variable declared but not assigned a value
 		$$ = make_node(ASSIGN, NULL);
 		attach($$, $1);
@@ -143,6 +144,9 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 	} | BRACE_OPEN statements BRACE_CLOSE {
 		$$ = make_node(STATEMENT, NULL);
 		attach($$, $2);
+	} | expression SEMICOLON {
+		$$ = make_node(STATEMENT, NULL);
+		attach($$, $1);
 	}
 
 
@@ -173,11 +177,6 @@ expression: expression LOG_OR disjunction {
 		attach($$, $3);
 	} | disjunction { }
 
-function_call: IDENTIFIER PAREN_OPEN arguments PAREN_CLOSE {
-		$$ = make_node(IDENTIFIER, NULL);
-		attach($$, $1);
-		attach($$, $3); // more below to come
-	}
 
 
 disjunction: disjunction LOG_AND conjunction {
@@ -314,6 +313,7 @@ int main(int argc, char **argv) {
 
 	FILE* orig_stdin = stdin;
 	stdin = fopen(argv[1], "r");
+
 
 	yyparse();
 
