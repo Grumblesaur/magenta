@@ -241,10 +241,9 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 		
 
 num: INTEGER_LITERAL {
-		// printf("%s\n", $1);
-		$$ = make_node(INTEGER_LITERAL, $1);
+		$$ = make_node(INTEGER_LITERAL, &$1);
 	} | FLOAT_LITERAL {
-		$$ = make_node(FLOAT_LITERAL, $1); 
+		$$ = make_node(FLOAT_LITERAL, &$1); 
 	}
 
 
