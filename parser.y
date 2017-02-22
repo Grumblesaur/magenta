@@ -34,9 +34,9 @@
 %token TYPE_VOID
 %token OPTION    
 %token CASE       
-%token IF         
-%token ELIF      
-%token ELSE       
+%precedence IF         
+%precedence ELIF      
+%precedence ELSE       
 %token FOR_LOOP        
 %token WHILE_LOOP
 %token IN
