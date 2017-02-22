@@ -84,7 +84,9 @@
 
 %token STATEMENT 
 
-%type<n> program statements statement elif_statement expression disjunction conjunction relation addend factor exponent term num id return_type type
+%type<n> program statements statement elif_statement expression disjunction
+%type<n> conjunction relation addend factor exponent term num id
+%type<n> return_type type function_call
 
 %error-verbose
 
@@ -104,7 +106,6 @@ statements: statement statements {
 		$$ = make_node(STATEMENT, NULL);
 		attach($$, $1);
 	}
-
 
 statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		$$ = make_node(ASSIGN, NULL);
