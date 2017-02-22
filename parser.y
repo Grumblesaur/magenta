@@ -114,8 +114,8 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		attach($$, $4);
 	} | id ASSIGN expression SEMICOLON { // re-assign a var w/value
 		$$ = make_node(ASSIGN, NULL);
-		attach($$, $2);
-		attach($$, $4);
+		attach($$, $1);
+		attach($$, $3);
 	} | type id SEMICOLON { // variable declared but not assigned a value
 		$$ = make_node(ASSIGN, NULL);
 		attach($$, $1);
@@ -176,11 +176,6 @@ expression: expression LOG_OR disjunction {
 		attach($$, $3);
 	} | disjunction { }
 
-function_call: IDENTIFIER PAREN_OPEN arguments PAREN_CLOSE {
-		$$ = make_node(IDENTIFIER, NULL);
-		attach($$, $1);
-		attach($$, $3); // more below to come
-	}
 
 
 disjunction: disjunction LOG_AND conjunction {
