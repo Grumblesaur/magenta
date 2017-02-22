@@ -2,13 +2,13 @@ magenta: lex.yy.o parser.tab.o tree.o mg_obj.o
 	g++ lex.yy.o parser.tab.o tree.o mg_obj.o -o magenta
 
 lex.yy.o: lex.yy.c parser.tab.h
-	gcc -c lex.yy.c
+	g++ -c lex.yy.c
 
 lex.yy.c: lexer.l parser.tab.h
 	flex lexer.l
 
 parser.tab.o: parser.tab.c tree.h
-	gcc -c parser.tab.c
+	g++ -c parser.tab.c
 
 mg_obj.o: mg_obj.h mg_obj.cpp tree.h
 	g++ -c mg_obj.cpp

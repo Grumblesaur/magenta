@@ -7,7 +7,8 @@
 	int yywrap();
 	int yylex();
 	struct node* make_node(int token, char* value);
-	// void attach(struct node* parent, struct node* child);
+	void attach(struct node* parent, struct node* child);
+	void print(struct node* node, int tabs);
 	void yyerror(const char* str);
 	struct node * result;
 %}
@@ -128,6 +129,9 @@ statement: type id ASSIGN expression SEMICOLON {
 	} | BRACE_OPEN statements BRACE_CLOSE {
 		$$ = make_node(STATEMENT, NULL);
 		attach($$, $2);
+	} | expression SEMICOLON {
+		$$ = make_node(STATEMENT, NULL);
+		attach($$, $1);
 	}
 
 
@@ -293,6 +297,7 @@ int main(int argc, char **argv) {
 
 	FILE* orig_stdin = stdin;
 	stdin = fopen(argv[1], "r");
+
 
 	yyparse();
 
