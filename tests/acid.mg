@@ -1,6 +1,6 @@
 #tests operator precedence with a bunch of float operations
 
-float eal_87_varNAME = 2.0 * (12.0 - 6.0) + 4.5;
+float real_87_varNAME = 2.0 * (12.0 - 6.0) + 4.5;
 float X2222 = (real_87_varNAME - 1/2) / 4.0;
 
 if 3 < 4 and 5 != 6 {
@@ -24,7 +24,7 @@ while i > 0 {
   i = i - 7;
 }
 
-if !!!(i != 0) {
+if not not not(i != 0) {
 	NUM = NUM + 2;
 }
 	
