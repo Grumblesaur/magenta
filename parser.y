@@ -103,11 +103,21 @@ statements: statement statements {
 	}
 
 
-statement: type id ASSIGN expression SEMICOLON {
+statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		$$ = make_node(ASSIGN, NULL);
 		attach($$, $1);
 		attach($$, $2);
 		attach($$, $4);
+	} | id ASSIGN expression SEMICOLON { // re-assign a var w/value
+		$$ = make_node(ASSIGN, NULL);
+		attach($$, $2);
+		attach($$, $4);
+	} | type id SEMICOLON { // variable declared but not assigned a value
+		$$ = make_node(ASSIGN, NULL);
+		attach($$, $1);
+		attach($$, $2);
+		// attach a default value here?
+		
 	} | WHILE_LOOP expression statement {
 		$$ = make_node(WHILE_LOOP, NULL);
 		attach($$, $2);
