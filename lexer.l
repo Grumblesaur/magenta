@@ -79,12 +79,12 @@
 }
 
 0|[1-9]+[0-9]* {
-	yylval.str = atoi(yytext);
+	yylval.ival = atoi(yytext);
 	return INTEGER_LITERAL;
 }
 
 [0-9]*\.[0-9]+ {
-	yylval.str = atof(yytext);
+	yylval.fval = atof(yytext);
 	return FLOAT_LITERAL;
 }
 
