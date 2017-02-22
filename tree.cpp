@@ -35,6 +35,7 @@ void print(struct node* node, int tabs) {
 		case ASSIGN: cout << "ASSIGN" << endl; break;
 		case COLON: cout << "COLON" << endl; break;
 		case SEMICOLON: cout << "SEMICOLON" << endl; break;
+		case COMMA: cout << "COMMA" << endl; break;
 		
 		case TYPE_FUNCTION: cout << "FUNCTION" << endl; break;
 		case TYPE_METHOD: cout << "METHOD" << endl; break;
@@ -50,6 +51,9 @@ void print(struct node* node, int tabs) {
 		case ELSE: cout << "ELSE" << endl; break;
 		case FOR_LOOP: cout << "FOR" << endl; break;
 		case WHILE_LOOP: cout << "WHILE" << endl; break;
+		case IN: cout << "IN" << endl; break;
+		case BREAK: cout << "BREAK" << endl; break;
+		case NEXT: cout << "NEXT" << endl; break;
 		
 		case ACCESS: cout << "ACCESS" << endl; break;
 		case BRACKET_OPEN: cout << "BRACKET_OPEN" << endl; break;
