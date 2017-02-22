@@ -7,7 +7,11 @@
 struct node* make_node(int token, char* value) {
 	struct node* n = new struct node;
 	n->token = token;
-	strcpy(n->value, value);
+
+	if (value != NULL) {
+		strcpy(n->value, value);
+	}
+
 	n->num_children = 0;
 	for (int i = 0; i <= MAX_CHILDREN; i++) {
 		n->children[i] = NULL;
@@ -16,7 +20,6 @@ struct node* make_node(int token, char* value) {
 }
 
 void attach(struct node* parent, struct node* child) {
-
 	parent->children[parent->num_children] = child;
 	parent->num_children++;
 }

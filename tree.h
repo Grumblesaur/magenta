@@ -5,10 +5,11 @@
 extern "C" {
 
 	#define MAX_CHILDREN 3
+	#define MAX_ID_LEN 64
 	
 	struct node {
 		int token;
-		char* value;
+		char value[MAX_ID_LEN];
 		int num_children;
 		struct node* children[MAX_CHILDREN];
 	};

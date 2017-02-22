@@ -1,21 +1,18 @@
 %{
 	#include <stdio.h>
 	#include "tree.h"
-	#include "mg_obj.h"
 	#define YYDEBUG 1
 
 	int yywrap();
 	int yylex();
-	struct node* make_node(int token, char* value);
-	void attach(struct node* parent, struct node* child);
-	void print(struct node* node, int tabs);
+
 	void yyerror(const char* str);
 	struct node * result;
 %}
 
 %union {
 	struct node * n;
-	char * val;
+	char* str;
 }
 
 %token BRACE_OPEN      
@@ -78,10 +75,10 @@
 %token BIT_XOR         
 %token BIT_IMPLIES     
 
-%token<val> IDENTIFIER      
-%token<val> INTEGER_LITERAL
-%token<val> FLOAT_LITERAL 
-%token<val> STRING_LITERAL 
+%token<str> IDENTIFIER      
+%token<str> INTEGER_LITERAL
+%token<str> FLOAT_LITERAL 
+%token<str> STRING_LITERAL 
 
 %token STATEMENT 
 
@@ -122,7 +119,6 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		attach($$, $1);
 		attach($$, $2);
 		// attach a default value here?
-		
 	} | WHILE_LOOP expression statement {
 		$$ = make_node(WHILE_LOOP, NULL);
 		attach($$, $2);
@@ -131,11 +127,6 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		$$ = make_node(IF, NULL);
 		attach($$, $2);
 		attach($$, $3);
-	} | IF expression statement ELIF elif_statement {
-		$$ = make_node(IF, NULL);
-		attach($$, $2);
-		attach($$, $3);
-		attach($$, $5);
 	} | IF expression statement ELSE statement {
 		$$ = make_node(IF, NULL);
 		attach($$, $2);
@@ -147,23 +138,6 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 	} | expression SEMICOLON {
 		$$ = make_node(STATEMENT, NULL);
 		attach($$, $1);
-	}
-
-
-elif_statement: expression statement ELIF elif_statement {
-		$$ = make_node(ELIF, NULL);
-		attach($$, $1);
-		attach($$, $2);
-		attach($$, $4);
-	} | expression statement ELSE statement {
-		$$ = make_node(ELIF, NULL);
-		attach($$, $1);
-		attach($$, $2);
-		attach($$, $4);
-	} | expression statement {
-		$$ = make_node(ELIF, NULL);
-		attach($$, $1);
-		attach($$, $2);
 	}
 
 
@@ -253,9 +227,6 @@ factor: factor POWER exponent {
 exponent: LOG_NOT exponent {
 		$$ = make_node(LOG_NOT, NULL);
 		attach($$, $2);
-	} | MINUS exponent {
-		$$ = make_node(MINUS, NULL);
-		attach($$, $2);
 	} | term { }
 
 
@@ -269,6 +240,7 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 		
 
 num: INTEGER_LITERAL {
+		// printf("%s\n", $1);
 		$$ = make_node(INTEGER_LITERAL, $1);
 	} | FLOAT_LITERAL {
 		$$ = make_node(FLOAT_LITERAL, $1); 

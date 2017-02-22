@@ -31,7 +31,6 @@
 "option"   {return OPTION;        }
 "case"     {return CASE;          }
 "if"       {return IF;       	  }
-"elif"     {return ELIF;     	  }
 "else"     {return ELSE;     	  }
 "for"      {return FOR_LOOP;      }
 "while"    {return WHILE_LOOP;    }
@@ -75,18 +74,24 @@
 "imp"      {return BIT_IMPLIES;   }
 
 [a-zA-Z_]+[0-9a-zA-Z_]* {
+	yylval.str = yytext;
 	return IDENTIFIER;
 }
 
 0|[1-9]+[0-9]* {
+	yylval.str = yytext;
 	return INTEGER_LITERAL;
 }
 
 [0-9]*\.[0-9]+ {
+	yylval.str = yytext;
 	return FLOAT_LITERAL;
 }
 
-\".*\"     {return STRING_LITERAL;}
+\".*\"     {
+	yylval.str = yytext;
+	return STRING_LITERAL;
+	}
 
 "#".*      {/* comment */         }
 [ \t\n]+   {/* whitespace */      }
