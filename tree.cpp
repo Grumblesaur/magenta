@@ -1,11 +1,13 @@
 #include <iostream>
+#include <cstring>
+#include <cstdlib>
 #include "tree.h"
 #include "parser.tab.h"
 
 struct node* make_node(int token, char* value) {
 	struct node* n = new struct node;
 	n->token = token;
-	n->value = value;
+	strcpy(n->value, value);
 	n->num_children = 0;
 	for (int i = 0; i <= MAX_CHILDREN; i++) {
 		n->children[i] = NULL;
@@ -37,13 +39,13 @@ void print(struct node* node, int tabs) {
 		case SEMICOLON: cout << "SEMICOLON" << endl; break;
 		case COMMA: cout << "COMMA" << endl; break;
 		
-		case TYPE_FUNCTION: cout << "FUNCTION" << endl; break;
-		case TYPE_METHOD: cout << "METHOD" << endl; break;
-		case TYPE_INTEGER: cout << "INTEGER" << endl; break;
-		case TYPE_STRING: cout << "STRING" << endl; break;
-		case TYPE_FLOAT: cout << "FLOAT" << endl; break;
+		case TYPE_FUNCTION: cout << "TYPE_FUNCTION" << endl; break;
+		case TYPE_METHOD: cout << "TYPE_METHOD" << endl; break;
+		case TYPE_INTEGER: cout << "TYPE_INTEGER" << endl; break;
+		case TYPE_STRING: cout << "TYPE_STRING" << endl; break;
+		case TYPE_FLOAT: cout << "TYPE_FLOAT" << endl; break;
 		case TYPE_TYPE: cout << "USER TYPE" << endl; break;
-		case TYPE_VOID: cout << "VOID" << endl; break;
+		case TYPE_VOID: cout << "TYPE_VOID" << endl; break;
 		case OPTION: cout << "OPTION" << endl; break;
 		case CASE: cout << "CASE" << endl; break;
 		case IF: cout << "IF" << endl; break;
@@ -94,7 +96,11 @@ void print(struct node* node, int tabs) {
 			cout << "IDENTIFIER: " << node->value << endl;
 			break;
 		case INTEGER_LITERAL:
+			cout << node->value << endl;
+			break;
 		case FLOAT_LITERAL:
+			cout << node->value << endl;
+			break;
 		case STRING_LITERAL:
 			cout << node->value << endl;
 			break;
