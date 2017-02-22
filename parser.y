@@ -1,7 +1,7 @@
 %{
 	#include <stdio.h>
 	#include "tree.h"
-
+	#include "mg_obj.h"
 	#define YYDEBUG 1
 
 	int yywrap();
@@ -23,6 +23,7 @@
 %token ASSIGN          
 %token COLON 
 %token SEMICOLON          
+%token COMMA
 
 %token TYPE_FUNCTION
 %token TYPE_METHOD   
@@ -37,7 +38,10 @@
 %token ELIF      
 %token ELSE       
 %token FOR_LOOP        
-%token WHILE_LOOP      
+%token WHILE_LOOP
+%token IN
+%token BREAK
+%token NEXT
 
 %token ACCESS          
 %token BRACKET_OPEN    
@@ -103,11 +107,21 @@ statements: statement statements {
 	}
 
 
-statement: type id ASSIGN expression SEMICOLON {
+statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		$$ = make_node(ASSIGN, NULL);
 		attach($$, $1);
 		attach($$, $2);
 		attach($$, $4);
+	} | id ASSIGN expression SEMICOLON { // re-assign a var w/value
+		$$ = make_node(ASSIGN, NULL);
+		attach($$, $2);
+		attach($$, $4);
+	} | type id SEMICOLON { // variable declared but not assigned a value
+		$$ = make_node(ASSIGN, NULL);
+		attach($$, $1);
+		attach($$, $2);
+		// attach a default value here?
+		
 	} | WHILE_LOOP expression statement {
 		$$ = make_node(WHILE_LOOP, NULL);
 		attach($$, $2);
@@ -161,6 +175,12 @@ expression: expression LOG_OR disjunction {
 		attach($$, $1);
 		attach($$, $3);
 	} | disjunction { }
+
+function_call: IDENTIFIER PAREN_OPEN arguments PAREN_CLOSE {
+		$$ = make_node(IDENTIFIER, NULL);
+		attach($$, $1);
+		attach($$, $3); // more below to come
+	}
 
 
 disjunction: disjunction LOG_AND conjunction {

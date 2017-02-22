@@ -3,8 +3,7 @@
 #include "parser.tab.h"
 
 struct node* make_node(int token, char* value) {
-
-	struct node* n = new node;
+	struct node* n = new struct node;
 	n->token = token;
 	n->value = value;
 	n->num_children = 0;
@@ -87,7 +86,9 @@ void print(struct node* node, int tabs) {
 		case BIT_XOR: cout << "BIT_XOR" << endl; break;
 		case BIT_IMPLIES: cout << "BIT_IMPLIES" << endl; break;
 		
-		case IDENTIFIER: cout << "IDENTIFIER: " << node->value << endl; break;
+		case IDENTIFIER:
+			cout << "IDENTIFIER: " << node->value << endl;
+			break;
 		case INTEGER_LITERAL:
 		case FLOAT_LITERAL:
 		case STRING_LITERAL:

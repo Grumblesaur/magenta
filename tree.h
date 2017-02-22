@@ -13,11 +13,8 @@ extern "C" {
 		struct node* children[MAX_CHILDREN];
 	};
 
-
 	struct node* make_node(int token, char* value);
-
 	void attach(struct node* parent, struct node* child);
-
 	void print(struct node* node, int tabs);
 };
 
