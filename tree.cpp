@@ -15,12 +15,10 @@ struct node* make_node(int token, void* value) {
 			strcpy((char*)n->value, (char*)value);
 		}
 		else if (token == INTEGER_LITERAL) {
-			n->value = new int;
-			n->value = (int*)(value);
+			n->value = new int(*(int*)value);
 		}
 		else if (token == FLOAT_LITERAL) {
-			double* temp = (double*) value;
-			n->value = temp;
+			n->value = new double(* (double *) value);
 		}
 	}
 
@@ -110,10 +108,10 @@ void print(struct node* node, int tabs) {
 			cout << "IDENTIFIER: " << (char*)node->value << endl;
 			break;
 		case INTEGER_LITERAL:
-			cout << node->value << endl;
+			cout << *(int*)node->value << endl;
 			break;
 		case FLOAT_LITERAL:
-			cout << node->value << endl;
+			cout << *(double*)node->value << endl;
 			break;
 		case STRING_LITERAL:
 			cout << node->value << endl;
