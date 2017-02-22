@@ -10,7 +10,7 @@ struct node* make_node(int token, void* value) {
 
 	if (value != NULL) {
 		if (token == STRING_LITERAL || token == IDENTIFIER) {
-			strcpy(n->value, (char*)*value);
+			strcpy(n->value, (char*)value);
 		}
 		else if (token == INTEGER_LITERAL) {
 			int* temp = (int*) value;
