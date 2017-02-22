@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdio>
 #include <cstring>
 #include <cstdlib>
 #include "tree.h"
@@ -10,11 +11,12 @@ struct node* make_node(int token, void* value) {
 
 	if (value != NULL) {
 		if (token == STRING_LITERAL || token == IDENTIFIER) {
-			strcpy(n->value, (char*)value);
+			n->value = new char[strlen((char*)value)];
+			strcpy((char*)n->value, (char*)value);
 		}
 		else if (token == INTEGER_LITERAL) {
-			int* temp = (int*) value;
-			n->value = temp;
+			n->value = new int;
+			n->value = (int*)(value);
 		}
 		else if (token == FLOAT_LITERAL) {
 			double* temp = (double*) value;
@@ -105,7 +107,7 @@ void print(struct node* node, int tabs) {
 		case BIT_IMPLIES: cout << "BIT_IMPLIES" << endl; break;
 		
 		case IDENTIFIER:
-			cout << "IDENTIFIER: " << (int) *node->value << endl;
+			cout << "IDENTIFIER: " << (char*)node->value << endl;
 			break;
 		case INTEGER_LITERAL:
 			cout << node->value << endl;
