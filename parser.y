@@ -32,7 +32,6 @@
 %token OPTION    
 %token CASE       
 %precedence IF         
-%precedence ELIF      
 %precedence ELSE       
 %token FOR_LOOP        
 %token WHILE_LOOP

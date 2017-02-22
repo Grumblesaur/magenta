@@ -4,12 +4,22 @@
 #include "tree.h"
 #include "parser.tab.h"
 
-struct node* make_node(int token, char* value) {
+struct node* make_node(int token, void* value) {
 	struct node* n = new struct node;
 	n->token = token;
 
 	if (value != NULL) {
-		strcpy(n->value, value);
+		if (token == STRING_LITERAL || token == IDENTIFIER) {
+			strcpy(n->value, (char*)value);
+		}
+		else if (token == INTEGER_LITERAL) {
+			int* temp = (int*) value;
+			n->value = temp;
+		}
+		else if (token == FLOAT_LITERAL) {
+			double* temp = (double*) value;
+			n->value = temp;
+		}
 	}
 
 	n->num_children = 0;
@@ -52,7 +62,6 @@ void print(struct node* node, int tabs) {
 		case OPTION: cout << "OPTION" << endl; break;
 		case CASE: cout << "CASE" << endl; break;
 		case IF: cout << "IF" << endl; break;
-		case ELIF: cout << "ELIF" << endl; break;
 		case ELSE: cout << "ELSE" << endl; break;
 		case FOR_LOOP: cout << "FOR" << endl; break;
 		case WHILE_LOOP: cout << "WHILE" << endl; break;
@@ -96,7 +105,7 @@ void print(struct node* node, int tabs) {
 		case BIT_IMPLIES: cout << "BIT_IMPLIES" << endl; break;
 		
 		case IDENTIFIER:
-			cout << "IDENTIFIER: " << node->value << endl;
+			cout << "IDENTIFIER: " << (int) *node->value << endl;
 			break;
 		case INTEGER_LITERAL:
 			cout << node->value << endl;
