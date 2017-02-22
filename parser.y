@@ -22,6 +22,7 @@
 %token ASSIGN          
 %token COLON 
 %token SEMICOLON          
+%token COMMA
 
 %token TYPE_FUNCTION
 %token TYPE_METHOD   

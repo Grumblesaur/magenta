@@ -18,6 +18,7 @@
 "="        {return ASSIGN;        }
 ":"        {return COLON;         }
 ";"        {return SEMICOLON;     }
+","        {return COMMA;         }
 
 "func"     {return TYPE_FUNCTION; }
 "meth"     {return TYPE_METHOD;   }
