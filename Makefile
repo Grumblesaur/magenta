@@ -1,5 +1,5 @@
 magenta: lex.yy.o parser.tab.o tree.o mg_obj.o interpreter.o
-	g++ lex.yy.o parser.tab.o tree.o mg_obj.o -o magenta
+	g++ lex.yy.o parser.tab.o tree.o mg_obj.o interpreter.o -o magenta
 
 lex.yy.o: lex.yy.c parser.tab.h
 	g++ -c lex.yy.c
