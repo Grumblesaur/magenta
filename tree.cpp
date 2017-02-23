@@ -4,14 +4,37 @@
 #include "tree.h"
 #include "parser.tab.h"
 
+// copy a target string taken in by the lexer which represents a string
+// literal and remove the leading and trailing double-quotes for use by
+// the interpreter.
+// return the number of characters copied or -1 in the case of an error
+int strnqcpy(char * destination, char * target) {
+	// don't use this on string representations without quotes
+	if (target[0] != '"' || target[strlen(target)-1] != '"') {
+		return -1;
+	}
+	
+	// move up past the quoted character to start copying
+	target++;
+	
+	int c = 0;
+	while (target[c] != '"') {
+		destination[c] = target[c++];
+	}
+	destination[c] = '\0'; // write in the null-terminator
+	return c;
+}
+
 struct node* make_node(int token, void* value) {
 	struct node* n = new struct node;
 	n->token = token;
 
 	if (value != NULL) {
 		if (token == STRING_LITERAL || token == IDENTIFIER) {
-			n->value = new char[strlen((char*)value)];
-			strcpy((char*)n->value, (char*)value);
+			// drop two characters from the array because we're not
+			// allocating space for the quotes
+			n->value = new char[strlen((char*)value)-2];
+			strnqcpy((char*)n->value, (char*)value);
 		}
 		else if (token == INTEGER_LITERAL) {
 			n->value = new int(*(int*)value);
