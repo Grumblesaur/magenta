@@ -84,7 +84,7 @@
 %token STATEMENT 
 
 %type<n> program statements statement elif_statement expression disjunction
-%type<n> conjunction relation addend factor exponent term num id
+%type<n> conjunction relation addend factor exponent term id
 %type<n> return_type type function_call
 
 %error-verbose
@@ -237,16 +237,13 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 		attach($$, $2);
 	} | STRING_LITERAL {
 		$$ = make_node(STRING_LITERAL, $1);
-	} | id {
-	} | num { }
-		
-
-num: INTEGER_LITERAL {
+	} | INTEGER_LITERAL {
 		$$ = make_node(INTEGER_LITERAL, &$1);
 	} | FLOAT_LITERAL {
 		$$ = make_node(FLOAT_LITERAL, &$1); 
+	} | id {
 	}
-
+		
 
 id: IDENTIFIER {
 		$$ = make_node(IDENTIFIER, $1);
