@@ -7,8 +7,11 @@
 #include "mg_obj.h"
 
 
-std::unordered_map<std::string, mg_obj*> vars;
+std::unordered_map<std::string, struct mg_obj*> vars;
 
+
+// bool declared(struct node*);
+// bool typesMatch(int, int);
 
 void printVars() {
 	// std::cout << "VARIABLES" << std::endl;
@@ -18,19 +21,87 @@ void printVars() {
 	// }
 }
 
+//returns true if id is a key in the variable map
+bool declared(std::string id) {
+	std::unordered_map<std::string, struct mg_obj*>::const_iterator iter = vars.find(id);
+	return iter != vars.end();
+}
+
+//returns whether a given token type and literal type correspond
+bool typesMatch(int token, int literal) {
+
+	return (token == TYPE_INTEGER && literal == INTEGER_LITERAL)
+	|| (token == TYPE_FLOAT && literal == FLOAT_LITERAL)
+	|| (token == TYPE_STRING && literal == STRING_LITERAL);
+}
+
+//determines whether to do assignment, reassignment, or initialization
+//based on the node passed in and then does the appropriate action
+void assignment(struct node * n) {
+	//assignment
+	if (n->num_children == 3) {
+
+		std::string id = (char*)(n->children[1])->value;
+		struct mg_obj* value = eval_expr(n->children[2]); // reduce expression node to mg_obj
+		int type = (n->children[0])->token;
+
+		if (typesMatch(type, value->type)) {
+			vars[id] = value;
+		}
+		else {
+			//raise error for non matching types
+		}
+	}
+	else {
+		//reassignment 
+		if(n->children[0]->token == IDENTIFIER) {
+			std::string id = (char*)(n->children[0])->value;
+			
+			if (declared(id)) {
+				struct mg_obj * current_val = vars[id];
+				struct mg_obj * value = eval_expr(n->children[1]); //reduce expression node to mg_obj
+
+				if (typesMatch(current_val->type, value->type)) {
+					delete current_val;
+					vars[id] = value;
+				}else {
+					//raise types don't match
+				}
+			} else {
+				//raise assignment to undeclared identifier
+			}
+		}
+		//initialization
+		else {
+			std::string id = (char*)(n->children[1])->value;
+			int type = (n->children[0])->token;
+			vars[id] = mg_alloc(type, NULL, "");
+		}
+	}
+}
 
 void eval_stmt(struct node* node) {
 
 	switch (node->token) {
-		
+		case ASSIGN:
+			assignment(node);
+			break;
+		case WHILE_LOOP:
+			break;
+		case IF:
+			break;
+		case STATEMENT:
+			for (int i = 0; i < node->num_children; i++) {
+				eval_stmt(node->children[i]);
+			}
+			break;
 	}
 }
 
 
-mg_obj eval_expr(struct node* node) {
+mg_obj* eval_expr(struct node* node) {
 
 	switch (node->token) {
-
 		case IDENTIFIER:
 			break;
 		case INTEGER_LITERAL:
