@@ -36,7 +36,13 @@ bool typesMatch(int token, int literal) {
 }
 
 //determines whether to do assignment, reassignment, or initialization
-//based on the node passed in and then does the appropriate action
+// assignment -> reduces expression node to mg_obj and compares its type to the declared type
+// 					if the types match it inserts the <id,mg_obj> pair into vars map
+// reassignment -> if the identifier has already been declared/initialized
+// 					reduces expression node to mg_obj and compares its type to the existing 
+// 					mg_obj associated with the id if the types match the value is overwritten
+//initialization-> stores the identifier in the vars map and associates it with a mg_obj
+// 					of the declared type with NULL value
 void assignment(struct node * n) {
 	//assignment
 	if (n->num_children == 3) {
