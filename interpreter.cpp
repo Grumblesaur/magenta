@@ -81,7 +81,7 @@ void assignment(struct node * n) {
 		else {
 			std::string id = (char*)(n->children[1])->value;
 			int type = (n->children[0])->token;
-			vars[id] = mg_alloc(type, NULL, "");
+			vars[id] = mg_alloc(type, NULL);
 		}
 	}
 }

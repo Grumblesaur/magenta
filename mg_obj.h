@@ -17,7 +17,7 @@ struct mg_format {
 	std::map<std::string, struct mg_obj *> data;
 };
 
-struct mg_obj * mg_alloc(int, void *, std::string);
+struct mg_obj * mg_alloc(int, void *);
 struct mg_format * mg_alloc_type(std::string, struct mg_format);
 
 #endif
