@@ -13,7 +13,7 @@ parser.tab.o: parser.tab.c tree.h
 interpreter.o: interpreter.h interpreter.cpp tree.h mg_obj.h parser.tab.h
 	g++ -c -std=c++11 interpreter.cpp
 
-mg_obj.o: mg_obj.h mg_obj.cpp tree.h
+mg_obj.o: mg_obj.h mg_obj.cpp tree.h parser.tab.h
 	g++ -c mg_obj.cpp
 
 tree.o: tree.h tree.cpp parser.tab.h

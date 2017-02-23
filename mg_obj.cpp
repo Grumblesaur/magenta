@@ -5,31 +5,27 @@
 #include "mg_obj.h"
 #include "tree.h"
 
-struct mg_obj * mg_alloc(
-	obj_type o,
-	void * value,
-	std::string name_of_type
-) {
+struct mg_obj * mg_alloc(int type, void * value) {
 	struct mg_obj * m = new struct mg_obj;
-	switch (o) {
-		case FUNC:
+	switch (type) {
+		case TYPE_FUNCTION:
 			break;
 		
-		case METH:
+		case TYPE_METHOD:
 			break;
 		
-		case INT:
-			m->type = INT;
+		case TYPE_INTEGER:
+			m->type = TYPE_INTEGER;
 			m->value = new int(*(int*)value);
 			break;
 		
-		case FLT:
-			m->type = FLT;
+		case TYPE_FLOAT:
+			m->type = TYPE_FLOAT;
 			m->value = new double(*(double*)value);
 			break;
 		
-		case STR:
-			m->type = STR;
+		case TYPE_STRING:
+			m->type = TYPE_STRING;
 			m->value = new std::string(*(std::string*)value);
 			break;
 	}
