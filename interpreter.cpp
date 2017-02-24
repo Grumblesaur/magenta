@@ -24,32 +24,38 @@ void printVars() {
 
 //returns true if id is a key in the variable map
 bool declared(std::string id) {
-	std::unordered_map<std::string, struct mg_obj*>::const_iterator iter = vars.find(id);
+	std::unordered_map<
+		std::string,
+		struct mg_obj*
+	>::const_iterator iter = vars.find(id);
 	return iter != vars.end();
 }
 
 //returns whether a given token type and literal type correspond
 bool typesMatch(int token, int literal) {
-
 	return (token == TYPE_INTEGER && literal == INTEGER_LITERAL)
 	|| (token == TYPE_FLOAT && literal == FLOAT_LITERAL)
 	|| (token == TYPE_STRING && literal == STRING_LITERAL);
 }
 
 //determines whether to do assignment, reassignment, or initialization
-// assignment -> reduces expression node to mg_obj and compares its type to the declared type
-// 					if the types match it inserts the <id,mg_obj> pair into vars map
-// reassignment -> if the identifier has already been declared/initialized
-// 					reduces expression node to mg_obj and compares its type to the existing 
-// 					mg_obj associated with the id if the types match the value is overwritten
-//initialization-> stores the identifier in the vars map and associates it with a mg_obj
-// 					of the declared type with NULL value
+// assignment -> reduces expression node to mg_obj and compares its type to
+// the declared type. if the types match it inserts the <id,mg_obj> pair into
+// vars map. reassignment -> if the identifier has already been
+// declared/initialized reduces expression node to mg_obj and compares its type
+// to the existing mg_obj associated with the id if the types match the value is
+// overwritten.
+// initialization-> stores the identifier in the vars map and associates it with
+// a mg_obj of the declared type with NULL value
 void assignment(struct node * n) {
 	//assignment
 	if (n->num_children == 3) {
-
-		std::string id = (char*)(n->children[1])->value;
-		struct mg_obj* value = eval_expr(n->children[2]); // reduce expression node to mg_obj
+		std::string id = std::string(
+			(char*)(n->children[1]->value),
+			strlen((char*)n->children[1]->value)
+		);
+		// reduce expression node to mg_obj
+		struct mg_obj* value = eval_expr(n->children[2]); 
 		int type = (n->children[0])->token;
 
 		if (typesMatch(type, value->type)) {
@@ -66,21 +72,22 @@ void assignment(struct node * n) {
 			
 			if (declared(id)) {
 				struct mg_obj * current_val = vars[id];
-				struct mg_obj * value = eval_expr(n->children[1]); //reduce expression node to mg_obj
-
+				//reduce expression node to mg_obj
+				struct mg_obj * value = eval_expr(n->children[1]); 
 				if (typesMatch(current_val->type, value->type)) {
 					delete current_val;
 					vars[id] = value;
-				}else {
+				} else {
 					//raise types don't match
 				}
 			} else {
 				//raise assignment to undeclared identifier
 			}
-		}
-		//initialization
-		else {
-			std::string id = (char*)(n->children[1])->value;
+		} else { //initialization
+			std::string id = std::string(
+				(char*)(n->children[1])->value,
+				strlen((char*)n->children[1]->value)
+			);
 			int type = (n->children[0])->token;
 			vars[id] = mg_alloc(type, NULL);
 		}
@@ -90,7 +97,7 @@ void assignment(struct node * n) {
 bool eval_bool(struct mg_obj * o) {
 	int type = (o->type);
 	if (type == TYPE_STRING) {
-		std::string v = *(std::string*)o->value;
+		std::string v = std::string((char *)o->value, strlen((char*)o->value));
 		return v != "";
 	}
 	if (type == TYPE_INTEGER) {
