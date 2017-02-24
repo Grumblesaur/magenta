@@ -82,19 +82,22 @@
 %token<str> STRING_LITERAL 
 
 %token STATEMENT 
+%token ARGUMENT
+%token ARG_LIST
 
 %type<n> program statements statement elif_statement expression disjunction
 %type<n> conjunction relation addend factor exponent term id
-%type<n> return_type type function_call
+%type<n> return_type type function_call function_definition
+%type<n> method_definition arguments argument arg_list
 
 %error-verbose
 
 %%
 
 program: statements {
-	result = make_node(STATEMENT, NULL);
-	attach(result, $1);
-}
+		result = make_node(STATEMENT, NULL);
+		attach(result, $1);
+	}
 
 
 statements: statement statements {
@@ -106,7 +109,33 @@ statements: statement statements {
 		attach($$, $1);
 	}
 	
+function_definition: TYPE_FUNCTION id arg_list COLON type statements {
+		$$ = make_node(TYPE_FUNCTION, $2);
+		attach($$, $3); // arguments
+		attach($$, $5); // return type
+		attach($$, $6); // statements
+	}
 
+method_definition: TYPE_METHOD id arg_list COLON type statements {
+		$$ = make_node(TYPE_FUNCTION, $2);
+		attach($$, $3);
+		attach($$, $5);
+		attach($$, $6);
+	}
+
+arg_list: PAREN_OPEN arguments PAREN_CLOSE {
+		$$ = make_node(ARG_LIST, NULL);
+		attach($$, $2);
+	}
+
+arguments: argument COMMA arguments {
+		$$ = make_node(ARGUMENT, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | argument { }
+
+argument: type id { }
+	
 statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		$$ = make_node(ASSIGN, NULL);
 		attach($$, $1);
@@ -152,7 +181,6 @@ expression: expression LOG_OR disjunction {
 		attach($$, $1);
 		attach($$, $3);
 	} | disjunction { }
-
 
 
 disjunction: disjunction LOG_AND conjunction {

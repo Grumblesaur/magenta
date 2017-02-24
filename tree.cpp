@@ -143,8 +143,9 @@ void print(struct node* node, int tabs) {
 			cout << node->value << endl;
 			break;
 		
-		case STATEMENT: cout << "STATEMENT: " << endl; break;
-		
+		case STATEMENT:     cout << "STATEMENT:"    << endl; break;
+		case ARGUMENT:      cout << "ARGUMENT:"     << endl; break;
+		case ARG_LIST:      cout << "ARG_LIST:"     << endl; break;
 		default:
 			cout << "Invalid token: " << node->token << endl; break;
 	}
