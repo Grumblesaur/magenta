@@ -1,6 +1,7 @@
 #include <unordered_map>
 #include <iostream>
 #include <string>
+#include <cstring>
 #include "interpreter.h"
 #include "parser.tab.h"
 #include "tree.h"
@@ -86,6 +87,24 @@ void assignment(struct node * n) {
 	}
 }
 
+bool eval_bool(struct mg_obj * o) {
+	int type = (o->type);
+	if (type == TYPE_STRING) {
+		std::string v = *(std::string*)o->value;
+		return v != "";
+	}
+	if (type == TYPE_INTEGER) {
+		return *(int*)o->value != 0;
+	}
+	if (type == TYPE_FLOAT) {
+		return *(double*)o->value != 0;
+	}
+}
+
+void loop(struct node * node) {
+
+}
+
 void eval_stmt(struct node* node) {
 
 	switch (node->token) {
@@ -93,6 +112,7 @@ void eval_stmt(struct node* node) {
 			assignment(node);
 			break;
 		case WHILE_LOOP:
+			loop(node);
 			break;
 		case IF:
 			break;
