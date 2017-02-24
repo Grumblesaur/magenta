@@ -104,7 +104,7 @@ bool eval_bool(struct mg_obj * o) {
 	}
 	
 	// default for other types: determine whether the object has a value
-	return o->value != NULL
+	return o->value != NULL;
 }
 
 void loop(struct node * node) {
