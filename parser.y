@@ -85,7 +85,7 @@
 %token ARGUMENT
 %token ARG_LIST
 
-%type<n> program statements statement elif_statement expression disjunction
+%type<n> program statements statement expression disjunction
 %type<n> conjunction relation addend factor exponent term id
 %type<n> return_type type function_call function_definition
 %type<n> method_definition arguments argument arg_list
@@ -110,14 +110,16 @@ statements: statement statements {
 	}
 	
 function_definition: TYPE_FUNCTION id arg_list COLON type statements {
-		$$ = make_node(TYPE_FUNCTION, $2);
+		$$ = make_node(TYPE_FUNCTION, NULL);
+		attach($$, $2); //identifier
 		attach($$, $3); // arguments
 		attach($$, $5); // return type
 		attach($$, $6); // statements
 	}
 
-method_definition: TYPE_METHOD id arg_list COLON type statements {
-		$$ = make_node(TYPE_FUNCTION, $2);
+method_definition: TYPE_METHOD id arg_list COLON return_type statements {
+		$$ = make_node(TYPE_METHOD, NULL);
+		attach($$, $2);
 		attach($$, $3);
 		attach($$, $5);
 		attach($$, $6);

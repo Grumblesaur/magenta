@@ -6,12 +6,11 @@
 #ifdef __cplusplus
 extern "C" {
 
-	#define MAX_CHILDREN 3
+	#define MAX_CHILDREN 4
 	#define MAX_ID_LEN 64
 	
 	struct node {
 		int token;
-		// char value[MAX_ID_LEN];
 		void * value;
 		int num_children;
 		struct node* children[MAX_CHILDREN];

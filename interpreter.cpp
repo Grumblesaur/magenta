@@ -11,23 +11,9 @@
 std::unordered_map<std::string, struct mg_obj*> vars;
 
 
-// bool declared(struct node*);
-// bool typesMatch(int, int);
-
-void printVars() {
-	// std::cout << "VARIABLES" << std::endl;
-	// std::unordered_map<std::string, double>::iterator it;
-	// for(it = vars.begin(); it != vars.end(); it++) {
-	// 	std::cout << it->first << "  " << it->second << std::endl;
-	// }
-}
-
 //returns true if id is a key in the variable map
 bool declared(std::string id) {
-	std::unordered_map<
-		std::string,
-		struct mg_obj*
-	>::const_iterator iter = vars.find(id);
+	std::unordered_map<std::string, struct mg_obj*>::const_iterator iter = vars.find(id);
 	return iter != vars.end();
 }
 
