@@ -313,9 +313,8 @@ int main(int argc, char **argv) {
 
 	FILE* orig_stdin = stdin;
 	stdin = fopen(argv[1], "r");
-
-
 	yyparse();
+	
 
 	print(result, 0);
 	// int token;

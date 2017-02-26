@@ -93,20 +93,27 @@ bool eval_bool(struct mg_obj * o) {
 	return o->value != NULL;
 }
 
-void loop(struct node * node) {
-
-}
 
 void eval_stmt(struct node* node) {
-
+	struct mg_obj * conditional;
 	switch (node->token) {
 		case ASSIGN:
 			assignment(node);
 			break;
 		case WHILE_LOOP:
-			loop(node);
+			conditional = eval_expr(node->children[0]);
+			while (eval_bool(conditional)) {
+				eval_stmt(node->children[1]);
+			}
 			break;
 		case IF:
+			conditional = eval_expr(node->children[0]);
+			if (eval_bool(conditional)) {
+				eval_stmt(node->children[1]);
+			}
+			else if (node->num_children == 3) {
+				eval_stmt(node->children[2]);
+			}
 			break;
 		case STATEMENT:
 			for (int i = 0; i < node->num_children; i++) {
