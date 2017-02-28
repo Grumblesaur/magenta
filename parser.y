@@ -33,8 +33,8 @@
 %token TYPE_VOID
 %token OPTION    
 %token CASE       
-%precedence IF         
-%precedence ELSE       
+%token IF         
+%token ELSE       
 %token FOR_LOOP        
 %token WHILE_LOOP
 %token IN

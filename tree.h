@@ -1,13 +1,10 @@
 #ifndef TREE_H
 #define TREE_H
 
-#include <string>
-
 #ifdef __cplusplus
 extern "C" {
 
 	#define MAX_CHILDREN 4
-	#define MAX_ID_LEN 64
 	
 	struct node {
 		int token;

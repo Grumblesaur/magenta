@@ -49,7 +49,7 @@ struct node* make_node(int token, void* value) {
 	}
 
 	n->num_children = 0;
-	for (int i = 0; i <= MAX_CHILDREN; i++) {
+	for (int i = 0; i < MAX_CHILDREN; i++) {
 		n->children[i] = NULL;
 	}
 	return n;
