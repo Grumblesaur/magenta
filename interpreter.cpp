@@ -76,7 +76,7 @@ void assignment(struct node * n) {
 	}
 }
 
-bool eval_bool(struct mg_obj * o) {
+int eval_bool(struct mg_obj * o) {
 	int type = (o->type);
 	if (type == TYPE_STRING) {
 		std::string v = std::string((char *)o->value);
@@ -91,6 +91,22 @@ bool eval_bool(struct mg_obj * o) {
 	
 	// default for other types: determine whether the object has a value
 	return o->value != NULL;
+}
+
+int eval_comp(struct mg_obj * left, struct mg_obj * right) {
+	if (left->type != right->type) {
+		// TODO: raise type comparison error
+	}
+
+	if (left->type == TYPE_INTEGER) {
+
+	}
+	else if (left->type == TYPE_FLOAT) {
+
+	}
+	else if (left->type == TYPE_STRING) {
+
+	}
 }
 
 
@@ -126,24 +142,48 @@ void eval_stmt(struct node* node) {
 
 mg_obj* eval_expr(struct node* node) {
 
+	bool t_val;
+	struct mg_obj * left;
+	struct mg_obj * right;
+
 	switch (node->token) {
 		case IDENTIFIER:
+			return vars[*(std::string*)(node->value)];
 			break;
 		case INTEGER_LITERAL:
+			return mg_alloc(TYPE_INTEGER, (int*)node->value);
 			break;
 		case FLOAT_LITERAL:
+			return mg_alloc(TYPE_FLOAT, (double*)node->value);
 			break;
 		case STRING_LITERAL:
+			return mg_alloc(TYPE_STRING, (std::string*)node->value);
 			break;
 		case PAREN_OPEN:
+			return eval_expr(node->children[0]);
 			break;
 		case LOG_NOT:
+			right = eval_expr(node->children[0]);
+			t_val = !eval_bool(right);
+			return mg_alloc(TYPE_INTEGER, new int(t_val));
 			break;
 		case LOG_OR:
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			t_val = eval_bool(left) || eval_bool(right);
+			return mg_alloc(TYPE_INTEGER, new int(t_val));
 			break;
 		case LOG_XOR:
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			t_val = (eval_bool(left) || eval_bool(right)) && !((eval_bool(left) && eval_bool(right)));
+			return mg_alloc(TYPE_INTEGER, new int(t_val));
 			break;
 		case LOG_AND:
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			t_val = eval_bool(left) && eval_bool(right);
+			return mg_alloc(TYPE_INTEGER, new int(t_val));
 			break;
 		case LESS_THAN:
 			break;
