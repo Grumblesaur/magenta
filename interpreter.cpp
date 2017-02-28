@@ -93,19 +93,80 @@ int eval_bool(struct mg_obj * o) {
 	return o->value != NULL;
 }
 
-int eval_comp(struct mg_obj * left, struct mg_obj * right) {
+//returns an int that represents a boolean value indicating
+//wether the comparison between nodes left and right evaluates to true or false
+//comparison type is passes in as its token
+//could probably be more elegantly done. should be revisited.
+int eval_comp(struct mg_obj * left, int token, struct mg_obj * right) {
 	if (left->type != right->type) {
 		// TODO: raise type comparison error
 	}
 
 	if (left->type == TYPE_INTEGER) {
-
+		switch(token) {
+			case LESS_THAN:
+				return *(int*)left->value < *(int*)right->value;
+				break;
+			case LESS_EQUAL:
+				return *(int*)left->value <= *(int*)right->value;
+				break;
+			case EQUAL:
+				return *(int*)left->value == *(int*)right->value;
+				break;
+			case NOT_EQUAL:
+				return *(int*)left->value != *(int*)right->value;
+				break;
+			case GREATER_EQUAL:
+				return *(int*)left->value >= *(int*)right->value;
+				break;
+			case GREATER_THAN:
+				return *(int*)left->value > *(int*)right->value;
+				break;
+		}
 	}
 	else if (left->type == TYPE_FLOAT) {
-
+		switch(token) {
+			case LESS_THAN:
+				return *(double*)left->value < *(double*)right->value;
+				break;
+			case LESS_EQUAL:
+				return *(double*)left->value <= *(double*)right->value;
+				break;
+			case EQUAL:
+				return *(double*)left->value == *(double*)right->value;
+				break;
+			case NOT_EQUAL:
+				return *(double*)left->value != *(double*)right->value;
+				break;
+			case GREATER_EQUAL:
+				return *(double*)left->value >= *(double*)right->value;
+				break;
+			case GREATER_THAN:
+				return *(double*)left->value > *(double*)right->value;
+				break;
+		}
 	}
 	else if (left->type == TYPE_STRING) {
-
+		switch(token) {
+			case LESS_THAN:
+				return *(std::string*)left->value < *(std::string*)right->value;
+				break;
+			case LESS_EQUAL:
+				return *(std::string*)left->value <= *(std::string*)right->value;
+				break;
+			case EQUAL:
+				return *(std::string*)left->value == *(std::string*)right->value;
+				break;
+			case NOT_EQUAL:
+				return *(std::string*)left->value != *(std::string*)right->value;
+				break;
+			case GREATER_EQUAL:
+				return *(std::string*)left->value >= *(std::string*)right->value;
+				break;
+			case GREATER_THAN:
+				return *(std::string*)left->value > *(std::string*)right->value;
+				break;
+		}
 	}
 }
 
@@ -186,16 +247,34 @@ mg_obj* eval_expr(struct node* node) {
 			return mg_alloc(TYPE_INTEGER, new int(t_val));
 			break;
 		case LESS_THAN:
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			eval_comp(left, LESS_THAN, right);
 			break;
 		case LESS_EQUAL:
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			eval_comp(left, LESS_EQUAL, right);
 			break;
 		case EQUAL:
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			eval_comp(left, EQUAL, right);
 			break;
 		case NOT_EQUAL:
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			eval_comp(left, NOT_EQUAL, right);
 			break;
 		case GREATER_THAN:
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			eval_comp(left, GREATER_THAN, right);
 			break;
 		case GREATER_EQUAL:
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			eval_comp(left, GREATER_EQUAL, right);
 			break;
 		case TIMES:
 			break;
