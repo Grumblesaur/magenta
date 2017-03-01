@@ -205,7 +205,7 @@ struct mg_obj * multiply(struct mg_obj * x, struct mg_obj * y) {
 	} else if (x->type == TYPE_FLOAT && y->type == TYPE_INTEGER) {
 		// float * int -> float
 		double product = *(double*)x->value * *(int*)y->value;
-		return mg_alloc(TYPE_FLOAT, &product&);
+		return mg_alloc(TYPE_FLOAT, &product);
 	} else if (x->type == TYPE_FLOAT && y->type == TYPE_FLOAT) {
 		// float * float -> float
 		double product = *(double*)x->value * *(double*)y->value;
@@ -311,9 +311,9 @@ struct mg_obj * add(struct mg_obj * x, struct mg_obj * y) {
 		return mg_alloc(TYPE_FLOAT, &sum);
 	} else if (x->type == TYPE_STRING && y->type == TYPE_STRING) {
 		// str + str -> str (concatenation)
-		return mg_alloc(
-			TYPE_FLOAT, &(*(std::string *) x->value) + (*(std::string *) y->value)
-		);
+		std::string s = (*(std::string *) x->value)
+			+ (*(std::string *) y->value);
+		return mg_alloc(TYPE_STRING, &s);
 	}
 	//TODO raise invalid operand types error
 }
