@@ -13,17 +13,21 @@ std::unordered_map<std::string, struct mg_obj*> vars;
 
 void print_vars() {
 	std::unordered_map<std::string, struct mg_obj*> :: const_iterator iter;
+
 	for(iter = vars.begin(); iter != vars.end(); iter++) {
-	
 		switch(iter->second->type) {
 			case TYPE_INTEGER:
-				std::cout << iter->first << "  " << *(int*)iter->second->value << std::endl;
+				std::cout << iter->first << "  ";
+				std::cout << *(int*)iter->second->value << std::endl;
 				break;
 			case TYPE_FLOAT:
-				std::cout << iter->first << "  " << *(double*)iter->second->value << std::endl;
+				std::cout << iter->first << "  ";
+				std::cout << *(double*)iter->second->value << std::endl;
 				break;
 			case TYPE_STRING:
-				std::cout << iter->first << "  " << *(std::string*)iter->second->value << std::endl;
+				std::cout << iter->first <<
+				std::cout << "  " << *(std::string*) iter->second->value;
+				std::cout << std::endl;
 				break;
 		}
 	}
@@ -59,9 +63,9 @@ void assignment(struct node * n) {
 
 	//assignment
 	if (n->num_children == 3) {
-			std::cout << "assign" << std::endl;
-
+		std::cout << "assign" << std::endl;
 		std::string id = std::string((char*)n->children[1]->value);
+		
 		// reduce expression node to mg_obj
 		struct mg_obj * value = eval_expr(n->children[2]); 
 		int type = (n->children[0])->token;
@@ -101,14 +105,13 @@ int eval_bool(struct mg_obj * o) {
 	std::cout << "eval_bool" << std::endl;
 	int type = (o->type);
 	if (type == TYPE_STRING) {
-		std::string v = std::string((char *)o->value);
-		return v != "";
+		return std::string((char *)o->value) != "";
 	}
 	if (type == TYPE_INTEGER) {
 		return *(int*)o->value != 0;
 	}
 	if (type == TYPE_FLOAT) {
-		return *(double*)o->value != 0;
+		return *(double*)o->value != 0.0;
 	}
 	
 	// default for other types: determine whether the object has a value
@@ -182,26 +185,41 @@ int eval_comp(struct mg_obj * left, int token, struct mg_obj * right) {
 struct mg_obj * multiply(struct mg_obj * x, struct mg_obj * y) {
 	std::cout << "multiply" << std::endl;
 	if (x->type == TYPE_INTEGER && y->type == TYPE_INTEGER) {
+		// int * int -> int
 		int product = *(int*)x->value * *(int*)y->value;
 		return mg_alloc(TYPE_INTEGER, new int(product));
-	}
-	else if (x->type == TYPE_INTEGER && y->type == TYPE_FLOAT) {
+	} else if (x->type == TYPE_INTEGER && y->type == TYPE_FLOAT) {
+		// int * float -> float
 		double product = *(int*)x->value * *(double*)y->value;
 		return mg_alloc(TYPE_FLOAT, new double(product));
-	}
-	else if (x->type == TYPE_FLOAT && y->type == TYPE_INTEGER) {
+	} else if (x->type == TYPE_FLOAT && y->type == TYPE_INTEGER) {
+		// float * int -> float
 		double product = *(double*)x->value * *(int*)y->value;
 		return mg_alloc(TYPE_FLOAT, new double(product));
-	}
-	else if (x->type == TYPE_FLOAT && y->type == TYPE_FLOAT) {
+	} else if (x->type == TYPE_FLOAT && y->type == TYPE_FLOAT) {
+		// float * float -> float
 		double product = *(double*)x->value * *(double*)y->value;
 		return mg_alloc(TYPE_FLOAT, new double(product));
-	}
-	else if (x->type == TYPE_INTEGER && y->type == TYPE_STRING) {
-		//TODO
-	}
-	else if (x->type == TYPE_STRING && y->type == TYPE_INTEGER) {
-		//TODO
+	} else if (x->type == TYPE_INTEGER && y->type == TYPE_STRING) {
+		// int n * string s -> s repeated n times
+		int repeats = *(int *) x->value;
+		std::string text = *(std::string *) y->value;
+		std::string repetition = "";
+		while (repeats) {
+			repetition += text;
+			repeats--;
+		}
+		return mg_alloc(TYPE_STRING, new std::string(repetition));
+	} else if (x->type == TYPE_STRING && y->type == TYPE_INTEGER) {
+		// string s * int n -> s repeated n times
+		int repeats = *(int *) y->value;
+		std::string text = *(std::string *) x->value;
+		std::string repetition = "";
+		while (repeats) {
+			repetition += text;
+			repeats--;
+		}
+		return mg_alloc(TYPE_STRING, new std::string(repetition));
 	}
 	//TODO raise invalid operand types error
 }
