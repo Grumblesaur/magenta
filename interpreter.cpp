@@ -283,6 +283,17 @@ struct mg_obj * modulo(struct mg_obj * x, struct mg_obj * y) {
 // handles operations with the `+` operator
 struct mg_obj * add(struct mg_obj * x, struct mg_obj * y) {
 	std::cout << "add" << std::endl;
+	if (x == NULL) {
+		std::cerr << "x is null in add" << std::endl;
+	}
+	if (y == NULL) {
+		std::cerr << "y is null in add" << std::endl;
+	}
+	if (x == NULL || y == NULL) {
+		std::cerr << "uninitialized argument: add" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	
 	if (x->type == TYPE_INTEGER && y->type == TYPE_INTEGER) {
 		// int + int -> int
 		int sum = *(int*)x->value + *(int*)y->value;
