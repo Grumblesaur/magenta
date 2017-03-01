@@ -286,26 +286,23 @@ struct mg_obj * add(struct mg_obj * x, struct mg_obj * y) {
 	if (x->type == TYPE_INTEGER && y->type == TYPE_INTEGER) {
 		// int + int -> int
 		int sum = *(int*)x->value + *(int*)y->value;
-		return mg_alloc(TYPE_INTEGER, new int(sum));
+		return mg_alloc(TYPE_INTEGER, &sum);
 	} else if (x->type == TYPE_INTEGER && y->type == TYPE_FLOAT) {
 		// int + float -> float
 		double sum = *(int*)x->value + *(double*)y->value;
-		return mg_alloc(TYPE_FLOAT, new double(sum));
+		return mg_alloc(TYPE_FLOAT, &sum);
 	} else if (x->type == TYPE_FLOAT && y->type == TYPE_INTEGER) {
 		// float + int -> float
 		double sum = *(double*)x->value + *(int*)y->value;
-		return mg_alloc(TYPE_FLOAT, new double(sum));
+		return mg_alloc(TYPE_FLOAT, &sum);
 	} else if (x->type == TYPE_FLOAT && y->type == TYPE_FLOAT) {
 		// float + float -> float
 		double sum = *(double*)x->value + *(double*)y->value;
-		return mg_alloc(TYPE_FLOAT, new double(sum));
+		return mg_alloc(TYPE_FLOAT, &sum);
 	} else if (x->type == TYPE_STRING && y->type == TYPE_STRING) {
 		// str + str -> str (concatenation)
 		return mg_alloc(
-			TYPE_FLOAT,
-			new std::string(
-				(*(std::string *) x->value) + (*(std::string *) y->value)
-			)
+			TYPE_FLOAT, &(*(std::string *) x->value) + (*(std::string *) y->value)
 		);
 	}
 	//TODO raise invalid operand types error
@@ -327,25 +324,25 @@ struct mg_obj * subtract(struct mg_obj * x, struct mg_obj * y) {
 		// int - int -> int
 		std::cerr << "\tint - int" << std::endl;
 		int diff = *(int*)x->value - *(int*)y->value;
-		return mg_alloc(TYPE_INTEGER, new int(diff));
+		return mg_alloc(TYPE_INTEGER, &diff);
 		
 	} else if (x->type == TYPE_INTEGER && y->type == TYPE_FLOAT) {
 		// int - float -> float
 		std::cerr << "\tint - float" << std::endl;
 		double diff = *(int*)x->value - *(double*)y->value;
-		return mg_alloc(TYPE_FLOAT, new double(diff));
+		return mg_alloc(TYPE_FLOAT, &diff);
 		
 	} else if (x->type == TYPE_FLOAT && y->type == TYPE_INTEGER) {
 		// float - int -> float
 		std::cerr << "\tfloat - int" << std::endl;
 		double diff = *(double*)x->value - *(int*)y->value;
-		return mg_alloc(TYPE_FLOAT, new double(diff));
+		return mg_alloc(TYPE_FLOAT, &diff);
 		
 	} else if (x->type == TYPE_FLOAT && y->type == TYPE_FLOAT) {
 		// float - float -> float
 		std::cerr << "\tfloat - float" << std::endl;
 		double diff = *(double*)x->value - *(double*)y->value;
-		return mg_alloc(TYPE_FLOAT, new double(diff));
+		return mg_alloc(TYPE_FLOAT, &diff);
 	}
 	//TODO raise invalid operand types error
 	std::cerr << "SUBTRACTION FALLTHROUGH ERROR" << std::endl;
