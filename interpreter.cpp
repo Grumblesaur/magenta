@@ -25,7 +25,7 @@ void print_vars() {
 				std::cout << *(double*)iter->second->value << std::endl;
 				break;
 			case TYPE_STRING:
-				std::cout << iter->first <<
+				std::cout << iter->first;
 				std::cout << "  " << *(std::string*) iter->second->value;
 				std::cout << std::endl;
 				break;
@@ -38,13 +38,6 @@ bool declared(std::string id) {
 	std::unordered_map<std::string, struct mg_obj*>::const_iterator iter =
 		vars.find(id);
 	return iter != vars.end();
-}
-
-//returns whether a given token type and literal type correspond
-bool typesMatch(int token, int literal) {
-	return (token == TYPE_INTEGER && literal == INTEGER_LITERAL)
-	|| (token == TYPE_FLOAT && literal == FLOAT_LITERAL)
-	|| (token == TYPE_STRING && literal == STRING_LITERAL);
 }
 
 // determines whether to do assignment, reassignment, or initialization
@@ -71,7 +64,7 @@ void assignment(struct node * n) {
 		struct mg_obj * value = eval_expr(n->children[2]); 
 		int type = (n->children[0])->token;
 
-		if (typesMatch(type, value->type)) {
+		if (type == value->type) {
 			vars[id] = value;
 		} else {
 			//TODO: raise error for non matching types
@@ -85,7 +78,7 @@ void assignment(struct node * n) {
 				struct mg_obj * current_val = vars[id];
 				//reduce expression node to mg_obj
 				struct mg_obj * value = eval_expr(n->children[1]); 
-				if (typesMatch(current_val->type, value->type)) {
+				if (current_val->type == value->type) {
 					delete current_val;
 					vars[id] = value;
 				} else {
