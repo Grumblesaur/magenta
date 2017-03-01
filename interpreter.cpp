@@ -35,7 +35,8 @@ void print_vars() {
 
 //returns true if id is a key in the variable map
 bool declared(std::string id) {
-	std::unordered_map<std::string, struct mg_obj*> :: const_iterator iter = vars.find(id);
+	std::unordered_map<std::string, struct mg_obj*>::const_iterator iter =
+		vars.find(id);
 	return iter != vars.end();
 }
 
@@ -225,14 +226,13 @@ struct mg_obj * multiply(struct mg_obj * x, struct mg_obj * y) {
 }
 
 
-//returns mg_obj / with quotient of x and y
+// returns mg_obj / with quotient of x and y
 // int/int->int
 // int/flt->flt
 // flt/int->flt
 // flt/flt->flt
-// int/str->str
-// str/int->str
 // else error
+// handles operations with the `/` operator
 struct mg_obj * divide(struct mg_obj * x, struct mg_obj * y) {
 	std::cout << "divide" << std::endl;
 	if (x->type == TYPE_INTEGER && y->type == TYPE_INTEGER) {
@@ -261,56 +261,68 @@ struct mg_obj * divide(struct mg_obj * x, struct mg_obj * y) {
 }
 
 
+// modulo is only defined for integers
+struct mg_obj * modulo(struct mg_obj * x, struct mg_obj * y) {
+	std::cout << "modulo" << std::endl;
+	if (x->type == TYPE_INTEGER && y->type == TYPE_INTEGER) {
+		int z = *(int *)x->value % *(int *)y->value;
+		return mg_alloc(TYPE_INTEGER, new int(z));
+	}
+	// TODO raise invalid operand types error
+}
+
+// handles operations with the `+` operator
 struct mg_obj * add(struct mg_obj * x, struct mg_obj * y) {
 	std::cout << "add" << std::endl;
 	if (x->type == TYPE_INTEGER && y->type == TYPE_INTEGER) {
+		// int + int -> int
 		int sum = *(int*)x->value + *(int*)y->value;
 		return mg_alloc(TYPE_INTEGER, new int(sum));
-	}
-	else if (x->type == TYPE_INTEGER && y->type == TYPE_FLOAT) {
+	} else if (x->type == TYPE_INTEGER && y->type == TYPE_FLOAT) {
+		// int + float -> float
 		double sum = *(int*)x->value + *(double*)y->value;
 		return mg_alloc(TYPE_FLOAT, new double(sum));
-	}
-	else if (x->type == TYPE_FLOAT && y->type == TYPE_INTEGER) {
+	} else if (x->type == TYPE_FLOAT && y->type == TYPE_INTEGER) {
+		// float + int -> float
 		double sum = *(double*)x->value + *(int*)y->value;
 		return mg_alloc(TYPE_FLOAT, new double(sum));
-	}
-	else if (x->type == TYPE_FLOAT && y->type == TYPE_FLOAT) {
+	} else if (x->type == TYPE_FLOAT && y->type == TYPE_FLOAT) {
+		// float + float -> float
 		double sum = *(double*)x->value + *(double*)y->value;
 		return mg_alloc(TYPE_FLOAT, new double(sum));
-	}
-	else if (x->type == TYPE_INTEGER && y->type == TYPE_STRING) {
-		//TODO
-	}
-	else if (x->type == TYPE_STRING && y->type == TYPE_INTEGER) {
-		//TODO
+	} else if (x->type == TYPE_STRING && y->type == TYPE_STRING) {
+		// str + str -> str (concatenation)
+		return mg_alloc(
+			TYPE_FLOAT,
+			new std::string(
+				(*(std::string *) x->value) + (*(std::string *) y->value)
+			)
+		);
 	}
 	//TODO raise invalid operand types error
 }
 
+
+// handles operations with the `-` operator
 struct mg_obj * subtract(struct mg_obj * x, struct mg_obj * y) {
 	std::cout << "subtract" << std::endl;
 	if (x->type == TYPE_INTEGER && y->type == TYPE_INTEGER) {
+		// int - int -> int
 		int diff = *(int*)x->value - *(int*)y->value;
 		return mg_alloc(TYPE_INTEGER, new int(diff));
-	}
-	else if (x->type == TYPE_INTEGER && y->type == TYPE_FLOAT) {
+	} else if (x->type == TYPE_INTEGER && y->type == TYPE_FLOAT) {
+		// int - float -> float
 		double diff = *(int*)x->value - *(double*)y->value;
 		return mg_alloc(TYPE_FLOAT, new double(diff));
-	}
-	else if (x->type == TYPE_FLOAT && y->type == TYPE_INTEGER) {
+	} else if (x->type == TYPE_FLOAT && y->type == TYPE_INTEGER) {
+		// float - int -> float
 		double diff = *(double*)x->value - *(int*)y->value;
 		return mg_alloc(TYPE_FLOAT, new double(diff));
 	}
 	else if (x->type == TYPE_FLOAT && y->type == TYPE_FLOAT) {
+		// float - float -> float
 		double diff = *(double*)x->value - *(double*)y->value;
 		return mg_alloc(TYPE_FLOAT, new double(diff));
-	}
-	else if (x->type == TYPE_INTEGER && y->type == TYPE_STRING) {
-		//TODO
-	}
-	else if (x->type == TYPE_STRING && y->type == TYPE_INTEGER) {
-		//TODO
 	}
 	//TODO raise invalid operand types error
 }
@@ -334,8 +346,7 @@ void eval_stmt(struct node* node) {
 			conditional = eval_expr(node->children[0]);
 			if (eval_bool(conditional)) {
 				eval_stmt(node->children[1]);
-			}
-			else if (node->num_children == 3) {
+			} else if (node->num_children == 3) {
 				eval_stmt(node->children[2]);
 			}
 			break;
@@ -346,7 +357,7 @@ void eval_stmt(struct node* node) {
 			break;
 		case PRINT:
 			mg_obj * out = eval_expr(node->children[0]);
-			switch(out->type){
+			switch (out->type) {
 				case TYPE_INTEGER:
 					std::cout << *(int*)out->value << std::endl;
 					break;
@@ -357,13 +368,13 @@ void eval_stmt(struct node* node) {
 					std::cout << *(std::string*)out->value << std::endl;
 					break;
 			}
+
 	}
 }
 
 
 struct mg_obj * eval_expr(struct node* node) {
-
-std::cout << "eval_expr" << std::endl;
+	std::cout << "eval_expr" << std::endl;
 	bool t_val;
 	struct mg_obj * left;
 	struct mg_obj * right;
@@ -398,7 +409,8 @@ std::cout << "eval_expr" << std::endl;
 		case LOG_XOR:
 			left = eval_expr(node->children[0]);
 			right = eval_expr(node->children[1]);
-			t_val = (eval_bool(left) || eval_bool(right)) && !((eval_bool(left) && eval_bool(right)));
+			t_val = (eval_bool(left) || eval_bool(right))
+				&& !((eval_bool(left) && eval_bool(right)));
 			return mg_alloc(TYPE_INTEGER, new int(t_val));
 			break;
 		case LOG_AND:
@@ -407,37 +419,47 @@ std::cout << "eval_expr" << std::endl;
 			t_val = eval_bool(left) && eval_bool(right);
 			return mg_alloc(TYPE_INTEGER, new int(t_val));
 			break;
+		
 		case LESS_THAN:
-			eval_comp( eval_expr(node->children[0]), LESS_THAN, eval_expr(node->children[1]) );
-			break;
 		case LESS_EQUAL:
-			eval_comp( eval_expr(node->children[0]), LESS_EQUAL, eval_expr(node->children[1]) );
-			break;
 		case EQUAL:
-			eval_comp( eval_expr(node->children[0]), EQUAL, eval_expr(node->children[1]) );
-			break;
 		case NOT_EQUAL:
-			eval_comp( eval_expr(node->children[0]), NOT_EQUAL, eval_expr(node->children[1]) );
-			break;
 		case GREATER_THAN:
-			eval_comp( eval_expr(node->children[0]), GREATER_THAN, eval_expr(node->children[1]) );
-			break;
 		case GREATER_EQUAL:
-			eval_comp( eval_expr(node->children[0]), GREATER_EQUAL, eval_expr(node->children[1]) );
+			// use token passed in to process the value instead of having
+			// a separate case for each
+			eval_comp(
+				eval_expr(node->children[0]), // left hand side
+				node->token,                  // comparison operator
+				eval_expr(node->children[1])  // right hand side
+			);
 			break;
+		
 		case TIMES:
-			return multiply( eval_expr(node->children[0]), eval_expr(node->children[1]) );
+			return multiply(
+				eval_expr(node->children[0]), // left hand factor
+				eval_expr(node->children[1])  // right hand factor
+			);
 			break;
 		case DIVIDE:
-			return divide( eval_expr(node->children[0]), eval_expr(node->children[1]) );
+			return divide(
+				eval_expr(node->children[0]), // dividend
+				eval_expr(node->children[1])  // divisor
+			);
 			break;
 		case MODULO:
 			break;
 		case PLUS:
-			return add( eval_expr(node->children[0]), eval_expr(node->children[1]) );
+			return add(
+				eval_expr(node->children[0]), // left hand addend
+				eval_expr(node->children[1])  // right hand addend
+			);
 			break;
 		case MINUS:
-			return subtract( eval_expr(node->children[0]), eval_expr(node->children[1]) );
+			return subtract(
+				eval_expr(node->children[0]), // minuend
+				eval_expr(node->children[1])  // subtrahend
+			);
 			break;
 		case POWER:
 			break;
