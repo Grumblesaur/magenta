@@ -18,17 +18,17 @@ void print_vars() {
 		if(iter->second != NULL){
 		switch(iter->second->type) {
 			case TYPE_INTEGER:
-				std::cout << iter->first << "  ";
-				std::cout << *(int*)iter->second->value << std::endl;
+				std::cerr << iter->first << "  ";
+				std::cerr << *(int*)iter->second->value << std::endl;
 				break;
 			case TYPE_FLOAT:
-				std::cout << iter->first << "  ";
-				std::cout << *(double*)iter->second->value << std::endl;
+				std::cerr << iter->first << "  ";
+				std::cerr << *(double*)iter->second->value << std::endl;
 				break;
 			case TYPE_STRING:
-				std::cout << iter->first;
-				std::cout << "  " << *(std::string*) iter->second->value;
-				std::cout << std::endl;
+				std::cerr << iter->first;
+				std::cerr << "  " << *(std::string*) iter->second->value;
+				std::cerr << std::endl;
 				break;
 		}
 		}
@@ -68,8 +68,10 @@ void assignment(struct node * n) {
 
 		if (type == value->type) {
 			vars[id] = value;
-		} else {
-			//TODO: raise error for non matching types
+		} else if (type == TYPE_FLOAT && value->type == TYPE_INTEGER) {
+			value->type = TYPE_FLOAT;
+			*(double *) value->value = (double) *(int*)value->value;
+			vars[id] = value;
 		}
 	} else {
 		//reassignment 
@@ -120,6 +122,16 @@ int eval_bool(struct mg_obj * o) {
 // could probably be more elegantly done. should be revisited.
 int eval_comp(struct mg_obj * left, int token, struct mg_obj * right) {
 	std::cout << "eval_comp" << std::endl;
+	static int counter = 1;
+	std::cerr << "we have passed through eval_comp() " << counter++;
+	std::cerr << " times" << std::endl;
+	print_vars();
+	if (left == NULL) {
+		std::cerr << "left arg of eval_comp() is null" << std::endl;
+	}
+	if (right == NULL) {
+		std::cerr << "right arg of eval_comp() is null" << std::endl;
+	}
 	
 	print_vars();
 	if ( left == NULL || right == NULL 
