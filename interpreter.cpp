@@ -119,15 +119,16 @@ int eval_bool(struct mg_obj * o) {
 int eval_comp(struct mg_obj * left, int token, struct mg_obj * right) {
 	std::cout << "eval_comp" << std::endl;
 	
-	if (left->type == TYPE_STRING && left->type != right->type
-	|| right->type == TYPE_STRING && left->type != right->type) {
+	if ( left == NULL || right == NULL 
+	||(left->type == TYPE_STRING && left->type != right->type)
+	|| (right->type == TYPE_STRING && left->type != right->type)) {
 		// TODO: raise type comparison error
 		std::cerr << "Invalid comparison between incompatible types.";
 		std::cerr << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	
-	bool numeric = left->type == TYPE_STRING && right->type == TYPE_STRING;
+
+	bool numeric = left->type != TYPE_STRING && right->type != TYPE_STRING;
 	double lfloat, rfloat;
 	std::string lstr, rstr;
 	
@@ -419,7 +420,7 @@ struct mg_obj * eval_expr(struct node* node) {
 			left = eval_expr(node->children[0]);
 			right = eval_expr(node->children[1]);
 			t_val = (eval_bool(left) || eval_bool(right))
-				&& !((eval_bool(left) && eval_bool(right)));
+				&& !(eval_bool(left) && eval_bool(right));
 			return mg_alloc(TYPE_INTEGER, new int(t_val));
 			break;
 		case LOG_AND:
@@ -437,11 +438,12 @@ struct mg_obj * eval_expr(struct node* node) {
 		case GREATER_EQUAL:
 			// use token passed in to process the value instead of having
 			// a separate case for each
-			eval_comp(
+			t_val = eval_comp(
 				eval_expr(node->children[0]), // left hand side
 				node->token,                  // comparison operator
 				eval_expr(node->children[1])  // right hand side
 			);
+			return mg_alloc(TYPE_INTEGER, new int(t_val));
 			break;
 		
 		case TIMES:
