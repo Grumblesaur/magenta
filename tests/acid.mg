@@ -5,7 +5,7 @@ flt X2222 = (real_87_varNAME - 1/2) / 4.0;
 
 if 3 < 4 and 5 != 6 {
   flt _a = 5;
-}else {
+} else {
   flt _a = 17;
 }
 

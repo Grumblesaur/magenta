@@ -35,15 +35,12 @@ struct node* make_node(int token, void* value) {
 			// allocating space for the quotes
 			n->value = new char[strlen((char*)value)-1];
 			strnqcpy((char*)n->value, (char*)value);
-		}
-		else if (token == IDENTIFIER) {
+		} else if (token == IDENTIFIER) {
 			n->value = new char[strlen((char*)value)+1];
 			strcpy((char*)n->value, (char*)value);
-		}
-		else if (token == INTEGER_LITERAL) {
+		} else if (token == INTEGER_LITERAL) {
 			n->value = new int(*(int*)value);
-		}
-		else if (token == FLOAT_LITERAL) {
+		} else if (token == FLOAT_LITERAL) {
 			n->value = new double(* (double *) value);
 		}
 	}

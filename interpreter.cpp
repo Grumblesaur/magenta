@@ -306,25 +306,41 @@ struct mg_obj * add(struct mg_obj * x, struct mg_obj * y) {
 // handles operations with the `-` operator
 struct mg_obj * subtract(struct mg_obj * x, struct mg_obj * y) {
 	std::cout << "subtract" << std::endl;
+	if (!x) {
+		std::cerr << "x is null in subtract" << std::endl;
+	}
+	if (!y) {
+		std::cerr << "y is null in subtract" << std::endl;
+	}
+	if (!x || !y) exit(EXIT_FAILURE);
+	
 	if (x->type == TYPE_INTEGER && y->type == TYPE_INTEGER) {
 		// int - int -> int
+		std::cerr << "\tint - int" << std::endl;
 		int diff = *(int*)x->value - *(int*)y->value;
 		return mg_alloc(TYPE_INTEGER, new int(diff));
+		
 	} else if (x->type == TYPE_INTEGER && y->type == TYPE_FLOAT) {
 		// int - float -> float
+		std::cerr << "\tint - float" << std::endl;
 		double diff = *(int*)x->value - *(double*)y->value;
 		return mg_alloc(TYPE_FLOAT, new double(diff));
+		
 	} else if (x->type == TYPE_FLOAT && y->type == TYPE_INTEGER) {
 		// float - int -> float
+		std::cerr << "\tfloat - int" << std::endl;
 		double diff = *(double*)x->value - *(int*)y->value;
 		return mg_alloc(TYPE_FLOAT, new double(diff));
-	}
-	else if (x->type == TYPE_FLOAT && y->type == TYPE_FLOAT) {
+		
+	} else if (x->type == TYPE_FLOAT && y->type == TYPE_FLOAT) {
 		// float - float -> float
+		std::cerr << "\tfloat - float" << std::endl;
 		double diff = *(double*)x->value - *(double*)y->value;
 		return mg_alloc(TYPE_FLOAT, new double(diff));
 	}
 	//TODO raise invalid operand types error
+	std::cerr << "SUBTRACTION FALLTHROUGH ERROR" << std::endl;
+	return NULL;
 }
 
 
@@ -456,6 +472,7 @@ struct mg_obj * eval_expr(struct node* node) {
 			);
 			break;
 		case MINUS:
+			std::cerr << "case MINUS in EVAL_EXPR" << std::endl;
 			return subtract(
 				eval_expr(node->children[0]), // minuend
 				eval_expr(node->children[1])  // subtrahend
