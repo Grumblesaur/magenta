@@ -27,16 +27,16 @@ bool typesMatch(int token, int literal) {
 // determines whether to do assignment, reassignment, or initialization
 
 // assignment -> reduces expression node to mg_obj and compares its type to
-// the declared type. if the types match it inserts the <id,mg_obj> pair into
-// vars map.
+// the declared type. if the types match it inserts the <id,mg_obj> pair
+// into vars map.
 
 // reassignment -> if the identifier has already been
-// declared/initialized reduces expression node to mg_obj and compares its type
-// to the existing mg_obj associated with the id if the types match the value is
-// overwritten.
+// declared/initialized reduces expression node to mg_obj and compares its
+// type to the existing mg_obj associated with the id if the types match
+// the value is overwritten.
 
-// initialization-> stores the identifier in the vars map and associates it with
-// a mg_obj of the declared type with NULL value
+// initialization-> stores the identifier in the vars map and associates
+// it with a mg_obj of the declared type with NULL value
 void assignment(struct node * n) {
 	//assignment
 	if (n->num_children == 3) {
@@ -93,79 +93,56 @@ int eval_bool(struct mg_obj * o) {
 	return o->value != NULL;
 }
 
-//returns an int that represents a boolean value indicating
-//wether the comparison between nodes left and right evaluates to true or false
-//comparison type is passes in as its token
-//could probably be more elegantly done. should be revisited.
+// returns an int that represents a boolean value indicating
+// whether the comparison between nodes left and right evaluates to true
+// or false comparison type is passes in as its token
+// could probably be more elegantly done. should be revisited.
 int eval_comp(struct mg_obj * left, int token, struct mg_obj * right) {
-	if (left->type != right->type) {
+	if (left->type == TYPE_STRING && left->type != right->type
+	|| right->type == TYPE_STRING && left->type != right->type) {
 		// TODO: raise type comparison error
+		std::cerr << "Invalid comparison between incompatible types.";
+		std::cerr << std::endl;
+		exit(EXIT_FAILURE);
 	}
-
+	
+	bool numeric = left->type == TYPE_STRING && right->type == TYPE_STRING;
+	double lfloat, rfloat;
+	std::string lstr, rstr;
+	
+	// numerics are treated as floating-point values for comparison to
+	// allow comparison between floating-point values and integer values
 	if (left->type == TYPE_INTEGER) {
-		switch(token) {
-			case LESS_THAN:
-				return *(int*)left->value < *(int*)right->value;
-				break;
-			case LESS_EQUAL:
-				return *(int*)left->value <= *(int*)right->value;
-				break;
-			case EQUAL:
-				return *(int*)left->value == *(int*)right->value;
-				break;
-			case NOT_EQUAL:
-				return *(int*)left->value != *(int*)right->value;
-				break;
-			case GREATER_EQUAL:
-				return *(int*)left->value >= *(int*)right->value;
-				break;
-			case GREATER_THAN:
-				return *(int*)left->value > *(int*)right->value;
-				break;
-		}
+		lfloat = *(int *) left->value;
+	} else if (left->type = TYPE_FLOAT) {
+		lfloat = *(double *) left->value;
 	}
-	else if (left->type == TYPE_FLOAT) {
-		switch(token) {
-			case LESS_THAN:
-				return *(double*)left->value < *(double*)right->value;
-				break;
-			case LESS_EQUAL:
-				return *(double*)left->value <= *(double*)right->value;
-				break;
-			case EQUAL:
-				return *(double*)left->value == *(double*)right->value;
-				break;
-			case NOT_EQUAL:
-				return *(double*)left->value != *(double*)right->value;
-				break;
-			case GREATER_EQUAL:
-				return *(double*)left->value >= *(double*)right->value;
-				break;
-			case GREATER_THAN:
-				return *(double*)left->value > *(double*)right->value;
-				break;
-		}
+	
+	if (right->type == TYPE_FLOAT) {
+			rfloat = *(double *) right->value;
+	} else if (right->type == TYPE_INTEGER) {
+			rfloat = *(int *) right-> value;
 	}
-	else if (left->type == TYPE_STRING) {
+	
+	if (numeric) {
+		switch (token) {
+			case LESS_THAN: return lfloat < rfloat;
+			case LESS_EQUAL: return lfloat <= rfloat;
+			case EQUAL: return lfloat == rfloat;
+			case NOT_EQUAL: return lfloat != rfloat;
+			case GREATER_EQUAL: return lfloat >= rfloat;
+			case GREATER_THAN: return lfloat > rfloat;
+		}
+	} else {
+		lstr = *(std::string*) left->value;
+		rstr = *(std::string*) right->value;
 		switch(token) {
-			case LESS_THAN:
-				return *(std::string*)left->value < *(std::string*)right->value;
-				break;
-			case LESS_EQUAL:
-				return *(std::string*)left->value <= *(std::string*)right->value;
-				break;
-			case EQUAL:
-				return *(std::string*)left->value == *(std::string*)right->value;
-				break;
-			case NOT_EQUAL:
-				return *(std::string*)left->value != *(std::string*)right->value;
-				break;
-			case GREATER_EQUAL:
-				return *(std::string*)left->value >= *(std::string*)right->value;
-				break;
-			case GREATER_THAN:
-				return *(std::string*)left->value > *(std::string*)right->value;
-				break;
+			case LESS_THAN: return lstr < rstr;
+			case LESS_EQUAL: return lstr <= rstr;
+			case EQUAL: return lstr == rstr;
+			case NOT_EQUAL: return lstr != rstr;
+			case GREATER_EQUAL: return lstr >= rstr;
+			case GREATER_THAN: return lstr > rstr;
 		}
 	}
 }
