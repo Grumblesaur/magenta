@@ -2,7 +2,7 @@
 	#include <stdio.h>
 	#include "tree.h"
 	#include "interpreter.h"
-	#define YYDEBUG 1
+	int yydebug = 1;
 
 	int yywrap();
 	int yylex();
