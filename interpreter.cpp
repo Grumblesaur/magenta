@@ -15,6 +15,7 @@ void print_vars() {
 	std::unordered_map<std::string, struct mg_obj*> :: const_iterator iter;
 
 	for(iter = vars.begin(); iter != vars.end(); iter++) {
+		if(iter->second != NULL){
 		switch(iter->second->type) {
 			case TYPE_INTEGER:
 				std::cout << iter->first << "  ";
@@ -29,6 +30,7 @@ void print_vars() {
 				std::cout << "  " << *(std::string*) iter->second->value;
 				std::cout << std::endl;
 				break;
+		}
 		}
 	}
 }
@@ -119,6 +121,7 @@ int eval_bool(struct mg_obj * o) {
 int eval_comp(struct mg_obj * left, int token, struct mg_obj * right) {
 	std::cout << "eval_comp" << std::endl;
 	
+	print_vars();
 	if ( left == NULL || right == NULL 
 	||(left->type == TYPE_STRING && left->type != right->type)
 	|| (right->type == TYPE_STRING && left->type != right->type)) {
