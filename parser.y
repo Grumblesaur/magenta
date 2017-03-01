@@ -1,6 +1,7 @@
 %{
 	#include <stdio.h>
 	#include "tree.h"
+	#include "interpreter.h"
 	#define YYDEBUG 1
 
 	int yywrap();
@@ -84,6 +85,8 @@
 %token STATEMENT 
 %token ARGUMENT
 %token ARG_LIST
+
+%token PRINT
 
 %type<n> program statements statement expression disjunction
 %type<n> conjunction relation addend factor exponent term id
@@ -171,6 +174,9 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 	} | expression SEMICOLON {
 		$$ = make_node(STATEMENT, NULL);
 		attach($$, $1);
+	} | PRINT expression SEMICOLON {
+		$$ = make_node(PRINT, NULL);
+		attach($$, $2);
 	}
 
 
@@ -316,14 +322,8 @@ int main(int argc, char **argv) {
 	yyparse();
 	
 
-	print(result, 0);
-	// int token;
-	// do {	
-	// 	token = yylex( );
-		
-	// 	printf("%d\n", token);
-
-  	// } while(token != 0);
+	// print(result, 0);
+	eval_stmt(result);
 	
 
 	fclose(stdin);

@@ -20,7 +20,7 @@ tree.o: tree.h tree.cpp parser.tab.h
 	g++ -g -c tree.cpp
 
 parser.tab.h: parser.tab.c
-parser.tab.c: parser.y tree.h
+parser.tab.c: parser.y tree.h interpreter.h
 	bison -d parser.y
 
 clean:

@@ -10,7 +10,7 @@ extern "C" {
 		int token;
 		void * value;
 		int num_children;
-		struct node* children[MAX_CHILDREN];
+		struct node * children[MAX_CHILDREN];
 	};
 
 	int strnqcpy(char * destination, char * target);
