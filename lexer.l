@@ -73,6 +73,8 @@
 "xaut"     {return BIT_XOR;       }
 "imp"      {return BIT_IMPLIES;   }
 
+"print"    {return PRINT;         }
+
 [a-zA-Z_]+[0-9a-zA-Z_]* {
 	yylval.str = yytext;
 	return IDENTIFIER;

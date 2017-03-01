@@ -26,7 +26,7 @@ struct mg_obj * mg_alloc(int type, void * value) {
 		
 		case TYPE_STRING:
 			m->type = TYPE_STRING;
-			m->value = new std::string(*(std::string*)value);
+			m->value = new std::string((char*)value);
 			break;
 	}
 	return m;

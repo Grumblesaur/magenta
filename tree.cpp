@@ -33,11 +33,11 @@ struct node* make_node(int token, void* value) {
 		if (token == STRING_LITERAL) {
 			// drop two characters from the array because we're not
 			// allocating space for the quotes
-			n->value = new char[strlen((char*)value)-2];
+			n->value = new char[strlen((char*)value)-1];
 			strnqcpy((char*)n->value, (char*)value);
 		}
 		else if (token == IDENTIFIER) {
-			n->value = new char[strlen((char*)value)];
+			n->value = new char[strlen((char*)value)+1];
 			strcpy((char*)n->value, (char*)value);
 		}
 		else if (token == INTEGER_LITERAL) {
