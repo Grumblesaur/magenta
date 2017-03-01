@@ -16,21 +16,21 @@ void print_vars() {
 
 	for(iter = vars.begin(); iter != vars.end(); iter++) {
 		if(iter->second != NULL){
-		switch(iter->second->type) {
-			case TYPE_INTEGER:
-				std::cerr << iter->first << "  ";
-				std::cerr << *(int*)iter->second->value << std::endl;
-				break;
-			case TYPE_FLOAT:
-				std::cerr << iter->first << "  ";
-				std::cerr << *(double*)iter->second->value << std::endl;
-				break;
-			case TYPE_STRING:
-				std::cerr << iter->first;
-				std::cerr << "  " << *(std::string*) iter->second->value;
-				std::cerr << std::endl;
-				break;
-		}
+			switch(iter->second->type) {
+				case TYPE_INTEGER:
+					std::cerr << iter->first << "  ";
+					std::cerr << *(int*)iter->second->value << std::endl;
+					break;
+				case TYPE_FLOAT:
+					std::cerr << iter->first << "  ";
+					std::cerr << *(double*)iter->second->value << std::endl;
+					break;
+				case TYPE_STRING:
+					std::cerr << iter->first;
+					std::cerr << "  " << *(std::string*)iter->second->value;
+					std::cerr << std::endl;
+					break;
+			}
 		}
 	}
 }
@@ -197,19 +197,19 @@ struct mg_obj * multiply(struct mg_obj * x, struct mg_obj * y) {
 	if (x->type == TYPE_INTEGER && y->type == TYPE_INTEGER) {
 		// int * int -> int
 		int product = *(int*)x->value * *(int*)y->value;
-		return mg_alloc(TYPE_INTEGER, new int(product));
+		return mg_alloc(TYPE_INTEGER, &product);
 	} else if (x->type == TYPE_INTEGER && y->type == TYPE_FLOAT) {
 		// int * float -> float
 		double product = *(int*)x->value * *(double*)y->value;
-		return mg_alloc(TYPE_FLOAT, new double(product));
+		return mg_alloc(TYPE_FLOAT, &product);
 	} else if (x->type == TYPE_FLOAT && y->type == TYPE_INTEGER) {
 		// float * int -> float
 		double product = *(double*)x->value * *(int*)y->value;
-		return mg_alloc(TYPE_FLOAT, new double(product));
+		return mg_alloc(TYPE_FLOAT, &product&);
 	} else if (x->type == TYPE_FLOAT && y->type == TYPE_FLOAT) {
 		// float * float -> float
 		double product = *(double*)x->value * *(double*)y->value;
-		return mg_alloc(TYPE_FLOAT, new double(product));
+		return mg_alloc(TYPE_FLOAT, &product);
 	} else if (x->type == TYPE_INTEGER && y->type == TYPE_STRING) {
 		// int n * string s -> s repeated n times
 		int repeats = *(int *) x->value;
@@ -219,7 +219,7 @@ struct mg_obj * multiply(struct mg_obj * x, struct mg_obj * y) {
 			repetition += text;
 			repeats--;
 		}
-		return mg_alloc(TYPE_STRING, new std::string(repetition));
+		return mg_alloc(TYPE_STRING, &repetition);
 	} else if (x->type == TYPE_STRING && y->type == TYPE_INTEGER) {
 		// string s * int n -> s repeated n times
 		int repeats = *(int *) y->value;
@@ -229,7 +229,7 @@ struct mg_obj * multiply(struct mg_obj * x, struct mg_obj * y) {
 			repetition += text;
 			repeats--;
 		}
-		return mg_alloc(TYPE_STRING, new std::string(repetition));
+		return mg_alloc(TYPE_STRING, &repetition);
 	}
 	//TODO raise invalid operand types error
 }
@@ -246,25 +246,19 @@ struct mg_obj * divide(struct mg_obj * x, struct mg_obj * y) {
 	std::cout << "divide" << std::endl;
 	if (x->type == TYPE_INTEGER && y->type == TYPE_INTEGER) {
 		int quotient = *(int*)x->value / *(int*)y->value;
-		return mg_alloc(TYPE_INTEGER, new int(quotient));
+		return mg_alloc(TYPE_INTEGER, &quotient);
 	}
 	else if (x->type == TYPE_INTEGER && y->type == TYPE_FLOAT) {
 		double quotient = *(int*)x->value / *(double*)y->value;
-		return mg_alloc(TYPE_FLOAT, new double(quotient));
+		return mg_alloc(TYPE_FLOAT, &quotient);
 	}
 	else if (x->type == TYPE_FLOAT && y->type == TYPE_INTEGER) {
 		double quotient = *(double*)x->value / *(int*)y->value;
-		return mg_alloc(TYPE_FLOAT, new double(quotient));
+		return mg_alloc(TYPE_FLOAT, &quotient);
 	}
 	else if (x->type == TYPE_FLOAT && y->type == TYPE_FLOAT) {
 		double quotient = *(double*)x->value / *(double*)y->value;
-		return mg_alloc(TYPE_FLOAT, new double(quotient));
-	}
-	else if (x->type == TYPE_INTEGER && y->type == TYPE_STRING) {
-		//TODO
-	}
-	else if (x->type == TYPE_STRING && y->type == TYPE_INTEGER) {
-		//TODO
+		return mg_alloc(TYPE_FLOAT, &quotient);
 	}
 	//TODO raise invalid operand types error
 }
@@ -275,7 +269,7 @@ struct mg_obj * modulo(struct mg_obj * x, struct mg_obj * y) {
 	std::cout << "modulo" << std::endl;
 	if (x->type == TYPE_INTEGER && y->type == TYPE_INTEGER) {
 		int z = *(int *)x->value % *(int *)y->value;
-		return mg_alloc(TYPE_INTEGER, new int(z));
+		return mg_alloc(TYPE_INTEGER, &z);
 	}
 	// TODO raise invalid operand types error
 }
@@ -283,6 +277,11 @@ struct mg_obj * modulo(struct mg_obj * x, struct mg_obj * y) {
 // handles operations with the `+` operator
 struct mg_obj * add(struct mg_obj * x, struct mg_obj * y) {
 	std::cout << "add" << std::endl;
+	print_vars();
+	static int counter = 1;
+	std::cerr << "We have entered add() " << counter++ << " times";
+	std::cerr << std::endl;
+	
 	if (x == NULL) {
 		std::cerr << "x is null in add" << std::endl;
 	}
