@@ -125,7 +125,6 @@ int eval_comp(struct mg_obj * left, int token, struct mg_obj * right) {
 	static int counter = 1;
 	std::cerr << "we have passed through eval_comp() " << counter++;
 	std::cerr << " times" << std::endl;
-	print_vars();
 	if (left == NULL) {
 		std::cerr << "left arg of eval_comp() is null" << std::endl;
 	}
@@ -133,7 +132,6 @@ int eval_comp(struct mg_obj * left, int token, struct mg_obj * right) {
 		std::cerr << "right arg of eval_comp() is null" << std::endl;
 	}
 	
-	print_vars();
 	if ( left == NULL || right == NULL 
 	||(left->type == TYPE_STRING && left->type != right->type)
 	|| (right->type == TYPE_STRING && left->type != right->type)) {
@@ -277,7 +275,6 @@ struct mg_obj * modulo(struct mg_obj * x, struct mg_obj * y) {
 // handles operations with the `+` operator
 struct mg_obj * add(struct mg_obj * x, struct mg_obj * y) {
 	std::cout << "add" << std::endl;
-	print_vars();
 	static int counter = 1;
 	std::cerr << "We have entered add() " << counter++ << " times";
 	std::cerr << std::endl;
@@ -288,6 +285,9 @@ struct mg_obj * add(struct mg_obj * x, struct mg_obj * y) {
 	if (y == NULL) {
 		std::cerr << "y is null in add" << std::endl;
 	}
+	
+	print_vars();
+	
 	if (x == NULL || y == NULL) {
 		std::cerr << "uninitialized argument: add" << std::endl;
 		exit(EXIT_FAILURE);
@@ -362,7 +362,6 @@ struct mg_obj * subtract(struct mg_obj * x, struct mg_obj * y) {
 
 void eval_stmt(struct node* node) {
 	std::cout << "eval_stmt" << std::endl;
-	print_vars();
 	struct mg_obj * conditional;
 	switch (node->token) {
 		case ASSIGN:
@@ -406,6 +405,14 @@ void eval_stmt(struct node* node) {
 
 struct mg_obj * eval_expr(struct node* node) {
 	std::cout << "eval_expr" << std::endl;
+	std::cerr << "token type = " << node->token << std::endl;
+	if (node->token == INTEGER_LITERAL) {
+		std::cerr << "INT FOUND" << std::endl;
+		mg_obj * o = ((mg_obj *) node->value);
+		std::cerr << "\t addr = " << o << std::endl;
+		std::cerr << "\t val  = " << *(int *) o << std::endl;
+	}
+	
 	bool t_val;
 	struct mg_obj * left;
 	struct mg_obj * right;
@@ -482,6 +489,25 @@ struct mg_obj * eval_expr(struct node* node) {
 		case MODULO:
 			break;
 		case PLUS:
+			{ // anonymous block for scoping purposes
+				std::cerr << "case PLUS in EVAL_EXPR" << std::endl;
+				struct node * plus_test = node->children[1];
+				std::cerr << "plus_test->value = " << plus_test->value;
+				std::cerr << std::endl;
+				
+				std::cerr << "plus_test->value->type is ";
+				unsigned int t = ((mg_obj *) plus_test->value)->type;
+				if (t == INTEGER_LITERAL) {
+					std::cerr << "INT LITERAL " << std::endl;
+				} else {
+					std::cerr << "token type #" << t << std::endl;
+				}
+				
+				std::cerr << "plus_test->value->value = ";
+				std::cerr << ((mg_obj*)plus_test->value)->value;
+				std::cerr << std::endl;
+				
+			}
 			return add(
 				eval_expr(node->children[0]), // left hand addend
 				eval_expr(node->children[1])  // right hand addend

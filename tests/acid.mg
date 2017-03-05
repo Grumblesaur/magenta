@@ -13,7 +13,6 @@ if 3 >= 3.01 or 5 == 7 {
   X2222 = X2222 + 10;
 }
 
-#     V------------- here is where we are segfaulting currently
 if _a > X2222 {
 	flt NUM = X2222 * _a;
 }
@@ -25,6 +24,7 @@ while i > 0 {
   i = i - 7;
 }
 
+# here be a problem
 if not not not(i != 0) {
 	NUM = NUM + 2;
 }
