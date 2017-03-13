@@ -103,7 +103,7 @@ int eval_bool(struct mg_obj * o) {
 	std::cout << "eval_bool" << std::endl;
 	int type = (o->type);
 	if (type == TYPE_STRING) {
-		return std::string((char *)o->value) != "";
+		return *(std::string *)o->value != "";
 	}
 	if (type == TYPE_INTEGER) {
 		return *(int*)o->value != 0;
@@ -148,7 +148,7 @@ int eval_comp(struct mg_obj * left, int token, struct mg_obj * right) {
 	// numerics are treated as floating-point values for comparison to
 	// allow comparison between floating-point values and integer values
 	if (left->type == TYPE_INTEGER) {
-		lfloat = *(int *) left->value;
+		lfloat = (double)*(int *) left->value;
 	} else if (left->type = TYPE_FLOAT) {
 		lfloat = *(double *) left->value;
 	}
@@ -156,7 +156,7 @@ int eval_comp(struct mg_obj * left, int token, struct mg_obj * right) {
 	if (right->type == TYPE_FLOAT) {
 			rfloat = *(double *) right->value;
 	} else if (right->type == TYPE_INTEGER) {
-			rfloat = *(int *) right-> value;
+			rfloat = (double)*(int *) right-> value;
 	}
 	
 	if (numeric) {
@@ -362,6 +362,8 @@ struct mg_obj * subtract(struct mg_obj * x, struct mg_obj * y) {
 
 void eval_stmt(struct node* node) {
 	std::cout << "eval_stmt" << std::endl;
+	std::cout << "VARS" << std::endl;
+	print_vars();
 	struct mg_obj * conditional;
 	switch (node->token) {
 		case ASSIGN:
@@ -386,6 +388,7 @@ void eval_stmt(struct node* node) {
 			}
 			break;
 		case PRINT:
+			// std::cout << "PRINT STATEMENT: ";
 			mg_obj * out = eval_expr(node->children[0]);
 			switch (out->type) {
 				case TYPE_INTEGER:

@@ -18,12 +18,12 @@ struct mg_obj * mg_alloc(int type, void * value) {
 		
 		case TYPE_INTEGER:
 			m->type = TYPE_INTEGER;
-			m->value = new int(*(int*)value);
+			m->value = (int*)value;
 			break;
 		
 		case TYPE_FLOAT:
 			m->type = TYPE_FLOAT;
-			m->value = new double(*(double*)value);
+			m->value = (double*)value;
 			break;
 		
 		case TYPE_STRING:
