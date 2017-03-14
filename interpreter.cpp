@@ -57,6 +57,7 @@ bool declared(std::string id) {
 // it with a mg_obj of the declared type with NULL value
 void assignment(struct node * n) {
 
+	std::cerr << "ASSIGN" << std::endl;
 	//assignment
 	if (n->num_children == 3) {
 		std::cout << "assign" << std::endl;
@@ -83,7 +84,9 @@ void assignment(struct node * n) {
 				//reduce expression node to mg_obj
 				struct mg_obj * value = eval_expr(n->children[1]); 
 				if (current_val->type == value->type) {
-					delete current_val;
+					// the below delete statement was causing us to store
+					// identifiers with no value, not exactly sure why...
+					// delete current_val;
 					vars[id] = value;
 				} else {
 					//raise types don't match
@@ -285,15 +288,14 @@ struct mg_obj * add(struct mg_obj * x, struct mg_obj * y) {
 	if (y == NULL) {
 		std::cerr << "y is null in add" << std::endl;
 	}
-	
-	print_vars();
-	
+		
 	if (x == NULL || y == NULL) {
 		std::cerr << "uninitialized argument: add" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	
 	if (x->type == TYPE_INTEGER && y->type == TYPE_INTEGER) {
+		std::cout << *(int*)x->value << "+" << *(int*)y->value << std::endl;
 		// int + int -> int
 		int sum = *(int*)x->value + *(int*)y->value;
 		return mg_alloc(TYPE_INTEGER, &sum);
@@ -363,6 +365,10 @@ struct mg_obj * subtract(struct mg_obj * x, struct mg_obj * y) {
 void eval_stmt(struct node* node) {
 	std::cout << "eval_stmt" << std::endl;
 	std::cout << "VARS" << std::endl;
+	std::cerr << node->token << std::endl;
+	if (node->value == NULL) {
+		std::cerr << "NO VALUE" << std::endl;
+	}
 	print_vars();
 	struct mg_obj * conditional;
 	switch (node->token) {
