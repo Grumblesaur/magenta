@@ -8,16 +8,22 @@
 #include "v_wrapper.h"
 
 
-template<typename T> 
 class mg_obj {
 	public:
-		mg_obj<T>(int type);
-		mg_obj<T>(int type, T value);
+	
+		mg_obj(int type);
+
+		template <typename T>
+		mg_obj(int type, T value);
+
 		~mg_obj();
 		
 		int type;
 		bool set;
-		v_wrapper value;
+
+		template <typename T>
+		virtual T value( ) = 0;
 };
+
 #include "mg_obj.cpp"
 #endif
