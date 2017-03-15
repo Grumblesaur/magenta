@@ -57,6 +57,7 @@ bool declared(std::string id) {
 // it with a mg_obj of the declared type with NULL value
 void assignment(struct node * n) {
 
+	std::cerr << "ASSIGN" << std::endl;
 	//assignment
 	if (n->num_children == 3) {
 		std::cout << "assign" << std::endl;
@@ -83,7 +84,9 @@ void assignment(struct node * n) {
 				//reduce expression node to mg_obj
 				struct mg_obj * value = eval_expr(n->children[1]); 
 				if (current_val->type == value->type) {
-					delete current_val;
+					// the below delete statement was causing us to store
+					// identifiers with no value, not exactly sure why...
+					// delete current_val;
 					vars[id] = value;
 				} else {
 					//raise types don't match
@@ -103,7 +106,7 @@ int eval_bool(struct mg_obj * o) {
 	std::cout << "eval_bool" << std::endl;
 	int type = (o->type);
 	if (type == TYPE_STRING) {
-		return std::string((char *)o->value) != "";
+		return *(std::string *)o->value != "";
 	}
 	if (type == TYPE_INTEGER) {
 		return *(int*)o->value != 0;
@@ -125,7 +128,6 @@ int eval_comp(struct mg_obj * left, int token, struct mg_obj * right) {
 	static int counter = 1;
 	std::cerr << "we have passed through eval_comp() " << counter++;
 	std::cerr << " times" << std::endl;
-	print_vars();
 	if (left == NULL) {
 		std::cerr << "left arg of eval_comp() is null" << std::endl;
 	}
@@ -133,7 +135,6 @@ int eval_comp(struct mg_obj * left, int token, struct mg_obj * right) {
 		std::cerr << "right arg of eval_comp() is null" << std::endl;
 	}
 	
-	print_vars();
 	if ( left == NULL || right == NULL 
 	||(left->type == TYPE_STRING && left->type != right->type)
 	|| (right->type == TYPE_STRING && left->type != right->type)) {
@@ -150,7 +151,7 @@ int eval_comp(struct mg_obj * left, int token, struct mg_obj * right) {
 	// numerics are treated as floating-point values for comparison to
 	// allow comparison between floating-point values and integer values
 	if (left->type == TYPE_INTEGER) {
-		lfloat = *(int *) left->value;
+		lfloat = (double)*(int *) left->value;
 	} else if (left->type = TYPE_FLOAT) {
 		lfloat = *(double *) left->value;
 	}
@@ -158,7 +159,7 @@ int eval_comp(struct mg_obj * left, int token, struct mg_obj * right) {
 	if (right->type == TYPE_FLOAT) {
 			rfloat = *(double *) right->value;
 	} else if (right->type == TYPE_INTEGER) {
-			rfloat = *(int *) right-> value;
+			rfloat = (double)*(int *) right-> value;
 	}
 	
 	if (numeric) {
@@ -277,7 +278,6 @@ struct mg_obj * modulo(struct mg_obj * x, struct mg_obj * y) {
 // handles operations with the `+` operator
 struct mg_obj * add(struct mg_obj * x, struct mg_obj * y) {
 	std::cout << "add" << std::endl;
-	print_vars();
 	static int counter = 1;
 	std::cerr << "We have entered add() " << counter++ << " times";
 	std::cerr << std::endl;
@@ -288,12 +288,14 @@ struct mg_obj * add(struct mg_obj * x, struct mg_obj * y) {
 	if (y == NULL) {
 		std::cerr << "y is null in add" << std::endl;
 	}
+		
 	if (x == NULL || y == NULL) {
 		std::cerr << "uninitialized argument: add" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	
 	if (x->type == TYPE_INTEGER && y->type == TYPE_INTEGER) {
+		std::cout << *(int*)x->value << "+" << *(int*)y->value << std::endl;
 		// int + int -> int
 		int sum = *(int*)x->value + *(int*)y->value;
 		return mg_alloc(TYPE_INTEGER, &sum);
@@ -362,6 +364,11 @@ struct mg_obj * subtract(struct mg_obj * x, struct mg_obj * y) {
 
 void eval_stmt(struct node* node) {
 	std::cout << "eval_stmt" << std::endl;
+	std::cout << "VARS" << std::endl;
+	std::cerr << node->token << std::endl;
+	if (node->value == NULL) {
+		std::cerr << "NO VALUE" << std::endl;
+	}
 	print_vars();
 	struct mg_obj * conditional;
 	switch (node->token) {
@@ -387,6 +394,7 @@ void eval_stmt(struct node* node) {
 			}
 			break;
 		case PRINT:
+			// std::cout << "PRINT STATEMENT: ";
 			mg_obj * out = eval_expr(node->children[0]);
 			switch (out->type) {
 				case TYPE_INTEGER:
@@ -406,6 +414,14 @@ void eval_stmt(struct node* node) {
 
 struct mg_obj * eval_expr(struct node* node) {
 	std::cout << "eval_expr" << std::endl;
+	std::cerr << "token type = " << node->token << std::endl;
+	if (node->token == INTEGER_LITERAL) {
+		std::cerr << "INT FOUND" << std::endl;
+		mg_obj * o = ((mg_obj *) node->value);
+		std::cerr << "\t addr = " << o << std::endl;
+		std::cerr << "\t val  = " << *(int *) o << std::endl;
+	}
+	
 	bool t_val;
 	struct mg_obj * left;
 	struct mg_obj * right;
@@ -482,6 +498,25 @@ struct mg_obj * eval_expr(struct node* node) {
 		case MODULO:
 			break;
 		case PLUS:
+			{ // anonymous block for scoping purposes
+				std::cerr << "case PLUS in EVAL_EXPR" << std::endl;
+				struct node * plus_test = node->children[1];
+				std::cerr << "plus_test->value = " << plus_test->value;
+				std::cerr << std::endl;
+				
+				std::cerr << "plus_test->value->type is ";
+				unsigned int t = ((mg_obj *) plus_test->value)->type;
+				if (t == INTEGER_LITERAL) {
+					std::cerr << "INT LITERAL " << std::endl;
+				} else {
+					std::cerr << "token type #" << t << std::endl;
+				}
+				
+				std::cerr << "plus_test->value->value = ";
+				std::cerr << ((mg_obj*)plus_test->value)->value;
+				std::cerr << std::endl;
+				
+			}
 			return add(
 				eval_expr(node->children[0]), // left hand addend
 				eval_expr(node->children[1])  // right hand addend
