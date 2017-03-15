@@ -1,10 +1,12 @@
 #ifndef MG_INT_H
 #define MG_INT_H
 
-class mg_flt : public mg_obj{
+#include "mg_obj.h"
+
+class mg_flt : public mg_obj {
 	public:
-		mg_int(int type, void * value);
-		~mg_int();
+		mg_flt(int type, void * value);
+		~mg_flt();
 		double value;
 };
 #endif

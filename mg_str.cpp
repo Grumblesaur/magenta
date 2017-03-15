@@ -1,4 +1,5 @@
-#include "mg_int.h"
+#include <string>
+#include "mg_str.h"
 #include "mg_obj.h"
 
 mg_str::mg_str(int type, void * value) {

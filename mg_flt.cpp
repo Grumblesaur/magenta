@@ -1,4 +1,4 @@
-#include "mg_int.h"
+#include "mg_flt.h"
 #include "mg_obj.h"
 
 mg_flt::mg_flt(int type, void * value) {
