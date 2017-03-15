@@ -50,10 +50,11 @@ mg_obj eval_expr(struct node * node) {
 		case IDENTIFIER:
 			return vars[std::string((char *) node->value)];
 		case INTEGER_LITERAL:
-			return mg_int(TYPE_INTEGER, node->value);
+			return mg_int(node->value);
 		case FLOAT_LITERAL:
-			return mg_flt(TYPE_FLOAT, (node->value);
-		case XXXXX 
+			return mg_flt(node->value);
+		case STRING_LITERAL:
+			return mg_str(node->value); 
 	
 }
 

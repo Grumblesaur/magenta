@@ -1,4 +1,4 @@
-#include "mg_int.h"
+#include "mg_flt.h"
 #include "mg_obj.h"
 #include "parser.tab.h"
 
