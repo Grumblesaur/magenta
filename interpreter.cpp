@@ -27,6 +27,18 @@ bool declared(string id) {
 
 
 mg_obj eval_expr(struct node * node) {
+	bool t_val;
+	mg_obj left, right;
+	switch(node->token) {
+		case IDENTIFIER:
+			return vars[std::string((char *) node->value)];
+		case INTEGER_LITERAL:
+			return mg_int(node->value);
+		case FLOAT_LITERAL:
+			return mg_flt(node->value);
+		case STRING_LITERAL:
+			return mg_str(node->value); 
+	}
 	
 }
 
@@ -63,7 +75,6 @@ void assign(struct node * n) {
 		vars[id] = value;
 	}
 }
-
 
 void eval_stmt(struct node * node) {
 

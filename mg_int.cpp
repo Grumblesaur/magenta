@@ -1,8 +1,8 @@
 #include "mg_int.h"
 #include "mg_obj.h"
+#include "parser.tab.h"
 
-mg_int::mg_int(int type, void * value) {
-	this->type = type;
+mg_int::mg_int(void * value) {
+	this->type = TYPE_INTEGER;
 	this->value = *(int *)value;
-	this->set = true;
 }

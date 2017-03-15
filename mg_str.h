@@ -6,7 +6,7 @@
 
 class mg_str : public mg_obj{
 	public:
-		mg_str(int type, void * value);
+		mg_str(void * value);
 		~mg_str();
 		std::string value;
 };
