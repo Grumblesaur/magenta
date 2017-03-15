@@ -16,6 +16,9 @@ interpreter.o: interpreter.h interpreter.cpp tree.h mg_obj.h parser.tab.h
 mg_obj.o: mg_obj.h mg_obj.cpp tree.h parser.tab.h
 	g++ -g -c mg_obj.cpp
 
+mg_int.o: mg_obj.h mg_obj.cpp
+	g++ -g -c mg_int.cpp
+
 tree.o: tree.h tree.cpp parser.tab.h
 	g++ -g -c tree.cpp
 
