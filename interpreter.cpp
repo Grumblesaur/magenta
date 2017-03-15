@@ -44,6 +44,16 @@ mg_obj assign(struct node * n) {
 }
 
 mg_obj eval_expr(struct node * node) {
+	bool t_val;
+	mg_obj left, right;
+	switch(node->token) {
+		case IDENTIFIER:
+			return vars[std::string((char *) node->value)];
+		case INTEGER_LITERAL:
+			return mg_int(TYPE_INTEGER, node->value);
+		case FLOAT_LITERAL:
+			return mg_flt(TYPE_FLOAT, (node->value);
+		case XXXXX 
 	
 }
 
