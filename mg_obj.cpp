@@ -1,4 +1,6 @@
-// Write code for creating and destroying mg_objects
+#ifndef MG_OBJ_CPP
+#define MG_OBJ_CPP
+
 #include <string>
 #include <map>
 #include <iostream>
@@ -25,3 +27,5 @@ template<typename T>
 mg_obj<T>::~mg_obj(void) {
 	if (DEBUG) std::cout << "destructed: " << value << std::endl;
 }
+
+#endif

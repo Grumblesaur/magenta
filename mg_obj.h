@@ -1,5 +1,5 @@
-#ifndef MG_OBJECT
-#define MG_OBJECT
+#ifndef MG_OBJECT_H
+#define MG_OBJECT_H
 
 #include <map>
 #include <string>
@@ -10,13 +10,13 @@
 template<typename T> 
 class mg_obj {
 	public:
-		mg_obj(int type);
-		mg_obj(int type, T value);
+		mg_obj<T>(int type);
+		mg_obj<T>(int type, T value);
 		~mg_obj();
 		
 		int type;
 		bool set;
 		T value;
 };
-
+#include "mg_obj.cpp"
 #endif

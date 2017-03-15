@@ -7,9 +7,10 @@
 #include "tree.h"
 #include "mg_obj.h"
 
-mg_obj eval_expr(struct node * node) {
+template <typename T>
+mg_obj<T> eval_expr(struct node * node) {
 
-	return mg_obj(TYPE_INTEGER);
+	return mg_obj<int>(TYPE_INTEGER);
 }
 
 
