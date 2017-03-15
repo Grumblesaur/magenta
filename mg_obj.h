@@ -7,17 +7,16 @@
 #include "parser.tab.h"
 
 
-struct mg_obj {
-	void * value;
-	int type;
+template<typename T> 
+class mg_obj {
+	public:
+		mg_obj(int type);
+		mg_obj(int type, T value);
+		~mg_obj();
+		
+		int type;
+		bool set;
+		T value;
 };
-
-struct mg_format {
-	std::string name_of_type;
-	std::map<std::string, struct mg_obj *> data;
-};
-
-struct mg_obj * mg_alloc(int, void *);
-struct mg_format * mg_alloc_type(std::string, struct mg_format);
 
 #endif
