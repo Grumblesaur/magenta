@@ -3,7 +3,7 @@
 
 class mg_obj {
 	
-	public:	
+	public:
 		int type;
 		bool set;
 };

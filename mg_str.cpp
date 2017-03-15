@@ -4,6 +4,6 @@
 
 mg_str::mg_str(int type, void * value) {
 	this->type = type;
-	this->value = *(std::string *)value;
+	this->value = std::string((char *)value);
 	this->set = true;
 }
