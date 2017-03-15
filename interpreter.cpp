@@ -6,6 +6,9 @@
 #include "parser.tab.h"
 #include "tree.h"
 #include "mg_obj.h"
+#include "mg_int.h"
+#include "mg_flt.h"
+#include "mg_str.h"
 
 using std::string; using std::cout; using std::endl;
 
@@ -26,6 +29,7 @@ mg_obj assign(struct node * n) {
 	//assignment 
 	if (n->num_children == 3) {
 		string id = string((char *)n->children[0]->value);
+
 	} else {
 
 		// reassignment
