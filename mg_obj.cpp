@@ -25,7 +25,7 @@ mg_obj<T>::mg_obj(int type, T value) {
 
 template<typename T>
 mg_obj<T>::~mg_obj(void) {
-	if (DEBUG) std::cout << "destructed: " << value << std::endl;
+	// if (DEBUG) std::cout << "destructed: " << value << std::endl;
 }
 
 #endif

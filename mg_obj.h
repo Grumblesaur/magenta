@@ -5,6 +5,7 @@
 #include <string>
 #include "tree.h"
 #include "parser.tab.h"
+#include "v_wrapper.h"
 
 
 template<typename T> 
@@ -16,7 +17,7 @@ class mg_obj {
 		
 		int type;
 		bool set;
-		T value;
+		v_wrapper value;
 };
 #include "mg_obj.cpp"
 #endif
