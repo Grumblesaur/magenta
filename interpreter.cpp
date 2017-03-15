@@ -8,6 +8,10 @@
 #include "mg_obj.h"
 
 template <typename T>
+std::unordered_map<std::string, mg_obj<T>> vars;
+
+
+template <typename T>
 mg_obj<T> eval_expr(struct node * node) {
 
 	return mg_obj<int>(TYPE_INTEGER);
