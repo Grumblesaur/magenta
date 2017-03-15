@@ -6,3 +6,7 @@ mg_int::mg_int(void * value) {
 	this->type = TYPE_INTEGER;
 	this->value = *(int *)value;
 }
+
+mg_int::~mg_int() {
+	
+}

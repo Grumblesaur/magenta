@@ -5,7 +5,6 @@ class mg_obj {
 	
 	public:
 		int type;
-		bool set;
 };
 
 #endif

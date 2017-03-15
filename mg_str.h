@@ -1,5 +1,5 @@
-#ifndef MG_INT_H
-#define MG_INT_H
+#ifndef MG_STR_H
+#define MG_STR_H
 
 #include <string>
 #include "mg_obj.h"

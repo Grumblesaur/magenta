@@ -5,5 +5,8 @@
 mg_flt::mg_flt(void * value) {
 	this->type = type;
 	this->value = *(double *)value;
-	this->set = true;
+}
+
+mg_flt::~mg_flt() {
+	
 }
