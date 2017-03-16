@@ -23,12 +23,13 @@ std::unordered_map<string, mg_obj *> vars;
 
 // returns whether id is an initialized variable name
 bool declared(string id) {
-	std::unordered_map<string, mg_obj>::const_iterator iter =
+	std::unordered_map<string, mg_obj *>::const_iterator iter =
 		vars.find(id);
 	return iter != vars.end();
 }
 
 
+// I think this needs to take a mg_obj * not a node
 bool eval_bool(struct node * node) {
 	switch(node->token) {
 		case TYPE_STRING:
@@ -49,21 +50,25 @@ bool eval_bool(struct node * node) {
 // 		if (mg_obj->type == TYPE_INTEGER) {
 // 			int value = (mg_int *)o->value;
 // 		}
+// you can't access value from mg_obj because it doesn't have that field
+// you can't directly cast mg_obj to any of its subclasses, but you can cast pointers
 bool eval_comp(mg_obj * left, int op, mg_obj * right) {
-	if (left.type == TYPE_STRING && left.type != right.type
-		|| right.type == TYPE_STRING && left.type != right.type) {
+	if ( (left->type == TYPE_STRING && left->type != right->type)
+		|| (right->type == TYPE_STRING && left->type != right->type)) {
 		
 		cerr << "Bad comparison: str val against non-str val" << endl;
 		exit(EXIT_FAILURE);
 	}
 	
-	bool numeric = left.type != TYPE_STRING && right.type != TYPE_STRING;
+	bool numeric = left->type != TYPE_STRING && right->type != TYPE_STRING;
 	double lfloat, rfloat;
 	string lstr, rstr;
 	
 	if (numeric) {
-		lfloat = (double) ((mg_flt*)left)->value;
-		rfloat = (double) right.value;
+		lfloat = (left->type == TYPE_INTEGER) ? 
+			(double) ((mg_int *)left)->value : ((mg_flt *)left)->value;
+		rfloat = (right->type == TYPE_INTEGER) ? 
+			(double) ((mg_int *)right)->value : ((mg_flt *)right)->value;
 		switch (op) {
 			case LESS_THAN: return lfloat < rfloat;
 			case LESS_EQUAL: return lfloat <= rfloat;
@@ -73,8 +78,8 @@ bool eval_comp(mg_obj * left, int op, mg_obj * right) {
 			case GREATER_THAN: return lfloat > rfloat;
 		}
 	} else {
-		lstr = left.value;
-		rstr = right.value;
+		lstr = ((mg_str *)left)->value;
+		rstr = ((mg_str *)right)->value;
 		switch (op) {
 			case LESS_THAN: return lstr < rstr;
 			case LESS_EQUAL: return lstr <= rstr;
@@ -88,8 +93,7 @@ bool eval_comp(mg_obj * left, int op, mg_obj * right) {
 }
 
 
-//want to know pls explain to me (string part)
-mg_obj multiply(mg_obj left, mg_obj right) {
+mg_obj multiply(mg_obj * left, mg_obj * right) {
 	int i_product;
 	double d_product;
 	int repeats;
@@ -98,21 +102,21 @@ mg_obj multiply(mg_obj left, mg_obj right) {
 	std::ostringstream oss;
 	std::vector<string> repetition;
 	
-	if (x.type == TYPE_INTEGER && right.type == TYPE_INTEGER) {
-		i_product = left.value * right.value;
+	if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
+		i_product = ((mg_int *)left)->value * ((mg_int *)right)->value;
 		return mg_int(&i_product);
-	} else if (left.type == TYPE_INTEGER && right.type TYPE_FLOAT) {
-		d_product = left.value * right.value;
+	} else if (left->type == TYPE_INTEGER && right->type == TYPE_FLOAT) {
+		d_product = ((mg_int *)left)->value * ((mg_flt *)right)->value;
 		return mg_flt(&d_product);
-	} else if (left.type == TYPE_FLOAT && right.type == TYPE_INTEGER) {
-		d_product = left.value * right.value;
+	} else if (left->type == TYPE_FLOAT && right->type == TYPE_INTEGER) {
+		d_product = ((mg_int *)left)->value * ((mg_int *)right)->value;
 		return mg_flt(&d_product);
-	} else if (left.type == TYPE_FLOAT && right.type == TYPE_FLOAT) {
-		d_product = left.value * right.value;
+	} else if (left->type == TYPE_FLOAT && right->type == TYPE_FLOAT) {
+		d_product = ((mg_int *)left)->value * ((mg_flt *)right)->value;
 		return mg_flt(&d_product);
-	} else if (left.type == TYPE_INTEGER && right.type == TYPE_STRING) {
-		repeats = left.value;
-		text = right.value;
+	} else if (left->type == TYPE_INTEGER && right->type == TYPE_STRING) {
+		repeats = ((mg_int *)left)->value;
+		text = ((mg_str *)right)->value;
 		if (repeats < 0) {
 			// reverse the string on negative repeats
 			repeats *= 1;
@@ -121,16 +125,17 @@ mg_obj multiply(mg_obj left, mg_obj right) {
 				text[i] = text[text.length() - i - 1];
 				text[text.length() - i - 1] = temp;
 			}
+		}
 		repetition = std::vector<string>(repeats, text);
 		std::copy(
 			repetition.begin(),
 			repetition.end(),
 			std::ostream_iterator<>(oss)
 		);
-		return oss.str()
-	} else if (left.type == TYPE_STRING && right.type == TYPE_INTEGER) {
-		repeats = right.value;
-		text = left.value;
+		return oss.str();
+	} else if (left->type == TYPE_STRING && right->type == TYPE_INTEGER) {
+		repeats = ((mg_int *)right)->value;
+		text = ((mg_str *)left)->value;
 		if (repeats < 0) {
 			// reverse the string on negative repeats
 			repeats *= 1;
@@ -139,6 +144,7 @@ mg_obj multiply(mg_obj left, mg_obj right) {
 				text[i] = text[text.length() - i - 1];
 				text[text.length() - i - 1] = temp;
 			}
+		}
 		repetition = std::vector<string>(repeats, text);
 		std::copy(
 			repetition.begin(),
@@ -149,18 +155,19 @@ mg_obj multiply(mg_obj left, mg_obj right) {
 	}
 }
 
-mg_obj eval_expr(struct node * node) {
+mg_obj * eval_expr(struct node * node) {
 	bool t_val;
-	mg_obj left, right;
+	mg_obj * left;
+	mg_obj * right;
 	switch(node->token) {
 		case IDENTIFIER:
 			return vars[std::string((char *) node->value)];
 		case INTEGER_LITERAL:
-			return mg_int(node->value);
+			return new mg_int(node->value);
 		case FLOAT_LITERAL:
-			return mg_flt(node->value);
+			return new mg_flt(node->value);
 		case STRING_LITERAL:
-			return mg_str(node->value);
+			return new mg_str(node->value);
 		
 		case PAREN_OPEN:
 			return eval_expr(node->children[0]);
