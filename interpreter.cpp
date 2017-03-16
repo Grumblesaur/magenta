@@ -19,7 +19,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-std::unordered_map<string, mg_obj> vars;
+std::unordered_map<string, mg_obj *> vars;
 
 // returns whether id is an initialized variable name
 bool declared(string id) {
@@ -30,9 +30,9 @@ bool declared(string id) {
 
 
 bool eval_bool(struct node * node) {
-	switch(node->type) {
+	switch(node->token) {
 		case TYPE_STRING:
-			return string(*(char *) node->value) != "";
+			return string((char *) node->value) != "";
 		case TYPE_INTEGER:
 			return *(int *) node->value != 0;
 		case TYPE_FLOAT:
@@ -42,7 +42,14 @@ bool eval_bool(struct node * node) {
 	}
 }
 
-bool eval_comp(mg_obj left, int op, mg_obj right) {
+//mg_objs need to be cast to their appropriate subclasses to access value
+//we will need to use pointers for this.
+// e.g. map<string, mg_obj *> 
+// 		mg_obj * o;
+// 		if (mg_obj->type == TYPE_INTEGER) {
+// 			int value = (mg_int *)o->value;
+// 		}
+bool eval_comp(mg_obj * left, int op, mg_obj * right) {
 	if (left.type == TYPE_STRING && left.type != right.type
 		|| right.type == TYPE_STRING && left.type != right.type) {
 		
@@ -50,12 +57,12 @@ bool eval_comp(mg_obj left, int op, mg_obj right) {
 		exit(EXIT_FAILURE);
 	}
 	
-	bool numeric = left->type != TYPE_STRING && right->type != TYPE_STRING;
+	bool numeric = left.type != TYPE_STRING && right.type != TYPE_STRING;
 	double lfloat, rfloat;
 	string lstr, rstr;
 	
 	if (numeric) {
-		lfloat = (double) left.value;
+		lfloat = (double) ((mg_flt*)left)->value;
 		rfloat = (double) right.value;
 		switch (op) {
 			case LESS_THAN: return lfloat < rfloat;
@@ -80,9 +87,11 @@ bool eval_comp(mg_obj left, int op, mg_obj right) {
 	
 }
 
+
+//want to know pls explain to me (string part)
 mg_obj multiply(mg_obj left, mg_obj right) {
 	int i_product;
-	double = d_product;
+	double d_product;
 	int repeats;
 	string text;
 	char temp;
@@ -136,7 +145,7 @@ mg_obj multiply(mg_obj left, mg_obj right) {
 			repetition.end(),
 			std::ostream_iterator<>(oss)
 		);
-		return oss.str()
+		return oss.str();
 	}
 }
 
