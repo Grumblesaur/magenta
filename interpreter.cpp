@@ -1,7 +1,5 @@
 #include <unordered_map>
 #include <iterator>
-#include <vector>
-#include <algorithm>
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -98,15 +96,37 @@ bool eval_comp(mg_obj * left, int op, mg_obj * right) {
 	
 }
 
+// if reps > 0 return value == s repeated reps times
+// 	"abc" * 3 == "abcabcabc"
+// if reps < 0 return value == reversed s repeated reps times
+// 	"abc" * -3 == "cbacbacba""
+// if reps == 0 return value == ""
+string str_multiply(string s, int reps) {
+	int len = s.length();
+	int new_len = len * reps;
+	if (reps > 0) {
+		char temp[new_len];
+		for (int i = 0; i < new_len; i++) {
+			temp[i] = s[i % len];
+		}
+		return string(temp, new_len);
+	} else if (reps < 0) {
+		new_len = new_len * (-1);
+		char temp[new_len];
+		for (int i = new_len - 1; i > -1; i--) {
+			temp[new_len - i - 1] = s[i % len];
+		}
+		return string(temp, new_len);
+	}
+	return "";
+}
+
 
 mg_obj * multiply(mg_obj * left, mg_obj * right) {
 	int i_product;
 	double d_product;
 	int repeats;
 	string text;
-	char temp;
-	std::ostringstream oss;
-	std::vector<string> repetition;
 	
 	if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
 		i_product = ((mg_int *)left)->value * ((mg_int *)right)->value;
@@ -123,41 +143,13 @@ mg_obj * multiply(mg_obj * left, mg_obj * right) {
 	} else if (left->type == TYPE_INTEGER && right->type == TYPE_STRING) {
 		repeats = ((mg_int *)left)->value;
 		text = ((mg_str *)right)->value;
-		if (repeats < 0) {
-			// reverse the string on negative repeats
-			repeats *= 1;
-			for (int i = 0; i < text.length() / 2; i++) {
-				temp = text[i];
-				text[i] = text[text.length() - i - 1];
-				text[text.length() - i - 1] = temp;
-			}
-		}
-		repetition = std::vector<string>(repeats, text);
-		std::copy(
-			repetition.begin(),
-			repetition.end(),
-			std::ostream_iterator<>(oss)
-		);
-		return oss.str();
+		string str_product = str_multiply(text, repeats);
+		return new mg_str(&str_product);
 	} else if (left->type == TYPE_STRING && right->type == TYPE_INTEGER) {
 		repeats = ((mg_int *)right)->value;
 		text = ((mg_str *)left)->value;
-		if (repeats < 0) {
-			// reverse the string on negative repeats
-			repeats *= 1;
-			for (int i = 0; i < text.length() / 2; i++) {
-				temp = text[i];
-				text[i] = text[text.length() - i - 1];
-				text[text.length() - i - 1] = temp;
-			}
-		}
-		repetition = std::vector<string>(repeats, text);
-		std::copy(
-			repetition.begin(),
-			repetition.end(),
-			std::ostream_iterator<>(oss)
-		);
-		return oss.str();
+		string str_product = str_multiply(text, repeats);
+		return new mg_str(&str_product);
 	}
 }
 
@@ -275,10 +267,11 @@ mg_obj * eval_expr(struct node * node) {
 			);
 		
 		case DIVIDE:
-			return divide(
-				eval_expr(node->children[0]),
-				eval_expr(node->children[1])
-			);
+			// return divide(
+			// 	eval_expr(node->children[0]),
+			// 	eval_expr(node->children[1])
+			// );
+			break;
 		
 	}
 	
