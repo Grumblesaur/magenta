@@ -161,6 +161,61 @@ mg_obj * multiply(mg_obj * left, mg_obj * right) {
 	}
 }
 
+mg_obj * add(mg_obj * left, mg_obj * right) {
+	string concat;
+	if (left->type == TYPE_STRING && right->type == TYPE_STRING) {
+		concat = ((mg_str *)left)->value + ((mg_str *)right)->value;
+		return new mg_str(&concat);
+	} else if (left->type == TYPE_STRING && right->type != TYPE_STRING
+		|| left->type != TYPE_STRING && right->type == TYPE_STRING) {
+		
+		cerr << "unsupported addition operation" << endl;
+		exit(EXIT_FAILURE);
+	}
+		
+	bool left_is_float, right_is_float;
+	left_is_float = left->type == TYPE_FLOAT;
+	right_is_float = right->type == TYPE_FLOAT;
+	
+	double lval, rval, result;
+	lval = left_is_float ?
+		((mg_flt *)left)->value : ((mg_int *)left)->value;
+	rval = right_is_float ?
+		((mg_flt *)right)->value : ((mg_int *)right)->value;
+	
+	if (!left_is_float && !right_is_float) {
+		result = lval + rval;
+		return new mg_int(&result);
+	}
+	
+	result = lval + rval;
+	return new mg_flt(&result);
+}
+
+mg_obj * subtract(mg_obj * left, mg_obj * right) {
+	if (left->type == TYPE_STRING || right->type == TYPE_STRING) {
+		cerr << "unsupported subtraction operation" << endl;
+		exit(EXIT_FAILURE);
+	}
+	
+	bool left_is_float, right_is_float;
+	left_is_float = left->type == TYPE_FLOAT;
+	right_is_float = right->type == TYPE_FLOAT;
+	
+	double lval, rval, result;
+	lval = left_is_float ?
+		((mg_flt *)left)->value : ((mg_int *)left)->value;
+	rval = right_is_float ?
+		((mg_flt *)right)->value : ((mg_int *)right)->value;
+	
+	if (!left_is_float && !right_is_float) {
+		result = lval - rval;
+		return new mg_int(&result);
+	}
+	result = lval - rval;
+	return new mg_flt(&result);
+}
+
 mg_obj * eval_expr(struct node * node) {
 	bool t_val;
 	mg_obj * left;
