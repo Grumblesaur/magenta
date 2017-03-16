@@ -23,23 +23,23 @@ std::unordered_map<string, mg_obj *> vars;
 
 // returns whether id is an initialized variable name
 bool declared(string id) {
-	std::unordered_map<string, mg_obj *>::const_iterator iter =
-		vars.find(id);
+	std::unordered_map<string, mg_obj *>
+		::const_iterator iter = vars.find(id);
 	return iter != vars.end();
 }
 
 
 // I think this needs to take a mg_obj * not a node
-bool eval_bool(struct node * node) {
-	switch(node->token) {
+bool eval_bool(mg_obj * o) {
+	switch(o->type) {
 		case TYPE_STRING:
-			return string((char *) node->value) != "";
+			return ((mg_str *) o)->value != "";
 		case TYPE_INTEGER:
-			return *(int *) node->value != 0;
+			return  ((mg_int *) o)->value != 0;
 		case TYPE_FLOAT:
-			return *(double *) node->value != 0.0;
+			return  ((mg_flt *) o)->value != 0.0;
 		default: // for non-primitive types XXX this may change later
-			return node->value != NULL;
+			return false;
 	}
 }
 
