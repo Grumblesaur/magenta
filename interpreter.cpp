@@ -1,4 +1,7 @@
 #include <unordered_map>
+#include <iterator>
+#include <vector>
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -26,6 +29,117 @@ bool declared(string id) {
 }
 
 
+bool eval_bool(struct node * node) {
+	switch(node->type) {
+		case TYPE_STRING:
+			return string(*(char *) node->value) != "";
+		case TYPE_INTEGER:
+			return *(int *) node->value != 0;
+		case TYPE_FLOAT:
+			return *(double *) node->value != 0.0;
+		default: // for non-primitive types XXX this may change later
+			return node->value != NULL;
+	}
+}
+
+bool eval_comp(mg_obj left, int op, mg_obj right) {
+	if (left.type == TYPE_STRING && left.type != right.type
+		|| right.type == TYPE_STRING && left.type != right.type) {
+		
+		cerr << "Bad comparison: str val against non-str val" << endl;
+		exit(EXIT_FAILURE);
+	}
+	
+	bool numeric = left->type != TYPE_STRING && right->type != TYPE_STRING;
+	double lfloat, rfloat;
+	string lstr, rstr;
+	
+	if (numeric) {
+		lfloat = (double) left.value;
+		rfloat = (double) right.value;
+		switch (op) {
+			case LESS_THAN: return lfloat < rfloat;
+			case LESS_EQUAL: return lfloat <= rfloat;
+			case EQUAL: return lfloat == rfloat;
+			case NOT_EQUAL: return lfloat != rfloat;
+			case GREATER_EQUAL: return lfloat >= rfloat;
+			case GREATER_THAN: return lfloat > rfloat;
+		}
+	} else {
+		lstr = left.value;
+		rstr = right.value;
+		switch (op) {
+			case LESS_THAN: return lstr < rstr;
+			case LESS_EQUAL: return lstr <= rstr;
+			case EQUAL: return lstr == rstr;
+			case NOT_EQUAL: return lstr != rstr;
+			case GREATER_EQUAL: return lstr >= rstr;
+			case GREATER_THAN: return lstr > rstr;
+		}
+	}
+	
+}
+
+mg_obj multiply(mg_obj left, mg_obj right) {
+	int i_product;
+	double = d_product;
+	int repeats;
+	string text;
+	char temp;
+	std::ostringstream oss;
+	std::vector<string> repetition;
+	
+	if (x.type == TYPE_INTEGER && right.type == TYPE_INTEGER) {
+		i_product = left.value * right.value;
+		return mg_int(&i_product);
+	} else if (left.type == TYPE_INTEGER && right.type TYPE_FLOAT) {
+		d_product = left.value * right.value;
+		return mg_flt(&d_product);
+	} else if (left.type == TYPE_FLOAT && right.type == TYPE_INTEGER) {
+		d_product = left.value * right.value;
+		return mg_flt(&d_product);
+	} else if (left.type == TYPE_FLOAT && right.type == TYPE_FLOAT) {
+		d_product = left.value * right.value;
+		return mg_flt(&d_product);
+	} else if (left.type == TYPE_INTEGER && right.type == TYPE_STRING) {
+		repeats = left.value;
+		text = right.value;
+		if (repeats < 0) {
+			// reverse the string on negative repeats
+			repeats *= 1;
+			for (int i = 0; i < text.length() / 2; i++) {
+				temp = text[i];
+				text[i] = text[text.length() - i - 1];
+				text[text.length() - i - 1] = temp;
+			}
+		repetition = std::vector<string>(repeats, text);
+		std::copy(
+			repetition.begin(),
+			repetition.end(),
+			std::ostream_iterator<>(oss)
+		);
+		return oss.str()
+	} else if (left.type == TYPE_STRING && right.type == TYPE_INTEGER) {
+		repeats = right.value;
+		text = left.value;
+		if (repeats < 0) {
+			// reverse the string on negative repeats
+			repeats *= 1;
+			for (int i = 0; i < text.length() / 2; i++) {
+				temp = text[i];
+				text[i] = text[text.length() - i - 1];
+				text[text.length() - i - 1] = temp;
+			}
+		repetition = std::vector<string>(repeats, text);
+		std::copy(
+			repetition.begin(),
+			repetition.end(),
+			std::ostream_iterator<>(oss)
+		);
+		return oss.str()
+	}
+}
+
 mg_obj eval_expr(struct node * node) {
 	bool t_val;
 	mg_obj left, right;
@@ -37,7 +151,58 @@ mg_obj eval_expr(struct node * node) {
 		case FLOAT_LITERAL:
 			return mg_flt(node->value);
 		case STRING_LITERAL:
-			return mg_str(node->value); 
+			return mg_str(node->value);
+		
+		case PAREN_OPEN:
+			return eval_expr(node->children[0]);
+		
+		case LOG_NOT:
+			right = eval_expr(node->children[0]);
+			t_val = !eval_bool(right);
+			return mg_int(&t_val); 
+		case LOG_OR:
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			t_val = eval_bool(left) || eval_bool(right);
+			return mg_int(&t_val);
+		case LOG_XOR:
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			t_val = eval_bool(left) || eval_bool(right)
+				&& !(eval_bool(left) && eval_bool(right));
+			return mg_int(&t_val);
+		case LOG_AND:
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			t_val = eval_bool(left) && eval_bool(right);
+			return mg_int(&t_val);
+		
+		case LESS_THAN:
+		case LESS_EQUAL:
+		case EQUAL:
+		case NOT_EQUAL:
+		case GREATER_THAN:
+		case GREATER_EQUAL:
+			// use token passed in to determine the operation in eval_comp()
+			t_val = eval_comp(
+				eval_expr(node->children[0]),
+				node->token,
+				eval_expr(node->children[1])
+			);
+			return mg_int(&tval);
+		
+		case TIMES:
+			return multiply(
+				eval_expr(node->children[0]),
+				eval_expr(node->children[1])
+			);
+		
+		case DIVIDE:
+			return divide(
+				eval_expr(node->children[0]),
+				eval_expr(node->children[1])
+			);
+		
 	}
 	
 }
@@ -60,7 +225,8 @@ void assign(struct node * n) {
 			}
 			vars[id] = value;	
 		} else {
-			cerr << "ERROR: IDENTIFIER CANNOT BE INITIALIZED MORE THAN ONCE." << endl;
+			cerr << "ERROR: IDENTIFIER CANNOT BE INITIALIZED ";
+			cerr << "MORE THAN ONCE." << endl;
 			exit(EXIT_FAILURE);
 		}
 	} else {
