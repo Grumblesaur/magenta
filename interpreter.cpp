@@ -19,6 +19,16 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
+//mg_objs need to be cast to their appropriate subclasses to access value
+//we need to use pointers for this.
+// e.g. map<string, mg_obj *> 
+// 		mg_obj * o;
+// 		if (mg_obj->type == TYPE_INTEGER) {
+// 			int value = ((mg_int *)o)->value;
+// 		}
+// you can't access value from mg_obj because it doesn't have that field
+// you can't directly cast mg_obj to any of its subclasses, but you can cast pointers
+
 std::unordered_map<string, mg_obj *> vars;
 
 // returns whether id is an initialized variable name
@@ -29,7 +39,9 @@ bool declared(string id) {
 }
 
 
-// I think this needs to take a mg_obj * not a node
+// given mg_obj pointer o this function will
+// cast the pointer to a pointer of the appropriate subclass and
+// return the boolean value of that pointer's actual value
 bool eval_bool(mg_obj * o) {
 	switch(o->type) {
 		case TYPE_STRING:
@@ -43,15 +55,9 @@ bool eval_bool(mg_obj * o) {
 	}
 }
 
-//mg_objs need to be cast to their appropriate subclasses to access value
-//we will need to use pointers for this.
-// e.g. map<string, mg_obj *> 
-// 		mg_obj * o;
-// 		if (mg_obj->type == TYPE_INTEGER) {
-// 			int value = (mg_int *)o->value;
-// 		}
-// you can't access value from mg_obj because it doesn't have that field
-// you can't directly cast mg_obj to any of its subclasses, but you can cast pointers
+// returns the boolean evaluation of a comparison between the values of
+// two mg_objs
+// Throws error if str is compared to non-str
 bool eval_comp(mg_obj * left, int op, mg_obj * right) {
 	if ( (left->type == TYPE_STRING && left->type != right->type)
 		|| (right->type == TYPE_STRING && left->type != right->type)) {
@@ -93,7 +99,7 @@ bool eval_comp(mg_obj * left, int op, mg_obj * right) {
 }
 
 
-mg_obj multiply(mg_obj * left, mg_obj * right) {
+mg_obj * multiply(mg_obj * left, mg_obj * right) {
 	int i_product;
 	double d_product;
 	int repeats;
@@ -104,16 +110,16 @@ mg_obj multiply(mg_obj * left, mg_obj * right) {
 	
 	if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
 		i_product = ((mg_int *)left)->value * ((mg_int *)right)->value;
-		return mg_int(&i_product);
+		return new mg_int(&i_product);
 	} else if (left->type == TYPE_INTEGER && right->type == TYPE_FLOAT) {
 		d_product = ((mg_int *)left)->value * ((mg_flt *)right)->value;
-		return mg_flt(&d_product);
+		return new mg_flt(&d_product);
 	} else if (left->type == TYPE_FLOAT && right->type == TYPE_INTEGER) {
 		d_product = ((mg_int *)left)->value * ((mg_int *)right)->value;
-		return mg_flt(&d_product);
+		return new mg_flt(&d_product);
 	} else if (left->type == TYPE_FLOAT && right->type == TYPE_FLOAT) {
 		d_product = ((mg_int *)left)->value * ((mg_flt *)right)->value;
-		return mg_flt(&d_product);
+		return new mg_flt(&d_product);
 	} else if (left->type == TYPE_INTEGER && right->type == TYPE_STRING) {
 		repeats = ((mg_int *)left)->value;
 		text = ((mg_str *)right)->value;
@@ -175,23 +181,23 @@ mg_obj * eval_expr(struct node * node) {
 		case LOG_NOT:
 			right = eval_expr(node->children[0]);
 			t_val = !eval_bool(right);
-			return mg_int(&t_val); 
+			return new mg_int(&t_val); 
 		case LOG_OR:
 			left = eval_expr(node->children[0]);
 			right = eval_expr(node->children[1]);
 			t_val = eval_bool(left) || eval_bool(right);
-			return mg_int(&t_val);
+			return new mg_int(&t_val);
 		case LOG_XOR:
 			left = eval_expr(node->children[0]);
 			right = eval_expr(node->children[1]);
-			t_val = eval_bool(left) || eval_bool(right)
+			t_val = (eval_bool(left) || eval_bool(right))
 				&& !(eval_bool(left) && eval_bool(right));
-			return mg_int(&t_val);
+			return new mg_int(&t_val);
 		case LOG_AND:
 			left = eval_expr(node->children[0]);
 			right = eval_expr(node->children[1]);
 			t_val = eval_bool(left) && eval_bool(right);
-			return mg_int(&t_val);
+			return new mg_int(&t_val);
 		
 		case LESS_THAN:
 		case LESS_EQUAL:
@@ -205,7 +211,7 @@ mg_obj * eval_expr(struct node * node) {
 				node->token,
 				eval_expr(node->children[1])
 			);
-			return mg_int(&tval);
+			return new mg_int(&t_val);
 		
 		case TIMES:
 			return multiply(
@@ -233,9 +239,9 @@ void assign(struct node * n) {
 	if (n->num_children == 3) {
 		string id = string((char *)n->children[1]->value);
 		int type = n->children[0]->token;
-		mg_obj value = eval_expr(n->children[2]);
+		mg_obj * value = eval_expr(n->children[2]);
 		if (!declared(id)) {
-			if (type != value.type) {
+			if (type != value->type) {
 				cerr << "ERROR: TYPE MISMATCH" << endl;
 				exit(EXIT_FAILURE);
 			}
@@ -248,9 +254,9 @@ void assign(struct node * n) {
 	} else {
 		// reassignment
 		string id = string((char *)n->children[0]->value);
-		mg_obj value = eval_expr(n->children[1]);
-		int type = vars[id].type;
-		if (type != value.type) {
+		mg_obj * value = eval_expr(n->children[1]);
+		int type = vars[id]->type;
+		if (type != value->type) {
 			cerr << "ERROR: TYPE MISMATCH" << endl;
 			exit(EXIT_FAILURE);
 		}
