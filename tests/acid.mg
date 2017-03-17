@@ -36,9 +36,9 @@ if NUM > 20 {
   if NUM > 30 {
     if NUM > 40 {
       NUM = NUM - 10;
-	} else {
+	  } else {
       NUM = NUM + 5;
-	}
+	  }
   } else {
     NUM = real_87_varNAME - NUM;
   }
@@ -50,5 +50,4 @@ flt a = 0-2;
 a = a + 3;
 NUM = NUM + a;
 }
-
 print NUM + (6 - 1 - 1) + .5;
