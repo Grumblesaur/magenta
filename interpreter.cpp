@@ -151,7 +151,29 @@ mg_obj * multiply(mg_obj * left, mg_obj * right) {
 		string str_product = str_multiply(text, repeats);
 		return new mg_str(str_product);
 	} else {
-		cerr << "unsupported addition operation" << endl;
+		cerr << "unsupported multiplication operation" << endl;
+		exit(EXIT_FAILURE);
+	}
+}
+
+mg_obj * divide(mg_obj * left, mg_obj * right) {
+	int i_quotient;
+	double d_quotient;
+	
+	if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
+		i_quotient = ((mg_int *)left)->value / ((mg_int *)right)->value;
+		return new mg_int(i_quotient);
+	} else if (left->type == TYPE_INTEGER && right->type == TYPE_FLOAT) {
+		d_quotient = ((mg_int *)left)->value / ((mg_flt *)right)->value;
+		return new mg_int(d_quotient);
+	} else if (left->type == TYPE_FLOAT && right->type == TYPE_INTEGER) {
+		d_quotient = ((mg_int *)left)->value / ((mg_int *)right)->value;
+		return new mg_int(d_quotient);
+	} else if (left->type == TYPE_FLOAT && right->type == TYPE_FLOAT) {
+		d_quotient = ((mg_int *)left)->value / ((mg_flt *)right)->value;
+		return new mg_int(d_quotient);
+	} else {
+		cerr << "unsupported division operation" << endl;
 		exit(EXIT_FAILURE);
 	}
 }
@@ -216,9 +238,15 @@ mg_obj * eval_expr(struct node * node) {
 	bool t_val;
 	mg_obj * left;
 	mg_obj * right;
+	string id;
 	switch(node->token) {
 		case IDENTIFIER:
-			return vars[std::string((char *) node->value)];
+			id = std::string((char *) node->value);
+			if (!declared(id)) {
+				cerr << "assignment to uninitialized identifier" << endl;
+				exit(EXIT_FAILURE);
+			}
+			return vars[id];
 		case INTEGER_LITERAL:
 			return new mg_int(*(int *)node->value);
 		case FLOAT_LITERAL:
@@ -271,11 +299,10 @@ mg_obj * eval_expr(struct node * node) {
 			);
 		
 		case DIVIDE:
-			// return divide(
-			// 	eval_expr(node->children[0]),
-			// 	eval_expr(node->children[1])
-			// );
-			break;
+			return divide(
+				eval_expr(node->children[0]),
+				eval_expr(node->children[1])
+			);
 
 		case PLUS:
 			return add(
@@ -304,7 +331,11 @@ void assign(struct node * n) {
 		int type = n->children[0]->token;
 		mg_obj * value = eval_expr(n->children[2]);
 		if (!declared(id)) {
-			if (type != value->type) {
+			if (type == TYPE_FLOAT && value->type == TYPE_INTEGER) {
+				mg_flt * temp = new mg_flt((double)((mg_int *)value)->value);
+				delete value;
+				value = (mg_obj *) temp;
+			} else if (type != value->type) {
 				cerr << "ERROR: TYPE MISMATCH" << endl;
 				exit(EXIT_FAILURE);
 			}
@@ -319,7 +350,11 @@ void assign(struct node * n) {
 		string id = string((char *)n->children[0]->value);
 		mg_obj * value = eval_expr(n->children[1]);
 		int type = vars[id]->type;
-		if (type != value->type) {
+		if (type == TYPE_FLOAT && value->type == TYPE_INTEGER) {
+				mg_flt * temp = new mg_flt((double)((mg_int *)value)->value);
+				delete value;
+				value = (mg_obj *) temp;
+		} else if (type != value->type) {
 			cerr << "ERROR: TYPE MISMATCH" << endl;
 			exit(EXIT_FAILURE);
 		}
@@ -339,6 +374,11 @@ void eval_stmt(struct node * node) {
 			}
 			break;
 		case IF:
+			if (eval_bool(eval_expr(node->children[0]))) {
+				eval_stmt(node->children[1]);
+			} else if (node->num_children == 3) {
+				eval_stmt(node->children[2]);
+			}
 			break;
 		case STATEMENT:
 			for (int i = 0; i < node->num_children; i++) {

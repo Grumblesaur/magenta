@@ -24,11 +24,10 @@ while i > 0 {
   i = i - 7;
 }
 
-# here be a problem
 if not not not(i != 0) {
 	NUM = NUM + 2;
 }
-	
+
 while NUM < 10 {
 	 NUM = NUM + 1;
 }
@@ -44,10 +43,12 @@ if NUM > 20 {
     NUM = real_87_varNAME - NUM;
   }
 }
+
 NUM = NUM - .5;
 {
-  a = 0-2;
-  a = a + 3;
+flt a = 0-2;
+a = a + 3;
 NUM = NUM + a;
 }
+
 print NUM + (6 - 1 - 1) + .5;
