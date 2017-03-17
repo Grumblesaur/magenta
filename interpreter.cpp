@@ -57,8 +57,8 @@ bool eval_bool(mg_obj * o) {
 // two mg_objs
 // Throws error if str is compared to non-str
 bool eval_comp(mg_obj * left, int op, mg_obj * right) {
-	if ( (left->type == TYPE_STRING && left->type != right->type)
-		|| (right->type == TYPE_STRING && left->type != right->type)) {
+	if (left->type == TYPE_STRING && left->type != right->type
+		|| right->type == TYPE_STRING && left->type != right->type) {
 		
 		cerr << "Bad comparison: str val against non-str val" << endl;
 		exit(EXIT_FAILURE);
@@ -150,6 +150,9 @@ mg_obj * multiply(mg_obj * left, mg_obj * right) {
 		text = ((mg_str *)left)->value;
 		string str_product = str_multiply(text, repeats);
 		return new mg_str(&str_product);
+	} else {
+		cerr << "unsupported addition operation" << endl;
+		exit(EXIT_FAILURE);
 	}
 }
 
