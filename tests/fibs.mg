@@ -12,7 +12,6 @@ while n > 1 {
 	a = b;
 	b = f;
 	n = n - 1;
-	print f;
 }
 
-
+print f;

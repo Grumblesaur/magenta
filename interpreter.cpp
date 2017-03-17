@@ -334,6 +334,9 @@ void eval_stmt(struct node * node) {
 			assign(node);
 			break;
 		case WHILE_LOOP:
+			while (eval_bool(eval_expr(node->children[0]))) {
+				eval_stmt(node->children[1]);
+			}
 			break;
 		case IF:
 			break;
