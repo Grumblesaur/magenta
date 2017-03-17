@@ -60,7 +60,7 @@ bool eval_comp(mg_obj * left, int op, mg_obj * right) {
 	if (left->type == TYPE_STRING && left->type != right->type
 		|| right->type == TYPE_STRING && left->type != right->type) {
 		
-		cerr << "Bad comparison: str val against non-str val" << endl;
+		cerr << "ERROR Bad comparison: str val against non-str val" << endl;
 		exit(EXIT_FAILURE);
 	}
 	
@@ -151,7 +151,7 @@ mg_obj * multiply(mg_obj * left, mg_obj * right) {
 		string str_product = str_multiply(text, repeats);
 		return new mg_str(str_product);
 	} else {
-		cerr << "unsupported multiplication operation" << endl;
+		cerr << "ERROR: unsupported multiplication operation" << endl;
 		exit(EXIT_FAILURE);
 	}
 }
@@ -173,7 +173,7 @@ mg_obj * divide(mg_obj * left, mg_obj * right) {
 		d_quotient = ((mg_int *)left)->value / ((mg_flt *)right)->value;
 		return new mg_int(d_quotient);
 	} else {
-		cerr << "unsupported division operation" << endl;
+		cerr << "ERROR: unsupported division operation" << endl;
 		exit(EXIT_FAILURE);
 	}
 }
@@ -186,7 +186,7 @@ mg_obj * add(mg_obj * left, mg_obj * right) {
 	} else if (left->type == TYPE_STRING && right->type != TYPE_STRING
 		|| left->type != TYPE_STRING && right->type == TYPE_STRING) {
 		
-		cerr << "unsupported addition operation" << endl;
+		cerr << "ERROR: unsupported addition operation" << endl;
 		exit(EXIT_FAILURE);
 	}
 		
@@ -212,7 +212,7 @@ mg_obj * add(mg_obj * left, mg_obj * right) {
 
 mg_obj * subtract(mg_obj * left, mg_obj * right) {
 	if (left->type == TYPE_STRING || right->type == TYPE_STRING) {
-		cerr << "unsupported subtraction operation" << endl;
+		cerr << "ERROR: unsupported subtraction operation" << endl;
 		exit(EXIT_FAILURE);
 	}
 	
@@ -242,10 +242,6 @@ mg_obj * eval_expr(struct node * node) {
 	switch(node->token) {
 		case IDENTIFIER:
 			id = std::string((char *) node->value);
-			if (!declared(id)) {
-				cerr << "assignment to uninitialized identifier" << endl;
-				exit(EXIT_FAILURE);
-			}
 			return vars[id];
 		case INTEGER_LITERAL:
 			return new mg_int(*(int *)node->value);
@@ -348,6 +344,10 @@ void assign(struct node * n) {
 	} else {
 		// reassignment
 		string id = string((char *)n->children[0]->value);
+		if (!declared(id)) {
+			cerr << "ERROR: assignment to uninitialized identifier" << endl;
+			exit(EXIT_FAILURE);
+		}
 		mg_obj * value = eval_expr(n->children[1]);
 		int type = vars[id]->type;
 		if (type == TYPE_FLOAT && value->type == TYPE_INTEGER) {
