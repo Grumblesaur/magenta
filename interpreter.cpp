@@ -178,6 +178,39 @@ mg_obj * divide(mg_obj * left, mg_obj * right) {
 	}
 }
 
+mg_obj * flt_mod(mg_obj * left, mg_obj * right) {
+	double l_val, r_val, d_mod;
+	
+	if (left->type == TYPE_INTEGER && right->type == TYPE_FLOAT) {
+		l_val = (double)((mg_int *)left)->value;
+		r_val = ((mg_flt *)right)->value;		
+	} else if (left->type == TYPE_FLOAT && right->type == TYPE_INTEGER) {
+		l_val = ((mg_flt *)left)->value;
+		r_val = (double)((mg_int *)right)->value;
+	} else if (left->type == TYPE_FLOAT && right->type == TYPE_FLOAT) {
+		l_val = ((mg_flt *)left)->value;
+		r_val = ((mg_flt *)right)->value;	
+	}
+	d_mod = l_val - r_val;
+	while (d_mod < r_val) {
+		d_mod = d_mod - r_val;
+	}
+	return new mg_flt(d_mod);
+}
+
+mg_obj * mod(mg_obj * left, mg_obj * right) {
+	if (left->type != TYPE_INTEGER && left->type != TYPE_FLOAT
+		|| left->type != TYPE_INTEGER && right->type != TYPE_FLOAT) {
+		cerr << "ERROR: unsupported modulus operation" << endl;
+		exit(EXIT_FAILURE);
+	} else if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
+		int i_mod = ((mg_int *)left)->value % ((mg_int *)right)->value;
+		return new mg_int(i_mod);
+	}  else {
+		return flt_mod(left, right);
+	}
+}
+
 mg_obj * add(mg_obj * left, mg_obj * right) {
 	string concat;
 	if (left->type == TYPE_STRING && right->type == TYPE_STRING) {
@@ -296,6 +329,12 @@ mg_obj * eval_expr(struct node * node) {
 		
 		case DIVIDE:
 			return divide(
+				eval_expr(node->children[0]),
+				eval_expr(node->children[1])
+			);
+
+		case MODULO:
+			return mod(
 				eval_expr(node->children[0]),
 				eval_expr(node->children[1])
 			);

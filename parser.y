@@ -1,5 +1,6 @@
 %{
 	#include <stdio.h>
+	#include <stdlib.h>
 	#include "tree.h"
 	#include "interpreter.h"
 	int yydebug = 1;
@@ -308,6 +309,7 @@ int yywrap() {
 
 void yyerror(const char* str) {
 	fprintf(stderr, "COMPILER ERROR: '%s'.\n", str);
+	exit(EXIT_FAILURE);
 }
 
 int main(int argc, char **argv) {

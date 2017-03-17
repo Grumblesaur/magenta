@@ -1,6 +1,6 @@
 # calculate a factorial
 
-func fact : int (int x) {
+func fact (int x) : int {
 	int out = 1;
 	while (x) {
 		out = out * x;

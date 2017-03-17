@@ -6,7 +6,7 @@ https://trello.com/b/LEAOTeYg/magenta
 ### num (int, float, bool)
   ```
   int i = 0;
-  float f = 0.0;
+  flt f = 0.0;
   ```
   
   str
@@ -31,7 +31,7 @@ https://trello.com/b/LEAOTeYg/magenta
   
   # meth-declared procedures can have side effects
   meth add_debug(int a, int b) : int {
-    print a + b;
+    print(a + b);
     return a + b;
   }
   
@@ -49,7 +49,6 @@ https://trello.com/b/LEAOTeYg/magenta
     type  describe a new data structure
     
     if
-    elif
     else
     option
     case
@@ -57,8 +56,7 @@ https://trello.com/b/LEAOTeYg/magenta
     while
     for
     
-    print
-    input
+    return
 ```
 
 
