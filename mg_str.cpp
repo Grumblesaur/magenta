@@ -8,6 +8,11 @@ mg_str::mg_str(char * value) {
 	this->value = std::string(value);
 }
 
+mg_str::mg_str(std::string value) {
+	this->type = TYPE_STRING;
+	this->value = std::string(value);
+}
+
 mg_str::~mg_str() {
 	
 }

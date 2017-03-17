@@ -144,12 +144,12 @@ mg_obj * multiply(mg_obj * left, mg_obj * right) {
 		repeats = ((mg_int *)left)->value;
 		text = ((mg_str *)right)->value;
 		string str_product = str_multiply(text, repeats);
-		return new mg_str(&str_product);
+		return new mg_str(str_product);
 	} else if (left->type == TYPE_STRING && right->type == TYPE_INTEGER) {
 		repeats = ((mg_int *)right)->value;
 		text = ((mg_str *)left)->value;
 		string str_product = str_multiply(text, repeats);
-		return new mg_str(&str_product);
+		return new mg_str(str_product);
 	} else {
 		cerr << "unsupported addition operation" << endl;
 		exit(EXIT_FAILURE);
@@ -160,7 +160,7 @@ mg_obj * add(mg_obj * left, mg_obj * right) {
 	string concat;
 	if (left->type == TYPE_STRING && right->type == TYPE_STRING) {
 		concat = ((mg_str *)left)->value + ((mg_str *)right)->value;
-		return new mg_str(&concat);
+		return new mg_str(concat);
 	} else if (left->type == TYPE_STRING && right->type != TYPE_STRING
 		|| left->type != TYPE_STRING && right->type == TYPE_STRING) {
 		
@@ -179,7 +179,7 @@ mg_obj * add(mg_obj * left, mg_obj * right) {
 		((mg_flt *)right)->value : ((mg_int *)right)->value;
 	
 	if (!left_is_float && !right_is_float) {
-		cout << "left: " << lval << " right: " << rval << endl;
+		// cout << "left: " << lval << " right: " << rval << endl;
 		result = lval + rval;
 		return new mg_int(result);
 	}
