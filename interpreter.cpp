@@ -130,16 +130,16 @@ mg_obj * multiply(mg_obj * left, mg_obj * right) {
 	
 	if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
 		i_product = ((mg_int *)left)->value * ((mg_int *)right)->value;
-		return new mg_int(&i_product);
+		return new mg_int(i_product);
 	} else if (left->type == TYPE_INTEGER && right->type == TYPE_FLOAT) {
 		d_product = ((mg_int *)left)->value * ((mg_flt *)right)->value;
-		return new mg_flt(&d_product);
+		return new mg_int(d_product);
 	} else if (left->type == TYPE_FLOAT && right->type == TYPE_INTEGER) {
 		d_product = ((mg_int *)left)->value * ((mg_int *)right)->value;
-		return new mg_flt(&d_product);
+		return new mg_int(d_product);
 	} else if (left->type == TYPE_FLOAT && right->type == TYPE_FLOAT) {
 		d_product = ((mg_int *)left)->value * ((mg_flt *)right)->value;
-		return new mg_flt(&d_product);
+		return new mg_int(d_product);
 	} else if (left->type == TYPE_INTEGER && right->type == TYPE_STRING) {
 		repeats = ((mg_int *)left)->value;
 		text = ((mg_str *)right)->value;
@@ -179,12 +179,13 @@ mg_obj * add(mg_obj * left, mg_obj * right) {
 		((mg_flt *)right)->value : ((mg_int *)right)->value;
 	
 	if (!left_is_float && !right_is_float) {
+		cout << "left: " << lval << " right: " << rval << endl;
 		result = lval + rval;
-		return new mg_int(&result);
+		return new mg_int(result);
 	}
 	
 	result = lval + rval;
-	return new mg_flt(&result);
+	return new mg_int(result);
 }
 
 mg_obj * subtract(mg_obj * left, mg_obj * right) {
@@ -205,10 +206,10 @@ mg_obj * subtract(mg_obj * left, mg_obj * right) {
 	
 	if (!left_is_float && !right_is_float) {
 		result = lval - rval;
-		return new mg_int(&result);
+		return new mg_int(result);
 	}
 	result = lval - rval;
-	return new mg_flt(&result);
+	return new mg_int(result);
 }
 
 mg_obj * eval_expr(struct node * node) {
@@ -219,11 +220,11 @@ mg_obj * eval_expr(struct node * node) {
 		case IDENTIFIER:
 			return vars[std::string((char *) node->value)];
 		case INTEGER_LITERAL:
-			return new mg_int(node->value);
+			return new mg_int(*(int *)node->value);
 		case FLOAT_LITERAL:
-			return new mg_flt(node->value);
+			return new mg_flt(*(double *)node->value);
 		case STRING_LITERAL:
-			return new mg_str(node->value);
+			return new mg_str((char *)node->value);
 		
 		case PAREN_OPEN:
 			return eval_expr(node->children[0]);
@@ -231,23 +232,23 @@ mg_obj * eval_expr(struct node * node) {
 		case LOG_NOT:
 			right = eval_expr(node->children[0]);
 			t_val = !eval_bool(right);
-			return new mg_int(&t_val); 
+			return new mg_int(t_val); 
 		case LOG_OR:
 			left = eval_expr(node->children[0]);
 			right = eval_expr(node->children[1]);
 			t_val = eval_bool(left) || eval_bool(right);
-			return new mg_int(&t_val);
+			return new mg_int(t_val);
 		case LOG_XOR:
 			left = eval_expr(node->children[0]);
 			right = eval_expr(node->children[1]);
 			t_val = (eval_bool(left) || eval_bool(right))
 				&& !(eval_bool(left) && eval_bool(right));
-			return new mg_int(&t_val);
+			return new mg_int(t_val);
 		case LOG_AND:
 			left = eval_expr(node->children[0]);
 			right = eval_expr(node->children[1]);
 			t_val = eval_bool(left) && eval_bool(right);
-			return new mg_int(&t_val);
+			return new mg_int(t_val);
 		
 		case LESS_THAN:
 		case LESS_EQUAL:
@@ -261,7 +262,7 @@ mg_obj * eval_expr(struct node * node) {
 				node->token,
 				eval_expr(node->children[1])
 			);
-			return new mg_int(&t_val);
+			return new mg_int(t_val);
 		
 		case TIMES:
 			return multiply(

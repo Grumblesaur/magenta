@@ -5,7 +5,7 @@
 
 class mg_int : public mg_obj{
 	public:
-		mg_int(void * value);
+		mg_int(int value);
 		~mg_int();
 		int value;
 };
