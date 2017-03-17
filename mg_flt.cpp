@@ -3,7 +3,7 @@
 #include "parser.tab.h"
 
 mg_flt::mg_flt(double value) {
-	this->type = type;
+	this->type = TYPE_FLOAT;
 	this->value = value;
 }
 

@@ -10,7 +10,7 @@ mg_str::mg_str(char * value) {
 
 mg_str::mg_str(std::string value) {
 	this->type = TYPE_STRING;
-	this->value = std::string(value);
+	this->value = value;
 }
 
 mg_str::~mg_str() {

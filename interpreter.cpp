@@ -185,7 +185,7 @@ mg_obj * add(mg_obj * left, mg_obj * right) {
 	}
 	
 	result = lval + rval;
-	return new mg_int(result);
+	return new mg_flt(result);
 }
 
 mg_obj * subtract(mg_obj * left, mg_obj * right) {
@@ -209,7 +209,7 @@ mg_obj * subtract(mg_obj * left, mg_obj * right) {
 		return new mg_int(result);
 	}
 	result = lval - rval;
-	return new mg_int(result);
+	return new mg_flt(result);
 }
 
 mg_obj * eval_expr(struct node * node) {
