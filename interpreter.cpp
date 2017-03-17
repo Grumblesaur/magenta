@@ -275,7 +275,18 @@ mg_obj * eval_expr(struct node * node) {
 			// 	eval_expr(node->children[1])
 			// );
 			break;
+
+		case PLUS:
+			return add(
+				eval_expr(node->children[0]),
+				eval_expr(node->children[1])
+			);
 		
+		case MINUS:
+			return subtract(
+				eval_expr(node->children[0]),
+				eval_expr(node->children[1])
+			);
 	}
 	
 }
@@ -331,7 +342,18 @@ void eval_stmt(struct node * node) {
 			}
 			break;
 		case PRINT:
+			mg_obj * to_print = eval_expr(node->children[0]);
+			switch (to_print->type) {
+				case TYPE_INTEGER:
+					cout << ((mg_int *)to_print)->value << endl;
+					break;
+				case TYPE_FLOAT:
+					cout << ((mg_flt *)to_print)->value << endl;
+					break;
+				case TYPE_STRING:
+					cout << ((mg_str *)to_print)->value << endl;
+					break;
+			}
 			break;
-
 	}
 }
