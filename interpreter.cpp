@@ -4,6 +4,7 @@
 #include <string>
 #include <cstring>
 #include <cstdlib>
+#include <cmath>
 #include "interpreter.h"
 #include "parser.tab.h"
 #include "tree.h"
@@ -96,6 +97,43 @@ bool eval_comp(mg_obj * left, int op, mg_obj * right) {
 	
 }
 
+mg_obj * power(mg_obj * left, mg_obj * right) {
+	if (left->type == TYPE_STRING || right->type == TYPE_STRING) {
+		cerr << "ERROR: Unsupported exponentiation operation." << endl;
+		exit(EXIT_FAILURE);
+	}
+	bool left_is_float, right_is_float;
+	left_is_float = left->type == TYPE_FLOAT;
+	right_is_float = right->type == TYPE_FLOAT;
+	
+	double lval, rval, result;
+	lval = left_is_float ?
+		((mg_flt *)left)->value : ((mg_int *)left)->value;
+	rval = right_is_float ?
+		((mg_flt *)right)->value : ((mg_int *)right)->value;
+	
+	if (!left_is_float && !right_is_float) {
+		return new mg_int(pow(lval, rval));
+	}
+	return new mg_flt(pow(lval, rval));
+}
+
+mg_obj * logarithm(mg_obj * left, mg_obj * right) {
+	if (left->type == TYPE_STRING || right->type == TYPE_STRING) {
+		cerr << "ERROR: Unsupported logarithmic operation." << endl;
+		exit(EXIT_FAILURE);
+	}
+	double lval, rval, result;
+	lval = left_is_float ?
+		((mg_flt *)left)->value : ((mg_int *)left)->value;
+	rval = right_is_float ?
+		((mg_flt *)right)->value : ((mg_int *)right)->value;
+	
+	return new mg_flt(log(lval) / log(rval));
+}
+
+
+
 // if reps > 0 return value == s repeated reps times
 // 	"abc" * 3 == "abcabcabc"
 // if reps < 0 return value == reversed s repeated reps times
@@ -161,7 +199,8 @@ mg_obj * divide(mg_obj * left, mg_obj * right) {
 	double d_quotient;
 	
 	if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
-		d_quotient = (double)((mg_int *)left)->value / (double)((mg_int *)right)->value;
+		d_quotient = (double)((mg_int *)left)->value
+			/ (double)((mg_int *)right)->value;
 		return new mg_flt(d_quotient);
 	} else if (left->type == TYPE_INTEGER && right->type == TYPE_FLOAT) {
 		d_quotient = ((mg_int *)left)->value / ((mg_flt *)right)->value;
@@ -367,7 +406,9 @@ void assign(struct node * n) {
 		mg_obj * value = eval_expr(n->children[2]);
 		if (!declared(id)) {
 			if (type == TYPE_FLOAT && value->type == TYPE_INTEGER) {
-				mg_flt * temp = new mg_flt((double)((mg_int *)value)->value);
+				mg_flt * temp = new mg_flt(
+					(double)((mg_int *)value)->value
+				);
 				delete value;
 				value = (mg_obj *) temp;
 			} else if (type != value->type) {
@@ -390,7 +431,9 @@ void assign(struct node * n) {
 		mg_obj * value = eval_expr(n->children[1]);
 		int type = vars[id]->type;
 		if (type == TYPE_FLOAT && value->type == TYPE_INTEGER) {
-				mg_flt * temp = new mg_flt((double)((mg_int *)value)->value);
+				mg_flt * temp = new mg_flt(
+					(double)((mg_int *)value)->value
+				);
 				delete value;
 				value = (mg_obj *) temp;
 		} else if (type != value->type) {
