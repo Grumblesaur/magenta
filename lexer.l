@@ -44,7 +44,7 @@
 "("        {return PAREN_OPEN;    }
 ")"        {return PAREN_CLOSE;   }
 "**"       {return POWER;         }
-"~"        {return LOG;}
+"~"        {return LOG;           }
 "//"       {return INT_DIV;       }
 "*"        {return TIMES;         }
 "/"        {return DIVIDE;        }

@@ -123,6 +123,8 @@ mg_obj * logarithm(mg_obj * left, mg_obj * right) {
 		cerr << "ERROR: Unsupported logarithmic operation." << endl;
 		exit(EXIT_FAILURE);
 	}
+	bool left_is_float = left->type == TYPE_FLOAT;
+	bool right_is_float = right->type == TYPE_FLOAT;
 	double lval, rval, result;
 	lval = left_is_float ?
 		((mg_flt *)left)->value : ((mg_int *)left)->value;
@@ -386,6 +388,17 @@ mg_obj * eval_expr(struct node * node) {
 		
 		case MINUS:
 			return subtract(
+				eval_expr(node->children[0]),
+				eval_expr(node->children[1])
+			);
+		
+		case POWER:
+			return power(
+				eval_expr(node->children[0]),
+				eval_expr(node->children[1])
+			);
+		case LOG:
+			return logarithm(
 				eval_expr(node->children[0]),
 				eval_expr(node->children[1])
 			);
