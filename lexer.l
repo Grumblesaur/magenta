@@ -44,7 +44,7 @@
 "("        {return PAREN_OPEN;    }
 ")"        {return PAREN_CLOSE;   }
 "**"       {return POWER;         }
-"~"        {return LOG;}
+"~"        {return LOG;           }
 "//"       {return INT_DIV;       }
 "*"        {return TIMES;         }
 "/"        {return DIVIDE;        }
@@ -67,10 +67,10 @@
 "xor"      {return LOG_XOR;       }
 "then"     {return LOG_IMPLIES;   }
 
-"&"       {return BIT_AND;       }
-"|"      {return BIT_OR;        }
-"!"      {return BIT_NOT;       }
-"^"     {return BIT_XOR;       }
+"&"        {return BIT_AND;       }
+"|"        {return BIT_OR;        }
+"!"        {return BIT_NOT;       }
+"^"        {return BIT_XOR;       }
 
 "print"    {return PRINT;         }
 
