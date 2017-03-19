@@ -67,10 +67,10 @@
 "xor"      {return LOG_XOR;       }
 "then"     {return LOG_IMPLIES;   }
 
-"&"       {return BIT_AND;       }
-"|"      {return BIT_OR;        }
-"!"      {return BIT_NOT;       }
-"^"     {return BIT_XOR;       }
+"&"        {return BIT_AND;       }
+"|"        {return BIT_OR;        }
+"!"        {return BIT_NOT;       }
+"^"        {return BIT_XOR;       }
 
 "print"    {return PRINT;         }
 

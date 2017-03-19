@@ -103,7 +103,6 @@ void print(struct node* node, int tabs) {
 		case DIVIDE:        cout << "DIVIDE"        << endl; break;
 		case MODULO:        cout << "MODULO"        << endl; break;
 		case PLUS:          cout << "PLUS"          << endl; break;
-		case CONCAT:        cout << "CONCAT"        << endl; break;
 		case MINUS:         cout << "MINUS"         << endl; break;
 		case LEFT_SHIFT:    cout << "LEFT_SHIFT"    << endl; break;
 		case RIGHT_SHIFT:   cout << "RIGHT_SHIFT"   << endl; break;
