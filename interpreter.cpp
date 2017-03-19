@@ -497,6 +497,8 @@ void eval_stmt(struct node * node) {
 				eval_stmt(node->children[2]);
 			}
 			break;
+		case OPTION:
+			break;
 		case STATEMENT:
 			for (int i = 0; i < node->num_children; i++) {
 				eval_stmt(node->children[i]);
