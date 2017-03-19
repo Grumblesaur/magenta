@@ -308,6 +308,9 @@ factor: factor POWER exponent {
 exponent: LOG_NOT exponent {
 		$$ = make_node(LOG_NOT, NULL);
 		attach($$, $2);
+	} | BIT_NOT exponent {
+		$$ = make_node(BIT_NOT, NULL);
+		attach($$, $2);
 	} | term { }
 
 
