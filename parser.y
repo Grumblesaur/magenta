@@ -92,7 +92,8 @@
 %type<n> program statements statement expression disjunction
 %type<n> conjunction relation addend factor exponent term id
 %type<n> return_type type function_call function_definition
-%type<n> method_definition arguments argument arg_list
+%type<n> method_definition arguments argument arg_list implication
+%type<n> case
 
 %error-verbose
 
@@ -164,6 +165,9 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		attach($$, $2);
 		attach($$, $3);
 		attach($$, $5);
+	} | OPTION BRACE_OPEN case BRACE_CLOSE {
+		$$ = make_node(OPTION, NULL);
+		attach($$, $3);
 	} | BRACE_OPEN statements BRACE_CLOSE {
 		$$ = make_node(STATEMENT, NULL);
 		attach($$, $2);
@@ -173,7 +177,22 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 	} | PRINT expression SEMICOLON {
 		$$ = make_node(PRINT, NULL);
 		attach($$, $2);
+	} | BREAK SEMICOLON{ 
+		$$ = make_node(BREAK, NULL);
+	} | NEXT SEMICOLON {
+		$$ = make_node(NEXT, NULL);
 	}
+
+case: CASE expression COLON statements case {
+		$$ = make_node(CASE, NULL);
+		attach($$, $2);
+		attach($$, $4);
+		attach($$, $5);
+	} | CASE expression COLON statements {
+		$$ = make_node(CASE, NULL);
+		attach($$, $2);
+		attach($$, $4);
+	} 
 
 
 expression: expression LOG_OR disjunction {
@@ -193,33 +212,37 @@ disjunction: disjunction LOG_AND conjunction {
 		attach($$, $3);
 	} | conjunction { }
 
+conjunction: conjunction LOG_IMPLIES implication {
+		$$ = make_node(LOG_IMPLIES, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | implication { }
 
-conjunction: conjunction LESS_THAN relation {
+implication: implication LESS_THAN relation {
 		$$ = make_node(LESS_THAN, NULL);
 		attach($$, $1);
 		attach($$, $3);
-	} | conjunction LESS_EQUAL relation {
+	} | implication LESS_EQUAL relation {
 		$$ = make_node(LESS_EQUAL, NULL);
 		attach($$, $1);
 		attach($$, $3);
-	} | conjunction EQUAL relation {
+	} | implication EQUAL relation {
 		$$ = make_node(EQUAL, NULL);
 		attach($$, $1);
 		attach($$, $3);
-	} | conjunction GREATER_THAN relation {
+	} | implication GREATER_THAN relation {
 		$$ = make_node(GREATER_THAN, NULL);
 		attach($$, $1);
 		attach($$, $3);
-	} | conjunction GREATER_EQUAL relation {
+	} | implication GREATER_EQUAL relation {
 		$$ = make_node(GREATER_EQUAL, NULL);
 		attach($$, $1);
 		attach($$, $3);
-	} | conjunction NOT_EQUAL relation {
+	} | implication NOT_EQUAL relation {
 		$$ = make_node(NOT_EQUAL, NULL);
 		attach($$, $1);
 		attach($$, $3);
 	} | relation { }
-
 
 relation: relation PLUS addend {
 		$$ = make_node(PLUS, NULL);
