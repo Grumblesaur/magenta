@@ -93,7 +93,7 @@
 %type<n> conjunction relation addend factor exponent term id
 %type<n> return_type type function_call function_definition
 %type<n> method_definition arguments argument arg_list implication
-%type<n> case
+%type<n> case or_bit xor_bit and_bit imp_bit
 
 %error-verbose
 
@@ -218,27 +218,51 @@ conjunction: conjunction LOG_IMPLIES implication {
 		attach($$, $3);
 	} | implication { }
 
-implication: implication LESS_THAN relation {
+implication: implication BIT_OR or_bit {
+		$$ = make_node(BIT_OR, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | or_bit { }
+
+or_bit: or_bit BIT_XOR xor_bit {
+		$$ = make_node(BIT_XOR, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | xor_bit { }
+
+xor_bit: xor_bit BIT_AND and_bit {
+		$$ = make_node(BIT_AND, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | and_bit { }
+
+and_bit: and_bit BIT_IMPLIES imp_bit {
+		$$ = make_node(BIT_IMPLIES, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | imp_bit { }
+
+imp_bit: imp_bit LESS_THAN relation {
 		$$ = make_node(LESS_THAN, NULL);
 		attach($$, $1);
 		attach($$, $3);
-	} | implication LESS_EQUAL relation {
+	} | imp_bit LESS_EQUAL relation {
 		$$ = make_node(LESS_EQUAL, NULL);
 		attach($$, $1);
 		attach($$, $3);
-	} | implication EQUAL relation {
+	} | imp_bit EQUAL relation {
 		$$ = make_node(EQUAL, NULL);
 		attach($$, $1);
 		attach($$, $3);
-	} | implication GREATER_THAN relation {
+	} | imp_bit GREATER_THAN relation {
 		$$ = make_node(GREATER_THAN, NULL);
 		attach($$, $1);
 		attach($$, $3);
-	} | implication GREATER_EQUAL relation {
+	} | imp_bit GREATER_EQUAL relation {
 		$$ = make_node(GREATER_EQUAL, NULL);
 		attach($$, $1);
 		attach($$, $3);
-	} | implication NOT_EQUAL relation {
+	} | imp_bit NOT_EQUAL relation {
 		$$ = make_node(NOT_EQUAL, NULL);
 		attach($$, $1);
 		attach($$, $3);
