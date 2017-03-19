@@ -286,6 +286,32 @@ mg_obj * subtract(mg_obj * left, mg_obj * right) {
 	return new mg_flt(result);
 }
 
+int eval_bitwise(mg_obj * left, int token, mg_obj * right) {
+	// case for bitwise not (unary operator, left passed as null)
+	if (left == NULL && right->type == TYPE_INTEGER) {
+		return ~((mg_int *)right)->value;
+	}
+	
+	// bitwise operations are only valid for integers
+	if (left->type != TYPE_INTEGER || right->type != TYPE_INTEGER) {
+		cerr << "Unsupported bitwise operation." << endl;
+		exit(EXIT_FAILURE);
+	}
+	
+	int lval, rval;
+	lval = ((mg_int *)left)->value;
+	rval = ((mg_int *)right)->value;
+	
+	switch (token) {
+		case BIT_XOR:
+			return lval ^ rval;
+		case BIT_OR:
+			return lval | rval;
+		case BIT_AND:
+			return lval & rval;
+	}
+}
+
 mg_obj * eval_expr(struct node * node) {
 	bool t_val;
 	mg_obj * left;
@@ -325,6 +351,24 @@ mg_obj * eval_expr(struct node * node) {
 			right = eval_expr(node->children[1]);
 			t_val = eval_bool(left) && eval_bool(right);
 			return new mg_int(t_val);
+		case LOG_IMPLIES:
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			t_val = !eval_bool(left) && eval_bool(right);
+			return new mg_int(t_val);
+		
+		case BIT_NOT:
+		case BIT_AND:
+		case BIT_OR:
+		case BIT_XOR:
+			if (node->token == BIT_NOT) {
+				left = NULL;
+				right = eval_expr(node->children[0]);
+			} else {
+				left = eval_expr(node->children[0]);
+				right = eval_expr(node->children[1]);
+			}
+			return new mg_int(eval_bitwise(left, node->token, right));
 		
 		case LESS_THAN:
 		case LESS_EQUAL:
