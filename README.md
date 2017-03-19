@@ -66,7 +66,8 @@ https://trello.com/b/LEAOTeYg/magenta
 ```
     ()    grouping,
     **    exponentiation,
-    //    natural log,
+    ~     logarithm e.g. log base 2 of 3 is 2~3,
+    //    integer division,
     *     multiplication,
     /     division,
     %     modulo,
@@ -90,13 +91,12 @@ https://trello.com/b/LEAOTeYg/magenta
     then  material implication
 ```
 
-## bitwise (given Latin names for their obscurity and few use cases)
+## bitwise
 ```
-    et    bitwise and
-    aut   bitwise or
-    non   bitwise not
-    xaut  bitwise xor
-    imp   bitwise then (I know, weird, right?)
+    &    bitwise and
+    |   bitwise or
+    !   bitwise not
+    ^  bitwise xor
 ```
 
 # str

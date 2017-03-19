@@ -44,12 +44,12 @@
 "("        {return PAREN_OPEN;    }
 ")"        {return PAREN_CLOSE;   }
 "**"       {return POWER;         }
-"//"       {return LOG;           }
+"~"        {return LOG;}
+"//"       {return INT_DIV;       }
 "*"        {return TIMES;         }
 "/"        {return DIVIDE;        }
 "%"        {return MODULO;        }
 "+"        {return PLUS;          }
-"."        {return CONCAT;        }
 "-"        {return MINUS;         }
 "<<"       {return LEFT_SHIFT;    }
 ">>"       {return RIGHT_SHIFT;   }
@@ -67,11 +67,10 @@
 "xor"      {return LOG_XOR;       }
 "then"     {return LOG_IMPLIES;   }
 
-"et"       {return BIT_AND;       }
-"aut"      {return BIT_OR;        }
-"non"      {return BIT_NOT;       }
-"xaut"     {return BIT_XOR;       }
-"imp"      {return BIT_IMPLIES;   }
+"&"       {return BIT_AND;       }
+"|"      {return BIT_OR;        }
+"!"      {return BIT_NOT;       }
+"^"     {return BIT_XOR;       }
 
 "print"    {return PRINT;         }
 
