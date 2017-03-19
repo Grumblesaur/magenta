@@ -49,7 +49,8 @@
 %token PAREN_OPEN      
 %token PAREN_CLOSE     
 %token POWER           
-%token LOG             
+%token LOG
+%token INT_DIV            
 %token TIMES           
 %token DIVIDE          
 %token MODULO          
