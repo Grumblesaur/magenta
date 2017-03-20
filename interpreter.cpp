@@ -309,10 +309,6 @@ int eval_bitwise(mg_obj * left, int token, mg_obj * right) {
 			return lval | rval;
 		case BIT_AND:
 			return lval & rval;
-		case LEFT_SHIFT:
-			return lval << rval;
-		case RIGHT_SHIFT:
-			return lval >> rval;
 	}
 }
 
@@ -365,8 +361,6 @@ mg_obj * eval_expr(struct node * node) {
 		case BIT_AND:
 		case BIT_OR:
 		case BIT_XOR:
-		case LEFT_SHIFT:
-		case RIGHT_SHIFT:
 			if (node->token == BIT_NOT) {
 				left = NULL;
 				right = eval_expr(node->children[0]);
@@ -485,6 +479,28 @@ void assign(struct node * n) {
 	}
 }
 
+bool eval_case(struct node * n, mg_obj * option, int option_type) {
+
+}
+
+void eval_option(struct node * n) {
+	mg_obj * option = eval_expr(n->children[0]);
+	int type = option->type;
+	int case_count = 1;
+	struct node * case_node = n->children[1];
+	struct node * current = case_node;
+	while (current->num_children == 3) {
+		case_count++;
+		current = current->children[2];
+	}
+	for (int i = 0; i < case_count; i++) {
+		bool broken = eval_case(case_node + i, option, type);
+		if (broken) {
+			break;
+		}
+	}
+}
+
 void eval_stmt(struct node * node) {
 
 	switch (node->token) {
@@ -504,8 +520,7 @@ void eval_stmt(struct node * node) {
 			}
 			break;
 		case OPTION:
-			break;
-		case CASE:
+			eval_option(node);
 			break;
 		case STATEMENT:
 			for (int i = 0; i < node->num_children; i++) {
