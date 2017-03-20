@@ -327,6 +327,9 @@ exponent: LOG_NOT exponent {
 term: PAREN_OPEN expression PAREN_CLOSE {
 		$$ = make_node(PAREN_OPEN, NULL);
 		attach($$, $2);
+	} | BRACKET_OPEN expression BRACKET_CLOSE {
+		$$ = make_node(BRACE_OPEN, NULL);
+		attach($$, $2);
 	} | STRING_LITERAL {
 		$$ = make_node(STRING_LITERAL, $1);
 	} | INTEGER_LITERAL {
