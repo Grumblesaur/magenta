@@ -93,7 +93,7 @@
 %type<n> conjunction relation addend factor exponent term id
 %type<n> return_type type function_call function_definition
 %type<n> method_definition arguments argument arg_list implication
-%type<n> case or_bit xor_bit and_bit imp_bit
+%type<n> case or_bit xor_bit and_bit imp_bit shift
 
 %error-verbose
 
@@ -165,9 +165,10 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		attach($$, $2);
 		attach($$, $3);
 		attach($$, $5);
-	} | OPTION BRACE_OPEN case BRACE_CLOSE {
+	} | OPTION expression BRACE_OPEN case BRACE_CLOSE {
 		$$ = make_node(OPTION, NULL);
-		attach($$, $3);
+		attach($$, $2);
+		attach($$, $4);
 	} | BRACE_OPEN statements BRACE_CLOSE {
 		$$ = make_node(STATEMENT, NULL);
 		attach($$, $2);
@@ -268,16 +269,25 @@ imp_bit: imp_bit LESS_THAN relation {
 		attach($$, $3);
 	} | relation { }
 
-relation: relation PLUS addend {
+relation: relation PLUS shift {
 		$$ = make_node(PLUS, NULL);
 		attach($$, $1);
 		attach($$, $3);
-	} | relation MINUS addend {
+	} | relation MINUS shift {
 		$$ = make_node(MINUS, NULL);
 		attach($$, $1);
 		attach($$, $3);
-	} | addend { }
+	} | shift { }
 
+shift: shift RIGHT_SHIFT addend {
+		$$ = make_node(RIGHT_SHIFT, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | shift LEFT_SHIFT addend {
+		$$ = make_node(LEFT_SHIFT, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | addend { }
 
 addend: addend TIMES factor {
 		$$ = make_node(TIMES, NULL);
