@@ -316,6 +316,31 @@ int eval_bitwise(mg_obj * left, int token, mg_obj * right) {
 	}
 }
 
+mg_obj * eval_index(mg_obj * left, mg_obj * right) {
+	// TODO: amend this later when we support vector types
+	if (!(left->type == TYPE_STRING && right->type == TYPE_INTEGER)) {
+		cout << "Unsupported index operation." << endl;
+		exit(EXIT_FAILURE);
+	}
+	
+	string text = ((mg_str *)left)->value;
+	int length = text.length();
+	string out;
+	int position = ((mg_int *)right)->value;
+	
+	if (abs(position) >= length) {
+		cout << "Index out of bounds." << endl;
+		exit(EXIT_FAILURE);
+	}
+	
+	if (position < 0) {
+		out = text[length + position];
+	} else {
+		out = text[position];
+	}
+	return new mg_str(out);
+}
+
 mg_obj * eval_expr(struct node * node) {
 	bool t_val;
 	mg_obj * left;
@@ -334,6 +359,11 @@ mg_obj * eval_expr(struct node * node) {
 		
 		case PAREN_OPEN:
 			return eval_expr(node->children[0]);
+		
+		case BRACKET_OPEN:
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			return eval_index(left, right);
 		
 		case LOG_NOT:
 			right = eval_expr(node->children[0]);
