@@ -323,12 +323,8 @@ exponent: LOG_NOT exponent {
 		attach($$, $2);
 	} | term { }
 
-
 term: PAREN_OPEN expression PAREN_CLOSE {
 		$$ = make_node(PAREN_OPEN, NULL);
-		attach($$, $2);
-	} | BRACKET_OPEN expression BRACKET_CLOSE {
-		$$ = make_node(BRACE_OPEN, NULL);
 		attach($$, $2);
 	} | STRING_LITERAL {
 		$$ = make_node(STRING_LITERAL, $1);
@@ -336,8 +332,11 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 		$$ = make_node(INTEGER_LITERAL, &$1);
 	} | FLOAT_LITERAL {
 		$$ = make_node(FLOAT_LITERAL, &$1); 
-	} | id {
-	}
+	} | term BRACKET_OPEN expression BRACKET_CLOSE {
+		$$ = make_node(BRACE_OPEN, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | id { }
 		
 
 id: IDENTIFIER {
