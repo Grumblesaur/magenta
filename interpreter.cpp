@@ -232,9 +232,8 @@ mg_obj * mod(mg_obj * left, mg_obj * right) {
 }
 
 mg_obj * add(mg_obj * left, mg_obj * right) {
-	string concat;
 	if (left->type == TYPE_STRING && right->type == TYPE_STRING) {
-		concat = ((mg_str *)left)->value + ((mg_str *)right)->value;
+		string concat = ((mg_str *)left)->value + ((mg_str *)right)->value;
 		return new mg_str(concat);
 	} else if (left->type == TYPE_STRING && right->type != TYPE_STRING
 		|| left->type != TYPE_STRING && right->type == TYPE_STRING) {
@@ -254,7 +253,6 @@ mg_obj * add(mg_obj * left, mg_obj * right) {
 		((mg_flt *)right)->value : ((mg_int *)right)->value;
 	
 	if (!left_is_float && !right_is_float) {
-		// cout << "left: " << lval << " right: " << rval << endl;
 		result = lval + rval;
 		return new mg_int(result);
 	}
