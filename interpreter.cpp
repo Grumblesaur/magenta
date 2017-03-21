@@ -95,9 +95,10 @@ bool eval_comp(mg_obj * left, int op, mg_obj * right) {
 			case GREATER_THAN: return lstr > rstr;
 		}
 	}
-	
 }
 
+// Handle computation of expressions of the form x ** y where x and y are
+// numeric types.
 mg_obj * power(mg_obj * left, mg_obj * right) {
 	if (left->type == TYPE_STRING || right->type == TYPE_STRING) {
 		cerr << "ERROR: Unsupported exponentiation operation." << endl;
@@ -220,7 +221,6 @@ mg_obj * divide(mg_obj * left, mg_obj * right) {
 	}
 }
 
-
 mg_obj * mod(mg_obj * left, mg_obj * right) {
 	if (left->type != TYPE_INTEGER && left->type != TYPE_INTEGER) {
 		cerr << "ERROR: unsupported modulus operation" << endl;
@@ -233,7 +233,9 @@ mg_obj * mod(mg_obj * left, mg_obj * right) {
 
 mg_obj * add(mg_obj * left, mg_obj * right) {
 	if (left->type == TYPE_STRING && right->type == TYPE_STRING) {
+		cout << "`string concatenation`: ";
 		string concat = ((mg_str *)left)->value + ((mg_str *)right)->value;
+		cout << concat << endl;
 		return new mg_str(concat);
 	} else if (left->type == TYPE_STRING && right->type != TYPE_STRING
 		|| left->type != TYPE_STRING && right->type == TYPE_STRING) {
@@ -350,6 +352,23 @@ mg_obj * eval_index(mg_obj * left, mg_obj * right) {
 	return new mg_str(out);
 }
 
+mg_obj * eval_logical(mg_obj * left, int token, mg_obj * right) {
+	mg_int * out = NULL;
+	bool bleft = eval_bool(left);
+	bool bright = eval_bool(right);
+	switch (token) {
+		case LOG_OR:
+			out = new mg_int(bleft || bright);
+		case LOG_XOR:
+			out = new mg_int((bleft || bright) && !(bleft && bright));
+		case LOG_AND:
+			out = new mg_int(bleft && bright);
+		case LOG_IMPLIES:
+			out = new mg_int(!bleft && bright);
+		}
+	return out;
+}
+
 mg_obj * eval_expr(struct node * node) {
 	bool t_val;
 	mg_obj * left;
@@ -383,27 +402,15 @@ mg_obj * eval_expr(struct node * node) {
 			t_val = !eval_bool(right);
 			return new mg_int(t_val); 
 		case LOG_OR:
-			left = eval_expr(node->children[0]);
-			right = eval_expr(node->children[1]);
-			t_val = eval_bool(left) || eval_bool(right);
-			return new mg_int(t_val);
 		case LOG_XOR:
-			left = eval_expr(node->children[0]);
-			right = eval_expr(node->children[1]);
-			t_val = (eval_bool(left) || eval_bool(right))
-				&& !(eval_bool(left) && eval_bool(right));
-			return new mg_int(t_val);
 		case LOG_AND:
-			left = eval_expr(node->children[0]);
-			right = eval_expr(node->children[1]);
-			t_val = eval_bool(left) && eval_bool(right);
-			return new mg_int(t_val);
 		case LOG_IMPLIES:
-			left = eval_expr(node->children[0]);
-			right = eval_expr(node->children[1]);
-			t_val = !eval_bool(left) && eval_bool(right);
-			return new mg_int(t_val);
-		
+			return eval_logical(
+				eval_expr(node->children[0]),
+				node->token,
+				eval_expr(node->children[1])
+			);
+			
 		case BIT_NOT:
 		case BIT_AND:
 		case BIT_OR:
