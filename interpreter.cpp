@@ -8,10 +8,7 @@
 #include "interpreter.h"
 #include "parser.tab.h"
 #include "tree.h"
-#include "mg_obj.h"
-#include "mg_int.h"
-#include "mg_flt.h"
-#include "mg_str.h"
+#include "mg_types.h"
 #include "except.h"
 
 using std::string;

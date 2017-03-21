@@ -2,7 +2,7 @@
 #define INTERP_H
 
 #include "tree.h"
-#include "mg_obj.h"
+#include "mg_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,5 +1,5 @@
-magenta: lex.yy.o parser.tab.o tree.o mg_int.o mg_flt.o mg_str.o interpreter.o
-	g++ lex.yy.o parser.tab.o tree.o mg_int.o mg_flt.o mg_str.o interpreter.o -o magenta
+magenta: lex.yy.o parser.tab.o tree.o mg_types.o interpreter.o
+	g++ lex.yy.o parser.tab.o tree.o mg_types.o interpreter.o -o magenta
 
 lex.yy.o: lex.yy.c parser.tab.h
 	g++ -g -c lex.yy.c
@@ -10,17 +10,12 @@ lex.yy.c: lexer.l parser.tab.h
 parser.tab.o: parser.tab.c tree.h
 	g++ -g -c parser.tab.c
 
-interpreter.o: interpreter.h interpreter.cpp tree.h mg_obj.h parser.tab.h mg_int.h mg_flt.h mg_str.h except.h
+interpreter.o: interpreter.h interpreter.cpp tree.h mg_types.h \
+parser.tab.h except.h
 	g++ -g -c -std=c++11 interpreter.cpp
 
-mg_int.o: mg_obj.h mg_int.h mg_int.cpp
-	g++ -g -c mg_int.cpp
-
-mg_flt.o: mg_obj.h mg_flt.h mg_flt.cpp
-	g++ -g -c mg_flt.cpp
-
-mg_str.o: mg_obj.h mg_str.h mg_str.cpp
-	g++ -g -c mg_str.cpp
+mg_types.o: mg_types.h mg_types.cpp
+	g++ -g -c mg_types.cpp
 
 tree.o: tree.h tree.cpp parser.tab.h
 	g++ -g -c tree.cpp
