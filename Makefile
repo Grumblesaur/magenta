@@ -10,7 +10,7 @@ lex.yy.c: lexer.l parser.tab.h
 parser.tab.o: parser.tab.c tree.h
 	g++ -g -c parser.tab.c
 
-interpreter.o: interpreter.h interpreter.cpp tree.h mg_obj.h parser.tab.h mg_int.h mg_flt.h mg_str.h
+interpreter.o: interpreter.h interpreter.cpp tree.h mg_obj.h parser.tab.h mg_int.h mg_flt.h mg_str.h except.h
 	g++ -g -c -std=c++11 interpreter.cpp
 
 mg_int.o: mg_obj.h mg_int.h mg_int.cpp
