@@ -263,20 +263,30 @@ mg_obj * add(mg_obj * left, mg_obj * right) {
 }
 
 mg_obj * subtract(mg_obj * left, mg_obj * right) {
+	bool left_is_float, right_is_float;
+	double lval, rval, result;
+	right_is_float = right->type == TYPE_FLOAT;
+	rval = right_is_float ?
+		((mg_flt *)right)->value : ((mg_int *)right)->value;
+	
+	// handle unary minus first
+	if (left == NULL && right->type != TYPE_STRING) {
+		if (right_is_float) { 
+			return new mg_flt(-rval);
+		} else {
+			return new mg_int(-rval);
+		}
+	}
+	
 	if (left->type == TYPE_STRING || right->type == TYPE_STRING) {
 		cerr << "ERROR: unsupported subtraction operation" << endl;
 		exit(EXIT_FAILURE);
 	}
 	
-	bool left_is_float, right_is_float;
-	left_is_float = left->type == TYPE_FLOAT;
-	right_is_float = right->type == TYPE_FLOAT;
 	
-	double lval, rval, result;
+	left_is_float = left->type == TYPE_FLOAT;
 	lval = left_is_float ?
 		((mg_flt *)left)->value : ((mg_int *)left)->value;
-	rval = right_is_float ?
-		((mg_flt *)right)->value : ((mg_int *)right)->value;
 	
 	if (!left_is_float && !right_is_float) {
 		result = lval - rval;
@@ -445,6 +455,13 @@ mg_obj * eval_expr(struct node * node) {
 			);
 		
 		case MINUS:
+			// unary minus
+			if (node->num_children == 1) {
+				return subtract(
+					NULL,
+					eval_expr(node->children[0])
+				);
+			}
 			return subtract(
 				eval_expr(node->children[0]),
 				eval_expr(node->children[1])

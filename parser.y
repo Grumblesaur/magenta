@@ -333,9 +333,12 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 	} | FLOAT_LITERAL {
 		$$ = make_node(FLOAT_LITERAL, &$1); 
 	} | term BRACKET_OPEN expression BRACKET_CLOSE {
-		$$ = make_node(BRACE_OPEN, NULL);
+		$$ = make_node(BRACKET_OPEN, NULL);
 		attach($$, $1);
 		attach($$, $3);
+	} | MINUS term { 
+		$$ = make_node(MINUS, NULL);
+		attach($$, $2);
 	} | id { }
 		
 
