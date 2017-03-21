@@ -482,6 +482,12 @@ void assign(struct node * n) {
 	}
 }
 
+// given a CASE node, it's option mg_obj and option type this function will
+// evaluate whether option == case and if so will execute the statements
+// within the scope of that case
+// returns false if a break statement is reached
+// returns true otherwise
+// raises a type mismatch error if option and case don't match
 bool eval_case(struct node * n, mg_obj * option, int option_type) {
 	mg_obj * c = eval_expr(n->children[0]);
 	if (c->type != option_type) {
@@ -529,6 +535,10 @@ bool eval_case(struct node * n, mg_obj * option, int option_type) {
 	return true;
 }
 
+// given an OPTION node this function will
+// evaluate all case statements within it's scope
+// until a break statement is reached
+// or until the cases are exhausted
 void eval_option(struct node * n) {
 	mg_obj * option = eval_expr(n->children[0]);
 	struct node * current = n->children[1];
