@@ -10,15 +10,14 @@
 // return the number of characters copied or -1 in the case of an error
 int strnqcpy(char * destination, char * target) {
 	// don't use this on string representations without quotes
-	// if (target ==)
-	if (target[0] != '"' || target[strlen(target)-1] != '"') {
+	if (target[0] != '\'' || target[strlen(target)-1] != '\'') {
 		return -1;
 	}
 	// move up past the quoted character to start copying
 	target++;
 	
 	int c = 0;
-	while (target[c] != '"') {
+	while (target[c] != '\'') {
 		destination[c] = target[c++];
 	}
 	destination[c] = '\0'; // write in the null-terminator
@@ -142,6 +141,9 @@ void print(struct node* node, int tabs) {
 		case STATEMENT:     cout << "STATEMENT:"    << endl; break;
 		case ARGUMENT:      cout << "ARGUMENT:"     << endl; break;
 		case ARG_LIST:      cout << "ARG_LIST:"     << endl; break;
+		case PRINT:         cout << "PRINT:"        << endl; break;
+		case INPUT:         cout << "INPUT"         << endl; break;
+		
 		default:
 			cout << "Invalid token: " << node->token << endl; break;
 	}

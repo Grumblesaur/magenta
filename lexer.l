@@ -90,10 +90,10 @@
 	return FLOAT_LITERAL;
 }
 
-\".*\"     {
+\'.*\' {
 	yylval.str = yytext;
 	return STRING_LITERAL;
-	}
+}
 
 "#".*      {/* comment */         }
 [ \t\n]+   {/* whitespace */      }
