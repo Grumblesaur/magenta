@@ -589,15 +589,15 @@ bool eval_case(struct node * n, mg_obj * option, int option_type) {
 void eval_option(struct node * n) {
 	mg_obj * option = eval_expr(n->children[0]);
 	struct node * current = n->children[1];
-	struct node * last = NULL;
+	struct node * previous = NULL;
 	bool unbroken;
 	do {
 		unbroken = eval_case(current, option, option->type);
-		last = current;
+		previous = current;
 		if (current->num_children == 3) {
 			current = current->children[2];
 		}
-	} while (unbroken && current != last);
+	} while (unbroken && current != previous);
 }
 
 void eval_stmt(struct node * node) {
