@@ -88,6 +88,7 @@
 %token ARG_LIST
 
 %token PRINT
+%token INPUT
 
 %type<n> program statements statement expression disjunction
 %type<n> conjunction relation addend factor exponent term id
@@ -339,6 +340,8 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 	} | MINUS term { 
 		$$ = make_node(MINUS, NULL);
 		attach($$, $2);
+	} | INPUT {
+		$$ = make_node(INPUT, NULL);
 	} | id { }
 		
 

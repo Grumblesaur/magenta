@@ -12,6 +12,7 @@
 #include "except.h"
 
 using std::string;
+using std::cin;
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -367,6 +368,10 @@ mg_obj * eval_expr(struct node * node) {
 		case STRING_LITERAL:
 			return new mg_str((char *)node->value);
 		
+		case INPUT:
+			getline(cin, id); // use already-allocated `id` var for holder
+			return new mg_str(id);
+		
 		case PAREN_OPEN:
 			return eval_expr(node->children[0]);
 		
@@ -634,6 +639,7 @@ void eval_stmt(struct node * node) {
 				eval_stmt(node->children[i]);
 			}
 			break;
+		
 		case PRINT:
 			to_print = eval_expr(node->children[0]);
 			switch (to_print->type) {

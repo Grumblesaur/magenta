@@ -73,6 +73,7 @@
 "^"        {return BIT_XOR;       }
 
 "print"    {return PRINT;         }
+"input"    {return INPUT;         }
 
 [a-zA-Z_]+[0-9a-zA-Z_]* {
 	yylval.str = yytext;
