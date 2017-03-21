@@ -322,6 +322,10 @@ int eval_bitwise(mg_obj * left, int token, mg_obj * right) {
 			return lval | rval;
 		case BIT_AND:
 			return lval & rval;
+		case LEFT_SHIFT:
+			return lval << rval;
+		case RIGHT_SHIFT:
+			return lval >> rval;
 	}
 }
 
@@ -404,6 +408,8 @@ mg_obj * eval_expr(struct node * node) {
 		case BIT_AND:
 		case BIT_OR:
 		case BIT_XOR:
+		case LEFT_SHIFT:
+		case RIGHT_SHIFT:
 			if (node->token == BIT_NOT) {
 				left = NULL;
 				right = eval_expr(node->children[0]);
