@@ -9,8 +9,6 @@ if 3 < 4 and 5 != 6 {
   flt _a = 17;
 }
 
-print 'Anna';
-
 if 3 >= 3.01 or 5 == 7 {
   X2222 = X2222 + 10;
 }
@@ -19,16 +17,12 @@ if _a > X2222 {
 	flt NUM = X2222 * _a;
 }
 
-print 'Barb';
-
 flt i = 70;
 
 while i > 0 {
   NUM = NUM + 1;
   i = i - 7;
 }
-
-print 'Cori';
 
 if not not not(i != 0) {
 	NUM = NUM + 2;
@@ -37,8 +31,6 @@ if not not not(i != 0) {
 while NUM < 10 {
 	 NUM = NUM + 1;
 }
-
-print 'Dawn';
 
 if NUM > 20 {
   if NUM > 30 {
@@ -52,8 +44,6 @@ if NUM > 20 {
   }
 }
 
-print 'Elli';
-
 NUM = NUM - .5;
 {
 flt a = 0-2;
@@ -61,5 +51,4 @@ a = a + 3;
 NUM = NUM + a;
 }
 
-print 'Fara';
 print NUM + (6 - 1 - 1) + .5;

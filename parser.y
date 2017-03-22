@@ -387,7 +387,6 @@ int main(int argc, char **argv) {
 	yyparse();
 	
 	
-	printf("start\n");
 	// print(result, 0);
 	eval_stmt(result);
 	
