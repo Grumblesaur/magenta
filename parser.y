@@ -187,47 +187,47 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		$$ = make_node(BREAK, NULL);
 	} | NEXT SEMICOLON {
 		$$ = make_node(NEXT, NULL);
-	} | FOR_LOOP id from to by statements {
+	} | FOR_LOOP id from to by statement {
 		$$ = make_node(FOR_LOOP, NULL);
 		attach($$, $2);
 		attach($$, $3);
 		attach($$, $4);
 		attach($$, $5);
 		attach($$, $6);
-	} | FOR_LOOP id from to statements {
+	} | FOR_LOOP id from to statement {
 		$$ = make_node(FOR_LOOP, NULL);
 		attach($$, $2);
 		attach($$, $3);
 		attach($$, $4);
 		attach($$, $5);
-	} | FOR_LOOP id to by statements {
+	} | FOR_LOOP id to by statement {
 		$$ = make_node(FOR_LOOP, NULL);
 		attach($$, $2);
 		attach($$, $3);
 		attach($$, $4);
 		attach($$, $5);
-	} | FOR_LOOP id from by statements {
+	} | FOR_LOOP id from by statement {
 		$$ = make_node(FOR_LOOP, NULL);
 		attach($$, $2);
 		attach($$, $3);
 		attach($$, $4);
 		attach($$, $5);
-	} | FOR_LOOP id to statements {
+	} | FOR_LOOP id to statement {
 		$$ = make_node(FOR_LOOP, NULL);
 		attach($$, $2);
 		attach($$, $3);
 		attach($$, $4);
-	} | FOR_LOOP id from statements {
+	} | FOR_LOOP id from statement {
 		$$ = make_node(FOR_LOOP, NULL);
 		attach($$, $2);
 		attach($$, $3);
 		attach($$, $4);
-	} | FOR_LOOP id by statements {
+	} | FOR_LOOP id by statement {
 		$$ = make_node(FOR_LOOP, NULL);
 		attach($$, $2);
 		attach($$, $3);
 		attach($$, $4);
-	} | FOR_LOOP id statements {
+	} | FOR_LOOP id statement {
 		$$ = make_node(FOR_LOOP, NULL);
 		attach($$, $2);
 		attach($$, $3);
