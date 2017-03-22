@@ -346,13 +346,12 @@ void eval_option(struct node * n) {
 void eval_stmt(struct node * node) {
 	mg_obj * to_print;
 	int children = node->num_children;
-
+	bool next = false;
 	switch (node->token) {
 		case ASSIGN:
 			assign(node);
 			break;
 		case WHILE_LOOP: {
-			bool next = false;
 			while (eval_bool(eval_expr(node->children[0]))) {
 				try {
 					if (next) {
@@ -367,37 +366,32 @@ void eval_stmt(struct node * node) {
 				}
 			}
 		} break;
+		
 		case FOR_LOOP: {
-			int from = 0, to = INT_MAX, by = 1;
+			int from = 0, to = INT_MAX, by = 1, ch_token = 0;
 			mg_int * ptr;
 			string iter_name;
 			struct node * child;
 			// handle variable arrangements of by/from/to clauses
 			for (int x = 0; x < children; x++) {
 				child = node->children[x];
-				switch (child->token) {
-					case FROM:
-						ptr = ((mg_int *)eval_expr(child->children[0]));
-						from = ptr->value;
-						continue;
-					case TO:
-						ptr = ((mg_int *)eval_expr(child->children[0]));
-						to = ptr->value;
-						continue;
-					case BY:
-						ptr = ((mg_int *)eval_expr(child->children[0]));
-						by = ptr->value;
-						continue;
-					case IDENTIFIER:
-						iter_name = string((char *)child->value);
-						vars[iter_name] = 0;
-						continue;
+				ch_token = child->token;
+				if (ch_token == IDENTIFIER) {
+					iter_name = string((char *) child->value);
+					vars[iter_name] = new mg_int(0);
+				} else {
+					ptr = ((mg_int *)eval_expr(child->children[0]));
+					int error = 0;
+					(ch_token == FROM ? from
+						: ch_token == TO ? to
+						: ch_token == BY ? by
+						: error
+					) = ptr->value;
 				}
 			}
 			// if there was a from clause, start the loop var from there
 			vars[iter_name] = (mg_obj *) new mg_int(from ? from : 0);
-			cout << "iter = " << ((mg_int *)vars[iter_name])->value << endl;
-			cout << "by = " << by << "; to = " << to << "; from = " << from;
+			cout << "from = " << from << "; to = " << to << "; by = " << by;
 			cout << endl;
 			
 			// loop from `from` to `to` - 1 by `by`
@@ -405,17 +399,29 @@ void eval_stmt(struct node * node) {
 				for(int i = from; i < to; i += by) {
 					((mg_int *)vars[iter_name])->value = i;
 					try {
+						if (next) {
+							next = false;
+							continue;
+						}
 						eval_stmt(node->children[children - 1]);
 					} catch (break_except &e) {
 						break;
+					} catch (next_except &e) {
+						next = true;
 					}
 				}
 			} else if (from > to) {
 				for (int i = from; i > to; i -= by) {
 					((mg_int *)vars[iter_name])->value = i;
 					try {
+						if (next) {
+							next = false;
+							continue;
+						}
 						eval_stmt(node->children[children - 1]);
 					} catch (break_except &e) {
+						break;
+					} catch (next_except &e) {
 						break;
 					}
 				}
