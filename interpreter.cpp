@@ -5,6 +5,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cmath>
+#include <climits>
 #include "interpreter.h"
 #include "parser.tab.h"
 #include "tree.h"
@@ -367,45 +368,56 @@ void eval_stmt(struct node * node) {
 			}
 		} break;
 		case FOR_LOOP: {
-			int from, to, by;
-			mg_int * f, * t, * b;
+			int from = 0, to = INT_MAX, by = 1;
+			mg_int * ptr;
 			string iter_name;
 			struct node * child;
 			// handle variable arrangements of by/from/to clauses
-			for (int x = 0; x < children - 2; x++) {
+			for (int x = 0; x < children; x++) {
 				child = node->children[x];
 				switch (child->token) {
 					case FROM:
-						f = ((mg_int *)eval_expr(child->children[0]));
-						from = f->value;
-						delete f;
-						break;
+						ptr = ((mg_int *)eval_expr(child->children[0]));
+						from = ptr->value;
+						continue;
 					case TO:
-						t = ((mg_int *)eval_expr(child->children[0]));
-						to = t->value;
-						delete t;
-						break;
+						ptr = ((mg_int *)eval_expr(child->children[0]));
+						to = ptr->value;
+						continue;
 					case BY:
-						b = ((mg_int *)eval_expr(child->children[0]));
-						by = b->value;
-						delete b;
-						break;
+						ptr = ((mg_int *)eval_expr(child->children[0]));
+						by = ptr->value;
+						continue;
 					case IDENTIFIER:
 						iter_name = string((char *)child->value);
 						vars[iter_name] = 0;
-						break;
+						continue;
 				}
 			}
 			// if there was a from clause, start the loop var from there
 			vars[iter_name] = (mg_obj *) new mg_int(from ? from : 0);
-				
+			cout << "iter = " << ((mg_int *)vars[iter_name])->value << endl;
+			cout << "by = " << by << "; to = " << to << "; from = " << from;
+			cout << endl;
+			
 			// loop from `from` to `to` - 1 by `by`
-			for(int i = from; i < to; i += by) {
-				((mg_int *)vars[iter_name])->value = i;
-				try {
-					eval_stmt(node->children[children - 1]);
-				} catch (break_except &e) {
-					break;
+			if (from < to) {
+				for(int i = from; i < to; i += by) {
+					((mg_int *)vars[iter_name])->value = i;
+					try {
+						eval_stmt(node->children[children - 1]);
+					} catch (break_except &e) {
+						break;
+					}
+				}
+			} else if (from > to) {
+				for (int i = from; i > to; i -= by) {
+					((mg_int *)vars[iter_name])->value = i;
+					try {
+						eval_stmt(node->children[children - 1]);
+					} catch (break_except &e) {
+						break;
+					}
 				}
 			}
 			// remove temporary loop variable from scope

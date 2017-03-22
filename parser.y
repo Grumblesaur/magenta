@@ -97,7 +97,7 @@
 %type<n> conjunction relation addend factor exponent term id
 %type<n> return_type type function_call function_definition
 %type<n> method_definition arguments argument arg_list implication
-%type<n> case or_bit xor_bit and_bit imp_bit shift for from to by
+%type<n> case or_bit xor_bit and_bit imp_bit shift from to by
 %type<n> l_val
 
 %error-verbose
@@ -161,8 +161,6 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		$$ = make_node(WHILE_LOOP, NULL);
 		attach($$, $2);
 		attach($$, $3);
-	} | for statements {
-		
 	} | IF expression statement {
 		$$ = make_node(IF, NULL);
 		attach($$, $2);
@@ -189,9 +187,7 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		$$ = make_node(BREAK, NULL);
 	} | NEXT SEMICOLON {
 		$$ = make_node(NEXT, NULL);
-	}
-
-for: FOR_LOOP id from to by statements {
+	} | FOR_LOOP id from to by statements {
 		$$ = make_node(FOR_LOOP, NULL);
 		attach($$, $2);
 		attach($$, $3);

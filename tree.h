@@ -4,7 +4,7 @@
 #ifdef __cplusplus
 extern "C" {
 
-	#define MAX_CHILDREN 4
+	#define MAX_CHILDREN 5
 	
 	struct node {
 		int token;
