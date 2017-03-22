@@ -23,7 +23,6 @@ print 1 * 2 * 3 * 4;
 print 2 ** 3 ** 4;
 
 print "abc" + "def" + "ghi";
-str x = 'abc';
-str y = 'def';
-str z = "ghi";
+str x = 'abc'; str y = 'def'; str z = "ghi";
 print x + y + z;
+print x + y + '\n' + z;
