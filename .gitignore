@@ -1,3 +1,4 @@
+*.o
 *.yy.c
 *.tab.*
 magenta
