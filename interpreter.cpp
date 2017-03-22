@@ -17,8 +17,8 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-//mg_objs need to be cast to their appropriate subclasses to access value
-//we need to use pointers for this.
+// mg_objs need to be cast to their appropriate subclasses to access value
+// we need to use pointers for this.
 // e.g. map<string, mg_obj *> 
 // 		mg_obj * o;
 // 		if (mg_obj->type == TYPE_INTEGER) {
@@ -28,8 +28,7 @@ using std::endl;
 // you can't directly cast mg_obj to any of its subclasses,
 // but you can cast pointers
 
-
-
+/* This contains a mapping of <identifier name : value> for variables */
 std::unordered_map<string, mg_obj *> vars;
 
 // returns whether id is an initialized variable name
@@ -63,7 +62,7 @@ bool eval_comp(mg_obj * left, int op, mg_obj * right) {
 	if (left->type == TYPE_STRING && left->type != right->type
 		|| right->type == TYPE_STRING && left->type != right->type) {
 		
-		cerr << "ERROR Bad comparison: str val against non-str val" << endl;
+		cerr << "error: compares numeric type with string" << endl;
 		exit(EXIT_FAILURE);
 	}
 	
@@ -102,7 +101,7 @@ bool eval_comp(mg_obj * left, int op, mg_obj * right) {
 // numeric types.
 mg_obj * power(mg_obj * left, mg_obj * right) {
 	if (left->type == TYPE_STRING || right->type == TYPE_STRING) {
-		cerr << "ERROR: Unsupported exponentiation operation." << endl;
+		cerr << "error: unsupported exponentiation operation." << endl;
 		exit(EXIT_FAILURE);
 	}
 	bool left_is_float, right_is_float;
@@ -194,7 +193,7 @@ mg_obj * multiply(mg_obj * left, mg_obj * right) {
 		string str_product = str_multiply(text, repeats);
 		return new mg_str(str_product);
 	} else {
-		cerr << "ERROR: unsupported multiplication operation" << endl;
+		cerr << "error: unsupported multiplication operation" << endl;
 		exit(EXIT_FAILURE);
 	}
 }
@@ -217,14 +216,14 @@ mg_obj * divide(mg_obj * left, mg_obj * right) {
 		d_quotient = ((mg_flt *)left)->value / ((mg_flt *)right)->value;
 		return new mg_int(d_quotient);
 	} else {
-		cerr << "ERROR: unsupported division operation" << endl;
+		cerr << "error: unsupported division operation" << endl;
 		exit(EXIT_FAILURE);
 	}
 }
 
 mg_obj * mod(mg_obj * left, mg_obj * right) {
 	if (left->type != TYPE_INTEGER && left->type != TYPE_INTEGER) {
-		cerr << "ERROR: unsupported modulus operation" << endl;
+		cerr << "error: unsupported modulus operation" << endl;
 		exit(EXIT_FAILURE);
 	} else if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
 		int i_mod = ((mg_int *)left)->value % ((mg_int *)right)->value;
@@ -234,14 +233,12 @@ mg_obj * mod(mg_obj * left, mg_obj * right) {
 
 mg_obj * add(mg_obj * left, mg_obj * right) {
 	if (left->type == TYPE_STRING && right->type == TYPE_STRING) {
-		cout << "`string concatenation`: ";
 		string concat = ((mg_str *)left)->value + ((mg_str *)right)->value;
-		cout << concat << endl;
 		return new mg_str(concat);
 	} else if (left->type == TYPE_STRING && right->type != TYPE_STRING
 		|| left->type != TYPE_STRING && right->type == TYPE_STRING) {
 		
-		cerr << "ERROR: unsupported addition operation" << endl;
+		cerr << "error: unsupported addition operation" << endl;
 		exit(EXIT_FAILURE);
 	}
 		

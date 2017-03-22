@@ -85,6 +85,17 @@
 	return INTEGER_LITERAL;
 }
 
+"true" {
+	yylval.ival = 1;
+	return INTEGER_LITERAL;
+}
+
+"false" {
+	yylval.ival = 0;
+	return INTEGER_LITERAL:
+}
+
+
 [0-9]*\.[0-9]+ {
 	yylval.fval = atof(yytext);
 	return FLOAT_LITERAL;
