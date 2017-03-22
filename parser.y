@@ -386,7 +386,8 @@ int main(int argc, char **argv) {
 	stdin = fopen(argv[1], "r");
 	yyparse();
 	
-
+	
+	printf("start\n");
 	// print(result, 0);
 	eval_stmt(result);
 	

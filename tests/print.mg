@@ -7,3 +7,4 @@ print '"' + s + '"';
 print 1 + 2 + 3 + 4;
 
 print s+s+s;
+print "'" + s + "'";
