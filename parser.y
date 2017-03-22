@@ -328,7 +328,6 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 		$$ = make_node(PAREN_OPEN, NULL);
 		attach($$, $2);
 	} | STRING_LITERAL {
-		printf("attempt to make a node\n");
 		$$ = make_node(STRING_LITERAL, $1);
 	} | INTEGER_LITERAL {
 		$$ = make_node(INTEGER_LITERAL, &$1);

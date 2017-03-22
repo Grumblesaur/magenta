@@ -15,7 +15,6 @@ int strnqcpy(char * destination, char * target) {
 		return 0;
 	}
 	
-	std::cout << "begin strnqcpy" << std::endl;
 	if (target[0] == '"') {
 		delim = '"';
 	} else if (target[0] == '\'') {
@@ -42,7 +41,6 @@ struct node* make_node(int token, void* value) {
 
 	if (value != NULL) {
 		if (token == STRING_LITERAL) {
-			std::cout << "token is a string literal" << std::endl;
 			// drop two characters from the array because we're not
 			// allocating space for the quotes
 			n->value = new char[strlen((char*)value)-1];
