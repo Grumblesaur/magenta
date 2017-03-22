@@ -1,8 +1,11 @@
 #include <iostream>
+#include <string>
+#include <cstdlib>
 #include "mg_string.h"
 
 using std::cerr;
 using std::endl;
+using std::string;
 
 // Lookup table for ASCII escape sequences. All sequences are two characters
 // long, beginning with a backslash `\` and ending with another character.
@@ -29,4 +32,30 @@ char ascii_lookup(char escaped) {
 			cerr << endl;
 			exit(EXIT_FAILURE);
 	}
+}
+
+
+// if reps > 0 return value == s repeated reps times
+// 	"abc" * 3 == "abcabcabc"
+// if reps < 0 return value == reversed s repeated reps times
+// 	"abc" * -3 == "cbacbacba""
+// if reps == 0 return value == ""
+string str_multiply(string s, int reps) {
+	int len = s.length();
+	int new_len = len * reps;
+	if (reps > 0) {
+		char temp[new_len];
+		for (int i = 0; i < new_len; i++) {
+			temp[i] = s[i % len];
+		}
+		return string(temp, new_len);
+	} else if (reps < 0) {
+		new_len = new_len * (-1);
+		char temp[new_len];
+		for (int i = new_len - 1; i > -1; i--) {
+			temp[new_len - i - 1] = s[i % len];
+		}
+		return string(temp, new_len);
+	}
+	return "";
 }
