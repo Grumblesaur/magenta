@@ -161,6 +161,8 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		$$ = make_node(WHILE_LOOP, NULL);
 		attach($$, $2);
 		attach($$, $3);
+	} | for statements {
+		
 	} | IF expression statement {
 		$$ = make_node(IF, NULL);
 		attach($$, $2);
