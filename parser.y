@@ -240,12 +240,12 @@ from: FROM expression {
 	}
 
 to: TO expression {
-	$$ = make_node(FROM, NULL);
+	$$ = make_node(TO, NULL);
 	attach($$, $2);
 	}
 
 by:	BY expression {
-	$$ = make_node(FROM, NULL);
+	$$ = make_node(BY, NULL);
 	attach($$, $2);	
 	}
 

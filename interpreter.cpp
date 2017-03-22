@@ -322,15 +322,21 @@ void eval_stmt(struct node * node) {
 		case ASSIGN:
 			assign(node);
 			break;
-		case WHILE_LOOP:
+		case WHILE_LOOP: {
+			bool next = false;
 			while (eval_bool(eval_expr(node->children[0]))) {
 				try {
+					if (next) {
+						next = false;
+						continue;
+					}
 					eval_stmt(node->children[1]);
 				} catch (break_except &e) {
 					break;
+				} catch (next_except &e) {
+					next = true;
 				}
-			}
-			break;
+			} break;
 		case FOR_LOOP: {
 			int from, to, by;
 			mg_int * f, * t, * b;
