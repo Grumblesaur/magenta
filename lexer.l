@@ -92,7 +92,7 @@
 
 "false" {
 	yylval.ival = 0;
-	return INTEGER_LITERAL:
+	return INTEGER_LITERAL;
 }
 
 
@@ -101,12 +101,12 @@
 	return FLOAT_LITERAL;
 }
 
-\".*\" {
+\"(\\.|[^"])*\" {
 	yylval.str = yytext;
 	return STRING_LITERAL;
 }
 
-'.*' {
+'(\\.|[^'])*' {
 	yylval.str = yytext;
 	return STRING_LITERAL;
 }
