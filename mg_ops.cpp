@@ -106,6 +106,22 @@ mg_obj * divide(mg_obj * left, mg_obj * right) {
 	}
 }
 
+// divide two numbers after coercing them to integers
+mg_obj * int_divide(mg_obj * left, mg_obj * right) {
+	if (left->type == TYPE_STRING || right->type == TYPE_STRING) {
+		cerr << "error: unsupported division operation" << endl;
+	}
+	bool left_is_float = left->type == TYPE_FLOAT;
+	bool right_is_float = right->type == TYPE_FLOAT;
+	double lval, rval, result;
+	lval = left_is_float ?
+		((mg_flt *)left)->value : ((mg_int *)left)->value;
+	rval = right_is_float ?
+		((mg_flt *)right)->value : ((mg_int *)right)->value;
+	
+	return new mg_int((int) lval / (int) rval);
+}
+
 mg_obj * mod(mg_obj * left, mg_obj * right) {
 	if (left->type != TYPE_INTEGER && left->type != TYPE_INTEGER) {
 		cerr << "error: unsupported modulus operation" << endl;

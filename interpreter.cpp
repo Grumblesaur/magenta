@@ -222,7 +222,13 @@ mg_obj * eval_expr(struct node * node) {
 				eval_expr(node->children[0]),
 				eval_expr(node->children[1])
 			);
-
+		
+		case INT_DIVIDE:
+			return int_divide(
+				eval_expr(node->children[0]),
+				eval_expr(node->children[1])
+			);
+		
 		case MODULO:
 			return mod(
 				eval_expr(node->children[0]),
@@ -359,15 +365,53 @@ void eval_stmt(struct node * node) {
 				}
 			}
 		} break;
-		case FOR_LOOP:
-			for(/* put */ ; /* args */ ; /* here */) {
+		case FOR_LOOP: {
+			int from, to, by;
+			mg_int * f, * t, * b;
+			string iter_name;
+			struct node * child;
+			// handle variable arrangements of by/from/to clauses
+			for (int x = 0; x < children - 2; x++) {
+				child = node->children[x];
+				switch (child->token) {
+					case FROM:
+						f = ((mg_int *)eval_expr(child->children[0]));
+						from = f->value;
+						delete f;
+						break;
+					case TO:
+						t = ((mg_int *)eval_expr(child->children[0]));
+						to = t->value;
+						delete t;
+						break;
+					case BY:
+						b = ((mg_int *)eval_expr(child->children[0]));
+						by = b->value;
+						delete b;
+						break;
+					case IDENTIFIER:
+						iter_name = string((char *)child->value);
+						vars[iter_name] = 0;
+						break;
+				}
+			}
+			// if there was a from clause, start the loop var from there
+			vars[iter_name] = (mg_obj *) new mg_int(from ? from : 0);
+				
+			// loop from `from` to `to` - 1 by `by`
+			for(int i = from; i < to; i += by) {
+				((mg_int *)vars[iter_name])->value = i;
 				try {
 					eval_stmt(node->children[children - 1]);
 				} catch (break_except &e) {
 					break;
 				}
 			}
-			break;
+			// remove temporary loop variable from scope
+			delete vars[iter_name];
+			vars.erase(iter_name);
+		} break;
+		
 		case IF:
 			if (eval_bool(eval_expr(node->children[0]))) {
 				eval_stmt(node->children[1]);
