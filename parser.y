@@ -411,6 +411,10 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 
 id: IDENTIFIER {
 		$$ = make_node(IDENTIFIER, $1);
+	} | id BRACKET_OPEN expression BRACKET_CLOSE {
+		$$ = make_node(BRACKET_OPEN, NULL);
+		attach($$, $1);
+		attach($$, $3);
 	}
 
 
