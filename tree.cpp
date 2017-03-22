@@ -7,17 +7,29 @@
 // copy a target string taken in by the lexer which represents a string
 // literal and remove the leading and trailing double-quotes for use by
 // the interpreter.
-// return the number of characters copied or -1 in the case of an error
+// return the number of characters copied. This function should never be
+// called on anything but a string literal node.
 int strnqcpy(char * destination, char * target) {
-	// don't use this on string representations without quotes
-	if (target[0] != '\'' || target[strlen(target)-1] != '\'') {
-		return -1;
+	char delim;
+	if (!strlen(target)) {
+		return 0;
 	}
-	// move up past the quoted character to start copying
-	target++;
 	
+	std::cout << "begin strnqcpy" << std::endl;
+	if (target[0] == '"') {
+		delim = '"';
+	} else if (target[0] == '\'') {
+		delim = '\'';
+	} else {
+		return -1; // not a string literal
+	}
+	
+	if (target[strlen(target)-1] != delim) {
+		return -1; // improperly matched quotes or missing final quote
+	}
+	target++;
 	int c = 0;
-	while (target[c] != '\'') {
+	while (target[c] != delim) {
 		destination[c] = target[c++];
 	}
 	destination[c] = '\0'; // write in the null-terminator
@@ -30,6 +42,7 @@ struct node* make_node(int token, void* value) {
 
 	if (value != NULL) {
 		if (token == STRING_LITERAL) {
+			std::cout << "token is a string literal" << std::endl;
 			// drop two characters from the array because we're not
 			// allocating space for the quotes
 			n->value = new char[strlen((char*)value)-1];
