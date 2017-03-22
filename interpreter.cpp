@@ -9,14 +9,16 @@
 #include "parser.tab.h"
 #include "tree.h"
 #include "mg_types.h"
+#include "mg_ops.h"
 #include "except.h"
-#include "mg_string.h"
 
 using std::string;
 using std::cin;
 using std::cout;
 using std::cerr;
 using std::endl;
+
+mg_obj * eval_expr(struct node * node);
 
 // mg_objs need to be cast to their appropriate subclasses to access value
 // we need to use pointers for this.
@@ -39,264 +41,57 @@ bool declared(string id) {
 	return iter != vars.end();
 }
 
-
-// given mg_obj pointer o this function will
-// cast the pointer to a pointer of the appropriate subclass and
-// return the boolean value of that pointer's actual value
-bool eval_bool(mg_obj * o) {
-	switch(o->type) {
-		case TYPE_STRING:
-			return ((mg_str *) o)->value != "";
-		case TYPE_INTEGER:
-			return  ((mg_int *) o)->value != 0;
-		case TYPE_FLOAT:
-			return  ((mg_flt *) o)->value != 0.0;
-		default: // for non-primitive types XXX this may change later
-			return false;
-	}
-}
-
-// returns the boolean evaluation of a comparison between the values of
-// two mg_objs
-// Throws error if str is compared to non-str
-bool eval_comp(mg_obj * left, int op, mg_obj * right) {
-	if (left->type == TYPE_STRING && left->type != right->type
-		|| right->type == TYPE_STRING && left->type != right->type) {
-		
-		cerr << "error: compares numeric type with string" << endl;
-		exit(EXIT_FAILURE);
-	}
-	
-	bool numeric = left->type != TYPE_STRING && right->type != TYPE_STRING;
-	double lfloat, rfloat;
-	string lstr, rstr;
-	
-	if (numeric) {
-		lfloat = (left->type == TYPE_INTEGER) ? 
-			(double) ((mg_int *)left)->value : ((mg_flt *)left)->value;
-		rfloat = (right->type == TYPE_INTEGER) ? 
-			(double) ((mg_int *)right)->value : ((mg_flt *)right)->value;
-		switch (op) {
-			case LESS_THAN: return lfloat < rfloat;
-			case LESS_EQUAL: return lfloat <= rfloat;
-			case EQUAL: return lfloat == rfloat;
-			case NOT_EQUAL: return lfloat != rfloat;
-			case GREATER_EQUAL: return lfloat >= rfloat;
-			case GREATER_THAN: return lfloat > rfloat;
-		}
-	} else {
-		lstr = ((mg_str *)left)->value;
-		rstr = ((mg_str *)right)->value;
-		switch (op) {
-			case LESS_THAN: return lstr < rstr;
-			case LESS_EQUAL: return lstr <= rstr;
-			case EQUAL: return lstr == rstr;
-			case NOT_EQUAL: return lstr != rstr;
-			case GREATER_EQUAL: return lstr >= rstr;
-			case GREATER_THAN: return lstr > rstr;
-		}
-	}
-}
-
-// Handle computation of expressions of the form x ** y where x and y are
-// numeric types.
-mg_obj * power(mg_obj * left, mg_obj * right) {
-	if (left->type == TYPE_STRING || right->type == TYPE_STRING) {
-		cerr << "error: unsupported exponentiation operation." << endl;
-		exit(EXIT_FAILURE);
-	}
-	bool left_is_float, right_is_float;
-	left_is_float = left->type == TYPE_FLOAT;
-	right_is_float = right->type == TYPE_FLOAT;
-	
-	double lval, rval, result;
-	lval = left_is_float ?
-		((mg_flt *)left)->value : ((mg_int *)left)->value;
-	rval = right_is_float ?
-		((mg_flt *)right)->value : ((mg_int *)right)->value;
-	
-	if (!left_is_float && !right_is_float) {
-		return new mg_int(pow(lval, rval));
-	}
-	return new mg_flt(pow(lval, rval));
-}
-
-mg_obj * logarithm(mg_obj * left, mg_obj * right) {
-	if (left->type == TYPE_STRING || right->type == TYPE_STRING) {
-		cerr << "ERROR: Unsupported logarithmic operation." << endl;
-		exit(EXIT_FAILURE);
-	}
-	bool left_is_float = left->type == TYPE_FLOAT;
-	bool right_is_float = right->type == TYPE_FLOAT;
-	double lval, rval, result;
-	lval = left_is_float ?
-		((mg_flt *)left)->value : ((mg_int *)left)->value;
-	rval = right_is_float ?
-		((mg_flt *)right)->value : ((mg_int *)right)->value;
-	
-	return new mg_flt(log(lval) / log(rval));
-}
-
-mg_obj * multiply(mg_obj * left, mg_obj * right) {
-	int i_product;
-	double d_product;
-	int repeats;
-	string text;
-	
-	if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
-		i_product = ((mg_int *)left)->value * ((mg_int *)right)->value;
-		return new mg_int(i_product);
-	} else if (left->type == TYPE_INTEGER && right->type == TYPE_FLOAT) {
-		d_product = ((mg_int *)left)->value * ((mg_flt *)right)->value;
-		return new mg_int(d_product);
-	} else if (left->type == TYPE_FLOAT && right->type == TYPE_INTEGER) {
-		d_product = ((mg_flt *)left)->value * ((mg_int *)right)->value;
-		return new mg_int(d_product);
-	} else if (left->type == TYPE_FLOAT && right->type == TYPE_FLOAT) {
-		d_product = ((mg_flt *)left)->value * ((mg_flt *)right)->value;
-		return new mg_int(d_product);
-	} else if (left->type == TYPE_INTEGER && right->type == TYPE_STRING) {
-		repeats = ((mg_int *)left)->value;
-		text = ((mg_str *)right)->value;
-		string str_product = str_multiply(text, repeats);
-		return new mg_str(str_product);
-	} else if (left->type == TYPE_STRING && right->type == TYPE_INTEGER) {
-		repeats = ((mg_int *)right)->value;
-		text = ((mg_str *)left)->value;
-		string str_product = str_multiply(text, repeats);
-		return new mg_str(str_product);
-	} else {
-		cerr << "error: unsupported multiplication operation" << endl;
-		exit(EXIT_FAILURE);
-	}
-}
-
-mg_obj * divide(mg_obj * left, mg_obj * right) {
-	int i_quotient;
-	double d_quotient;
-	
-	if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
-		d_quotient = (double)((mg_int *)left)->value
-			/ (double)((mg_int *)right)->value;
-		return new mg_flt(d_quotient);
-	} else if (left->type == TYPE_INTEGER && right->type == TYPE_FLOAT) {
-		d_quotient = ((mg_int *)left)->value / ((mg_flt *)right)->value;
-		return new mg_int(d_quotient);
-	} else if (left->type == TYPE_FLOAT && right->type == TYPE_INTEGER) {
-		d_quotient = ((mg_flt *)left)->value / ((mg_int *)right)->value;
-		return new mg_int(d_quotient);
-	} else if (left->type == TYPE_FLOAT && right->type == TYPE_FLOAT) {
-		d_quotient = ((mg_flt *)left)->value / ((mg_flt *)right)->value;
-		return new mg_int(d_quotient);
-	} else {
-		cerr << "error: unsupported division operation" << endl;
-		exit(EXIT_FAILURE);
-	}
-}
-
-mg_obj * mod(mg_obj * left, mg_obj * right) {
-	if (left->type != TYPE_INTEGER && left->type != TYPE_INTEGER) {
-		cerr << "error: unsupported modulus operation" << endl;
-		exit(EXIT_FAILURE);
-	} else if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
-		int i_mod = ((mg_int *)left)->value % ((mg_int *)right)->value;
-		return new mg_int(i_mod);
-	}
-}
-
-mg_obj * add(mg_obj * left, mg_obj * right) {
-	if (left->type == TYPE_STRING && right->type == TYPE_STRING) {
-		string concat = ((mg_str *)left)->value + ((mg_str *)right)->value;
-		return new mg_str(concat);
-	} else if (left->type == TYPE_STRING && right->type != TYPE_STRING
-		|| left->type != TYPE_STRING && right->type == TYPE_STRING) {
-		
-		cerr << "error: unsupported addition operation" << endl;
-		exit(EXIT_FAILURE);
-	}
-		
-	bool left_is_float, right_is_float;
-	left_is_float = left->type == TYPE_FLOAT;
-	right_is_float = right->type == TYPE_FLOAT;
-	
-	double lval, rval, result;
-	lval = left_is_float ?
-		((mg_flt *)left)->value : ((mg_int *)left)->value;
-	rval = right_is_float ?
-		((mg_flt *)right)->value : ((mg_int *)right)->value;
-	
-	if (!left_is_float && !right_is_float) {
-		result = lval + rval;
-		return new mg_int(result);
-	}
-	
-	result = lval + rval;
-	return new mg_flt(result);
-}
-
-mg_obj * subtract(mg_obj * left, mg_obj * right) {
-	bool left_is_float, right_is_float;
-	double lval, rval, result;
-	right_is_float = right->type == TYPE_FLOAT;
-	rval = right_is_float ?
-		((mg_flt *)right)->value : ((mg_int *)right)->value;
-	
-	// handle unary minus first
-	if (left == NULL && right->type != TYPE_STRING) {
-		if (right_is_float) { 
-			return new mg_flt(-rval);
+// given a node n this function will do one of the following:
+// 1 initialize a new variable and assign it a value
+// 2 reassign a initialized variable
+// 3 throw a type mismatch error
+// 4 throw a multiple initialization error
+void assign(struct node * n) {
+	//assignment 
+	if (n->num_children == 3) {
+		string id = string((char *)n->children[1]->value);
+		int type = n->children[0]->token;
+		mg_obj * value = eval_expr(n->children[2]);
+		if (!declared(id)) {
+			if (type == TYPE_FLOAT && value->type == TYPE_INTEGER) {
+				mg_flt * temp = new mg_flt(
+					(double)((mg_int *)value)->value
+				);
+				delete value;
+				value = (mg_obj *) temp;
+			} else if (type != value->type) {
+				cerr << "ERROR: TYPE MISMATCH" << endl;
+				exit(EXIT_FAILURE);
+			}
+			vars[id] = value;	
 		} else {
-			return new mg_int(-rval);
+			cerr << "ERROR: IDENTIFIER CANNOT BE INITIALIZED ";
+			cerr << "MORE THAN ONCE." << endl;
+			exit(EXIT_FAILURE);
 		}
+	} else {
+		// reassignment
+		string id = string((char *)n->children[0]->value);
+		if (!declared(id)) {
+			cerr << "ERROR: assignment to uninitialized identifier" << endl;
+			exit(EXIT_FAILURE);
+		}
+		mg_obj * value = eval_expr(n->children[1]);
+		int type = vars[id]->type;
+		if (type == TYPE_FLOAT && value->type == TYPE_INTEGER) {
+				mg_flt * temp = new mg_flt(
+					(double)((mg_int *)value)->value
+				);
+				delete value;
+				value = (mg_obj *) temp;
+		} else if (type != value->type) {
+			cerr << "ERROR: TYPE MISMATCH" << endl;
+			exit(EXIT_FAILURE);
+		}
+		vars[id] = value;
 	}
-	
-	if (left->type == TYPE_STRING || right->type == TYPE_STRING) {
-		cerr << "ERROR: unsupported subtraction operation" << endl;
-		exit(EXIT_FAILURE);
-	}
-	
-	
-	left_is_float = left->type == TYPE_FLOAT;
-	lval = left_is_float ?
-		((mg_flt *)left)->value : ((mg_int *)left)->value;
-	
-	if (!left_is_float && !right_is_float) {
-		result = lval - rval;
-		return new mg_int(result);
-	}
-	result = lval - rval;
-	return new mg_flt(result);
 }
 
-int eval_bitwise(mg_obj * left, int token, mg_obj * right) {
-	// case for bitwise not (unary operator, left passed as null)
-	if (left == NULL && right->type == TYPE_INTEGER) {
-		return ~((mg_int *)right)->value;
-	}
-	
-	// bitwise operations are only valid for integers
-	if (left->type != TYPE_INTEGER || right->type != TYPE_INTEGER) {
-		cerr << "Unsupported bitwise operation." << endl;
-		exit(EXIT_FAILURE);
-	}
-	
-	int lval, rval;
-	lval = ((mg_int *)left)->value;
-	rval = ((mg_int *)right)->value;
-	
-	switch (token) {
-		case BIT_XOR:
-			return lval ^ rval;
-		case BIT_OR:
-			return lval | rval;
-		case BIT_AND:
-			return lval & rval;
-		case LEFT_SHIFT:
-			return lval << rval;
-		case RIGHT_SHIFT:
-			return lval >> rval;
-	}
-}
 
 mg_obj * eval_index(mg_obj * left, mg_obj * right) {
 	// TODO: amend this later when we support vector types
@@ -323,26 +118,6 @@ mg_obj * eval_index(mg_obj * left, mg_obj * right) {
 	return new mg_str(out);
 }
 
-mg_obj * eval_logical(mg_obj * left, int token, mg_obj * right) {
-	mg_int * out = NULL;
-	bool bleft = eval_bool(left);
-	bool bright = eval_bool(right);
-	switch (token) {
-		case LOG_OR:
-			out = new mg_int(bleft || bright);
-			break;
-		case LOG_XOR:
-			out = new mg_int((bleft || bright) && !(bleft && bright));
-			break;
-		case LOG_AND:
-			out = new mg_int(bleft && bright);
-			break;
-		case LOG_IMPLIES:
-			out = new mg_int(!bleft && bright);
-			break;
-		}
-	return out;
-}
 
 mg_obj * eval_expr(struct node * node) {
 	bool t_val;
@@ -466,56 +241,7 @@ mg_obj * eval_expr(struct node * node) {
 	
 }
 
-// given a node n this function will do one of the following:
-// 1 initialize a new variable and assign it a value
-// 2 reassign a initialized variable
-// 3 throw a type mismatch error
-// 4 throw a multiple initialization error
-void assign(struct node * n) {
-	//assignment 
-	if (n->num_children == 3) {
-		string id = string((char *)n->children[1]->value);
-		int type = n->children[0]->token;
-		mg_obj * value = eval_expr(n->children[2]);
-		if (!declared(id)) {
-			if (type == TYPE_FLOAT && value->type == TYPE_INTEGER) {
-				mg_flt * temp = new mg_flt(
-					(double)((mg_int *)value)->value
-				);
-				delete value;
-				value = (mg_obj *) temp;
-			} else if (type != value->type) {
-				cerr << "ERROR: TYPE MISMATCH" << endl;
-				exit(EXIT_FAILURE);
-			}
-			vars[id] = value;	
-		} else {
-			cerr << "ERROR: IDENTIFIER CANNOT BE INITIALIZED ";
-			cerr << "MORE THAN ONCE." << endl;
-			exit(EXIT_FAILURE);
-		}
-	} else {
-		// reassignment
-		string id = string((char *)n->children[0]->value);
-		if (!declared(id)) {
-			cerr << "ERROR: assignment to uninitialized identifier" << endl;
-			exit(EXIT_FAILURE);
-		}
-		mg_obj * value = eval_expr(n->children[1]);
-		int type = vars[id]->type;
-		if (type == TYPE_FLOAT && value->type == TYPE_INTEGER) {
-				mg_flt * temp = new mg_flt(
-					(double)((mg_int *)value)->value
-				);
-				delete value;
-				value = (mg_obj *) temp;
-		} else if (type != value->type) {
-			cerr << "ERROR: TYPE MISMATCH" << endl;
-			exit(EXIT_FAILURE);
-		}
-		vars[id] = value;
-	}
-}
+
 
 // given a CASE node, it's option mg_obj and option type this function will
 // evaluate whether option == case and if so will execute the statements
@@ -590,6 +316,7 @@ void eval_option(struct node * n) {
 
 void eval_stmt(struct node * node) {
 	mg_obj * to_print;
+	int children = node->num_children;
 
 	switch (node->token) {
 		case ASSIGN:
@@ -604,10 +331,19 @@ void eval_stmt(struct node * node) {
 				}
 			}
 			break;
+		case FOR_LOOP:
+			for(/* put */ ; /* args */ ; /* here */) {
+				try {
+					eval_stmt(node->children[children - 1]);
+				} catch (break_except &e) {
+					break;
+				}
+			}
+			break;
 		case IF:
 			if (eval_bool(eval_expr(node->children[0]))) {
 				eval_stmt(node->children[1]);
-			} else if (node->num_children == 3) {
+			} else if (children == 3) {
 				eval_stmt(node->children[2]);
 			}
 			break;
@@ -615,7 +351,7 @@ void eval_stmt(struct node * node) {
 			eval_option(node);
 			break;
 		case STATEMENT:
-			for (int i = 0; i < node->num_children; i++) {
+			for (int i = 0; i < children; i++) {
 				eval_stmt(node->children[i]);
 			}
 			break;
