@@ -360,12 +360,16 @@ mg_obj * eval_logical(mg_obj * left, int token, mg_obj * right) {
 	switch (token) {
 		case LOG_OR:
 			out = new mg_int(bleft || bright);
+			break;
 		case LOG_XOR:
 			out = new mg_int((bleft || bright) && !(bleft && bright));
+			break;
 		case LOG_AND:
 			out = new mg_int(bleft && bright);
+			break;
 		case LOG_IMPLIES:
 			out = new mg_int(!bleft && bright);
+			break;
 		}
 	return out;
 }
