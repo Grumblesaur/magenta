@@ -10,8 +10,8 @@ https://trello.com/b/LEAOTeYg/magenta
   ```
   
   str
-  `str s = "hello world!"`
-  
+  `str s = "hello world!"`;
+  `str z = 'single quotes are also legal';
   type
   ```
   type Person {
@@ -93,10 +93,10 @@ https://trello.com/b/LEAOTeYg/magenta
 
 ## bitwise
 ```
-    &    bitwise and
-    |   bitwise or
     !   bitwise not
-    ^  bitwise xor
+    &   bitwise and
+    |   bitwise or
+    ^   bitwise xor
 ```
 
 # str
@@ -109,7 +109,7 @@ https://trello.com/b/LEAOTeYg/magenta
 
 # Compounds
 ```
-    @    member access (e.g. y@x S.T. y belongs to x)
+     .    member access (e.g. x.y S.T. y belongs to x)
 ```
  
 # arrays

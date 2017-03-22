@@ -201,7 +201,13 @@ mg_obj * eval_expr(struct node * node) {
 				eval_expr(node->children[0]),
 				eval_expr(node->children[1])
 			);
-
+		
+		case INT_DIVIDE:
+			return int_divide(
+				eval_expr(node->children[0]),
+				eval_expr(node->children[1])
+			);
+		
 		case MODULO:
 			return mod(
 				eval_expr(node->children[0]),

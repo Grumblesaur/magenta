@@ -9,6 +9,7 @@ mg_obj * power(mg_obj * left, mg_obj * right);
 mg_obj * logarithm(mg_obj * left, mg_obj * right);
 mg_obj * multiply(mg_obj * left, mg_obj * right);
 mg_obj * divide(mg_obj * left, mg_obj * right);
+mg_obj * int_divide(mg_obj * left, mg_obj * right);
 mg_obj * mod(mg_obj * left, mg_obj * right);
 mg_obj * add(mg_obj * left, mg_obj * right);
 mg_obj * subtract(mg_obj * left, mg_obj * right);

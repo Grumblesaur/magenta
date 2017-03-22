@@ -53,7 +53,7 @@
 %token PAREN_CLOSE     
 %token POWER           
 %token LOG
-%token INT_DIV            
+%token INT_DIVIDE
 %token TIMES           
 %token DIVIDE          
 %token MODULO          
@@ -360,6 +360,10 @@ addend: addend TIMES factor {
 		attach($$, $3);
 	} | addend DIVIDE factor {
 		$$ = make_node(DIVIDE, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | addend INT_DIVIDE factor {
+		$$ = make_node(INT_DIVIDE, NULL);
 		attach($$, $1);
 		attach($$, $3);
 	} | addend MODULO factor {

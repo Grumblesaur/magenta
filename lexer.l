@@ -48,7 +48,7 @@
 ")"        {return PAREN_CLOSE;   }
 "**"       {return POWER;         }
 "~"        {return LOG;           }
-"//"       {return INT_DIV;       }
+"//"       {return INT_DIVIDE;    }
 "*"        {return TIMES;         }
 "/"        {return DIVIDE;        }
 "%"        {return MODULO;        }
@@ -78,16 +78,6 @@
 "print"    {return PRINT;         }
 "input"    {return INPUT;         }
 
-[a-zA-Z_]+[0-9a-zA-Z_]* {
-	yylval.str = yytext;
-	return IDENTIFIER;
-}
-
-0|[1-9]+[0-9]* {
-	yylval.ival = atoi(yytext);
-	return INTEGER_LITERAL;
-}
-
 "true" {
 	yylval.ival = 1;
 	return INTEGER_LITERAL;
@@ -98,6 +88,15 @@
 	return INTEGER_LITERAL;
 }
 
+[a-zA-Z_]+[0-9a-zA-Z_]* {
+	yylval.str = yytext;
+	return IDENTIFIER;
+}
+
+0|[1-9]+[0-9]* {
+	yylval.ival = atoi(yytext);
+	return INTEGER_LITERAL;
+}
 
 [0-9]*\.[0-9]+ {
 	yylval.fval = atof(yytext);
