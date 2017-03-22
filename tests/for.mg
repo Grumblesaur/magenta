@@ -1,9 +1,4 @@
-int z = 10;
-
-for x {
+for x from 1 to 10 by 1 {
 	print "I AM MAYOR";
-	z = z - 1;
-	if not z {
-		break;
-	}
+	print x;
 }

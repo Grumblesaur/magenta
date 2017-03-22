@@ -452,7 +452,7 @@ int yywrap() {
 }
 
 void yyerror(const char* str) {
-	fprintf(stderr, "COMPILER ERROR: '%s'.\n", str);
+	fprintf(stderr, "bad parse: '%s'.\n", str);
 	exit(EXIT_FAILURE);
 }
 

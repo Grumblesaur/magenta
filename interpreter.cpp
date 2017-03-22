@@ -89,7 +89,8 @@ void assign(struct node * n) {
 		mg_obj * value = eval_expr(n->children[1]);
 		int type = vars[id]->type;
 		if (type != TYPE_STRING && has_index) {
-			cerr << "ERROR: assignment to index of non-indexed data type" << endl;
+			cerr << "ERROR: assignment to index of non-indexed data type";
+			cerr << endl;
 			exit(EXIT_FAILURE);
 		} else if (has_index) {
 			string replacement = ((mg_str *)value)->value;
