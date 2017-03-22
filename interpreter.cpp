@@ -391,8 +391,6 @@ void eval_stmt(struct node * node) {
 			}
 			// if there was a from clause, start the loop var from there
 			vars[iter_name] = (mg_obj *) new mg_int(from ? from : 0);
-			cout << "from = " << from << "; to = " << to << "; by = " << by;
-			cout << endl;
 			
 			// loop from `from` to `to` - 1 by `by`
 			if (from < to) {
