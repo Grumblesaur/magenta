@@ -25,7 +25,8 @@ using std::endl;
 // 			int value = ((mg_int *)o)->value;
 // 		}
 // you can't access value from mg_obj because it doesn't have that field
-// you can't directly cast mg_obj to any of its subclasses, but you can cast pointers
+// you can't directly cast mg_obj to any of its subclasses,
+// but you can cast pointers
 
 
 
