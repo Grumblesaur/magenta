@@ -98,6 +98,7 @@
 %type<n> return_type type function_call function_definition
 %type<n> method_definition arguments argument arg_list implication
 %type<n> case or_bit xor_bit and_bit imp_bit shift for from to by
+%type<n> l_val
 
 %error-verbose
 
@@ -152,7 +153,7 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		attach($$, $1);
 		attach($$, $2);
 		attach($$, $4);
-	} | id ASSIGN expression SEMICOLON { // re-assign a var w/value
+	} | l_val ASSIGN expression SEMICOLON { // re-assign a var w/value
 		$$ = make_node(ASSIGN, NULL);
 		attach($$, $1);
 		attach($$, $3);
@@ -415,11 +416,14 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 
 id: IDENTIFIER {
 		$$ = make_node(IDENTIFIER, $1);
-	} | id BRACKET_OPEN expression BRACKET_CLOSE {
+	}
+	
+	
+l_val: id BRACKET_OPEN expression BRACKET_CLOSE {
 		$$ = make_node(BRACKET_OPEN, NULL);
 		attach($$, $1);
 		attach($$, $3);
-	}
+	} | id { }
 
 
 return_type: TYPE_VOID {

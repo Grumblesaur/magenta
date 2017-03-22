@@ -26,3 +26,12 @@ print "abc" + "def" + "ghi";
 str x = 'abc'; str y = 'def'; str z = "ghi";
 print x + y + z;
 print x + y + '\n' + z;
+
+
+str a = 'taylor';
+print a;
+a[0] = 'taylor t';
+print a;
+a = 'taylor';
+a[2] = 'j';
+print a;
