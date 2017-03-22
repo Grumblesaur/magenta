@@ -37,7 +37,10 @@
 %token CASE       
 %precedence IF         
 %precedence ELSE       
-%token FOR_LOOP        
+%token FOR_LOOP
+%token FROM;
+%token TO;
+%token BY;        
 %token WHILE_LOOP
 %token IN
 %token BREAK
@@ -94,7 +97,7 @@
 %type<n> conjunction relation addend factor exponent term id
 %type<n> return_type type function_call function_definition
 %type<n> method_definition arguments argument arg_list implication
-%type<n> case or_bit xor_bit and_bit imp_bit shift
+%type<n> case or_bit xor_bit and_bit imp_bit shift for from to by
 
 %error-verbose
 
@@ -183,6 +186,67 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		$$ = make_node(BREAK, NULL);
 	} | NEXT SEMICOLON {
 		$$ = make_node(NEXT, NULL);
+	}
+
+for: FOR_LOOP id from to by statements {
+		$$ = make_node(FOR_LOOP, NULL);
+		attach($$, $2);
+		attach($$, $3);
+		attach($$, $4);
+		attach($$, $5);
+		attach($$, $6);
+	} | FOR_LOOP id from to statements {
+		$$ = make_node(FOR_LOOP, NULL);
+		attach($$, $2);
+		attach($$, $3);
+		attach($$, $4);
+		attach($$, $5);
+	} | FOR_LOOP id to by statements {
+		$$ = make_node(FOR_LOOP, NULL);
+		attach($$, $2);
+		attach($$, $3);
+		attach($$, $4);
+		attach($$, $5);
+	} | FOR_LOOP id from by statements {
+		$$ = make_node(FOR_LOOP, NULL);
+		attach($$, $2);
+		attach($$, $3);
+		attach($$, $4);
+		attach($$, $5);
+	} | FOR_LOOP id to statements {
+		$$ = make_node(FOR_LOOP, NULL);
+		attach($$, $2);
+		attach($$, $3);
+		attach($$, $4);
+	} | FOR_LOOP id from statements {
+		$$ = make_node(FOR_LOOP, NULL);
+		attach($$, $2);
+		attach($$, $3);
+		attach($$, $4);
+	} | FOR_LOOP id by statements {
+		$$ = make_node(FOR_LOOP, NULL);
+		attach($$, $2);
+		attach($$, $3);
+		attach($$, $4);
+	} | FOR_LOOP id statements {
+		$$ = make_node(FOR_LOOP, NULL);
+		attach($$, $2);
+		attach($$, $3);
+	}
+
+from: FROM expression {
+	$$ = make_node(FROM, NULL);
+	attach($$, $2);
+	}
+
+to: TO expression {
+	$$ = make_node(FROM, NULL);
+	attach($$, $2);
+	}
+
+by:	BY expression {
+	$$ = make_node(FROM, NULL);
+	attach($$, $2);	
 	}
 
 case: CASE expression COLON statements case {
