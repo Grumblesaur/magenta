@@ -336,7 +336,8 @@ void eval_stmt(struct node * node) {
 				} catch (next_except &e) {
 					next = true;
 				}
-			} break;
+			}
+		} break;
 		case FOR_LOOP: {
 			int from, to, by;
 			mg_int * f, * t, * b;
