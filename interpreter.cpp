@@ -149,13 +149,33 @@ mg_obj * eval_index(mg_obj * left, mg_obj * right) {
 	return new mg_str(out);
 }
 
+mg_obj * eval_math(mg_obj * left, int token, mg_obj * right) {
+	switch (token) {
+		case TIMES:
+			return multiply(left, right);
+		case DIVIDE:
+			return divide(left, right);
+		case INT_DIVIDE:
+			return int_divide(left, right);
+		case MODULO:
+			return mod(left, right);
+		case PLUS:
+			return add(left, right);
+		case POWER:
+			return power(left, right);
+		case LOG:
+			return logarithm(left, right);
+	}
+}
 
 mg_obj * eval_expr(struct node * node) {
 	bool t_val;
 	mg_obj * left;
 	mg_obj * right;
+	mg_obj * result;
 	string id;
-	switch(node->token) {
+	int token = node->token;
+	switch(token) {
 		case IDENTIFIER:
 			id = std::string((char *) node->value);
 			return vars[id];
@@ -188,7 +208,7 @@ mg_obj * eval_expr(struct node * node) {
 		case LOG_IMPLIES:
 			return eval_logical(
 				eval_expr(node->children[0]),
-				node->token,
+				token,
 				eval_expr(node->children[1])
 			);
 			
@@ -198,14 +218,14 @@ mg_obj * eval_expr(struct node * node) {
 		case BIT_XOR:
 		case LEFT_SHIFT:
 		case RIGHT_SHIFT:
-			if (node->token == BIT_NOT) {
+			if (token == BIT_NOT) {
 				left = NULL;
 				right = eval_expr(node->children[0]);
 			} else {
 				left = eval_expr(node->children[0]);
 				right = eval_expr(node->children[1]);
 			}
-			return new mg_int(eval_bitwise(left, node->token, right));
+			return new mg_int(eval_bitwise(left, token, right));
 		
 		case LESS_THAN:
 		case LESS_EQUAL:
@@ -216,69 +236,41 @@ mg_obj * eval_expr(struct node * node) {
 			// use token passed in to determine the operation in eval_comp()
 			t_val = eval_comp(
 				eval_expr(node->children[0]),
-				node->token,
+				token,
 				eval_expr(node->children[1])
 			);
 			return new mg_int(t_val);
 		
 		case TIMES:
-			return multiply(
-				eval_expr(node->children[0]),
-				eval_expr(node->children[1])
-			);
-		
 		case DIVIDE:
-			return divide(
-				eval_expr(node->children[0]),
-				eval_expr(node->children[1])
-			);
-		
 		case INT_DIVIDE:
-			return int_divide(
-				eval_expr(node->children[0]),
-				eval_expr(node->children[1])
-			);
-		
 		case MODULO:
-			return mod(
-				eval_expr(node->children[0]),
-				eval_expr(node->children[1])
-			);
-
 		case PLUS:
-			return add(
-				eval_expr(node->children[0]),
-				eval_expr(node->children[1])
-			);
+		case LOG:
+		case POWER:
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			result = eval_math(left, token, right);
+			delete left;
+			delete right;
+			return result;
+			
 		
 		case MINUS:
 			// unary minus
 			if (node->num_children == 1) {
-				return subtract(
-					NULL,
-					eval_expr(node->children[0])
-				);
+				left = NULL;
+				right = eval_expr(node->children[0]);
+			} else {
+				left = eval_expr(node->children[0]);
+				right = eval_expr(node->children[1]);
 			}
-			return subtract(
-				eval_expr(node->children[0]),
-				eval_expr(node->children[1])
-			);
-		
-		case POWER:
-			return power(
-				eval_expr(node->children[0]),
-				eval_expr(node->children[1])
-			);
-		case LOG:
-			return logarithm(
-				eval_expr(node->children[0]),
-				eval_expr(node->children[1])
-			);
+			result = subtract(left, right);
+			delete left;
+			delete right;
+			return result;
 	}
-	
 }
-
-
 
 // given a CASE node, it's option mg_obj and option type this function will
 // evaluate whether option == case and if so will execute the statements
