@@ -14,8 +14,8 @@ mg_obj * mod(mg_obj * left, mg_obj * right);
 mg_obj * add(mg_obj * left, mg_obj * right);
 mg_obj * subtract(mg_obj * left, mg_obj * right);
 mg_obj * eval_logical(mg_obj * left, int token, mg_obj * right);
-bool eval_comp(mg_obj * left, int op, mg_obj * right);
-int eval_bitwise(mg_obj * left, int token, mg_obj * right);
+mg_obj * eval_comp(mg_obj * left, int op, mg_obj * right);
+mg_obj * eval_bitwise(mg_obj * left, int token, mg_obj * right);
 bool eval_bool(mg_obj * o);
 
 

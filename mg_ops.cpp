@@ -219,7 +219,7 @@ mg_obj * eval_logical(mg_obj * left, int token, mg_obj * right) {
 // returns the boolean evaluation of a comparison between the values of
 // two mg_objs
 // Throws error if str is compared to non-str
-bool eval_comp(mg_obj * left, int op, mg_obj * right) {
+mg_obj * eval_comp(mg_obj * left, int op, mg_obj * right) {
 	if (left->type == TYPE_STRING && left->type != right->type
 		|| right->type == TYPE_STRING && left->type != right->type) {
 		
@@ -231,37 +231,39 @@ bool eval_comp(mg_obj * left, int op, mg_obj * right) {
 	double lfloat, rfloat;
 	string lstr, rstr;
 	
+	bool out;
 	if (numeric) {
 		lfloat = (left->type == TYPE_INTEGER) ? 
 			(double) ((mg_int *)left)->value : ((mg_flt *)left)->value;
 		rfloat = (right->type == TYPE_INTEGER) ? 
 			(double) ((mg_int *)right)->value : ((mg_flt *)right)->value;
 		switch (op) {
-			case LESS_THAN: return lfloat < rfloat;
-			case LESS_EQUAL: return lfloat <= rfloat;
-			case EQUAL: return lfloat == rfloat;
-			case NOT_EQUAL: return lfloat != rfloat;
-			case GREATER_EQUAL: return lfloat >= rfloat;
-			case GREATER_THAN: return lfloat > rfloat;
+			case LESS_THAN:     out = lfloat <  rfloat; break;
+			case LESS_EQUAL:    out = lfloat <= rfloat; break;
+			case EQUAL:         out = lfloat == rfloat; break;
+			case NOT_EQUAL:     out = lfloat != rfloat; break;
+			case GREATER_EQUAL: out = lfloat >= rfloat; break;
+			case GREATER_THAN:  out = lfloat >  rfloat; break;
 		}
 	} else {
 		lstr = ((mg_str *)left)->value;
 		rstr = ((mg_str *)right)->value;
 		switch (op) {
-			case LESS_THAN: return lstr < rstr;
-			case LESS_EQUAL: return lstr <= rstr;
-			case EQUAL: return lstr == rstr;
-			case NOT_EQUAL: return lstr != rstr;
-			case GREATER_EQUAL: return lstr >= rstr;
-			case GREATER_THAN: return lstr > rstr;
+			case LESS_THAN:     out = lstr <  rstr; break;
+			case LESS_EQUAL:    out = lstr <= rstr; break;
+			case EQUAL:         out = lstr == rstr; break;
+			case NOT_EQUAL:     out = lstr != rstr; break;
+			case GREATER_EQUAL: out = lstr >= rstr; break;
+			case GREATER_THAN:  out = lstr >  rstr; break;
 		}
 	}
+	return new mg_int(out);
 }
 
-int eval_bitwise(mg_obj * left, int token, mg_obj * right) {
+mg_obj * eval_bitwise(mg_obj * left, int token, mg_obj * right) {
 	// case for bitwise not (unary operator, left passed as null)
 	if (left == NULL && right->type == TYPE_INTEGER) {
-		return ~((mg_int *)right)->value;
+		return new mg_int(~((mg_int *)right)->value);
 	}
 	
 	// bitwise operations are only valid for integers
@@ -270,22 +272,18 @@ int eval_bitwise(mg_obj * left, int token, mg_obj * right) {
 		exit(EXIT_FAILURE);
 	}
 	
-	int lval, rval;
+	int lval, rval, out;
 	lval = ((mg_int *)left)->value;
 	rval = ((mg_int *)right)->value;
 	
 	switch (token) {
-		case BIT_XOR:
-			return lval ^ rval;
-		case BIT_OR:
-			return lval | rval;
-		case BIT_AND:
-			return lval & rval;
-		case LEFT_SHIFT:
-			return lval << rval;
-		case RIGHT_SHIFT:
-			return lval >> rval;
+		case BIT_XOR:     out = lval ^  rval; break;
+		case BIT_OR:      out = lval |  rval; break;
+		case BIT_AND:     out = lval &  rval; break;
+		case LEFT_SHIFT:  out = lval << rval; break;
+		case RIGHT_SHIFT: out = lval >> rval; break;
 	}
+	return new mg_int(out);
 }
 
 

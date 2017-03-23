@@ -170,48 +170,50 @@ mg_obj * eval_math(mg_obj * left, int token, mg_obj * right) {
 
 mg_obj * eval_expr(struct node * node) {
 	bool t_val;
-	mg_obj * left;
-	mg_obj * right;
-	mg_obj * result;
+	mg_obj * left = NULL;
+	mg_obj * right = NULL;
+	mg_obj * result = NULL;
 	string id;
 	int token = node->token;
 	switch(token) {
 		case IDENTIFIER:
 			id = std::string((char *) node->value);
-			return vars[id];
+			result = vars[id];
+			break;
 		case INTEGER_LITERAL:
-			return new mg_int(*(int *)node->value);
+			result = new mg_int(*(int *)node->value);
+			break;
 		case FLOAT_LITERAL:
-			return new mg_flt(*(double *)node->value);
+			result = new mg_flt(*(double *)node->value);
+			break;
 		case STRING_LITERAL:
-			return new mg_str((char *)node->value);
-		
+			result = new mg_str((char *)node->value);
+			break;
 		case INPUT:
 			getline(cin, id); // use already-allocated `id` var for holder
-			return new mg_str(id);
-		
+			result = new mg_str(id);
+			break;
 		case PAREN_OPEN:
 			return eval_expr(node->children[0]);
 		
 		case BRACKET_OPEN:
 			left = eval_expr(node->children[0]);
 			right = eval_expr(node->children[1]);
-			return eval_index(left, right);
-		
+			result = eval_index(left, right);
+			break;
 		case LOG_NOT:
 			right = eval_expr(node->children[0]);
 			t_val = !eval_bool(right);
-			return new mg_int(t_val); 
+			result = new mg_int(t_val);
+			break;
 		case LOG_OR:
 		case LOG_XOR:
 		case LOG_AND:
 		case LOG_IMPLIES:
-			return eval_logical(
-				eval_expr(node->children[0]),
-				token,
-				eval_expr(node->children[1])
-			);
-			
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			result = eval_logical(left, token, right);
+			break;
 		case BIT_NOT:
 		case BIT_AND:
 		case BIT_OR:
@@ -225,8 +227,8 @@ mg_obj * eval_expr(struct node * node) {
 				left = eval_expr(node->children[0]);
 				right = eval_expr(node->children[1]);
 			}
-			return new mg_int(eval_bitwise(left, token, right));
-		
+			result = eval_bitwise(left, token, right);
+			break;
 		case LESS_THAN:
 		case LESS_EQUAL:
 		case EQUAL:
@@ -234,13 +236,10 @@ mg_obj * eval_expr(struct node * node) {
 		case GREATER_THAN:
 		case GREATER_EQUAL:
 			// use token passed in to determine the operation in eval_comp()
-			t_val = eval_comp(
-				eval_expr(node->children[0]),
-				token,
-				eval_expr(node->children[1])
-			);
-			return new mg_int(t_val);
-		
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			result = eval_comp(left, token, right);
+			break;
 		case TIMES:
 		case DIVIDE:
 		case INT_DIVIDE:
@@ -251,10 +250,7 @@ mg_obj * eval_expr(struct node * node) {
 			left = eval_expr(node->children[0]);
 			right = eval_expr(node->children[1]);
 			result = eval_math(left, token, right);
-			delete left;
-			delete right;
-			return result;
-			
+			break;
 		
 		case MINUS:
 			// unary minus
@@ -266,10 +262,12 @@ mg_obj * eval_expr(struct node * node) {
 				right = eval_expr(node->children[1]);
 			}
 			result = subtract(left, right);
-			delete left;
-			delete right;
-			return result;
+			break;
 	}
+	if (left != right) {
+		delete right;
+	} delete left;
+	return result;
 }
 
 // given a CASE node, it's option mg_obj and option type this function will
