@@ -58,26 +58,33 @@ mg_obj * multiply(mg_obj * left, mg_obj * right) {
 	if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
 		i_product = ((mg_int *)left)->value * ((mg_int *)right)->value;
 		return new mg_int(i_product);
+
 	} else if (left->type == TYPE_INTEGER && right->type == TYPE_FLOAT) {
 		d_product = ((mg_int *)left)->value * ((mg_flt *)right)->value;
 		return new mg_int(d_product);
+
 	} else if (left->type == TYPE_FLOAT && right->type == TYPE_INTEGER) {
 		d_product = ((mg_flt *)left)->value * ((mg_int *)right)->value;
 		return new mg_int(d_product);
+
 	} else if (left->type == TYPE_FLOAT && right->type == TYPE_FLOAT) {
 		d_product = ((mg_flt *)left)->value * ((mg_flt *)right)->value;
 		return new mg_int(d_product);
+
 	} else if (left->type == TYPE_INTEGER && right->type == TYPE_STRING) {
 		repeats = ((mg_int *)left)->value;
 		text = ((mg_str *)right)->value;
 		string str_product = str_multiply(text, repeats);
 		return new mg_str(str_product);
+
 	} else if (left->type == TYPE_STRING && right->type == TYPE_INTEGER) {
 		repeats = ((mg_int *)right)->value;
 		text = ((mg_str *)left)->value;
 		string str_product = str_multiply(text, repeats);
 		return new mg_str(str_product);
+
 	} else {
+		cerr << left->type << " ; " << right->type << endl;;
 		cerr << "error: unsupported multiplication operation" << endl;
 		exit(EXIT_FAILURE);
 	}

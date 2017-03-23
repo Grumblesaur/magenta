@@ -175,10 +175,28 @@ mg_obj * eval_expr(struct node * node) {
 	mg_obj * result = NULL;
 	string id;
 	int token = node->token;
+	int t;
 	switch(token) {
 		case IDENTIFIER:
 			id = std::string((char *) node->value);
-			result = vars[id];
+			t = vars[id]->type;
+			switch (t) {
+				case TYPE_INTEGER:
+					result = (mg_obj *) new mg_int(
+						((mg_int *)vars[id])->value
+					);
+					break;
+				case TYPE_FLOAT:
+					result = (mg_obj *) new mg_flt(
+						((mg_flt *)vars[id])->value
+					);
+					break;
+				case TYPE_STRING:
+					result = (mg_obj *) new mg_str(
+						((mg_str *)vars[id])->value
+					);
+					break;
+			}
 			break;
 		case INTEGER_LITERAL:
 			result = new mg_int(*(int *)node->value);
@@ -264,9 +282,12 @@ mg_obj * eval_expr(struct node * node) {
 			result = subtract(left, right);
 			break;
 	}
-	if (left != right) {
+	if (left == right) {
+		delete left;
+	} else {
+		delete left;
 		delete right;
-	} delete left;
+	}
 	return result;
 }
 
@@ -339,10 +360,12 @@ void eval_option(struct node * n) {
 			current = current->children[2];
 		}
 	} while (unbroken && current != previous);
+	delete option;
 }
 
 void eval_stmt(struct node * node) {
 	mg_obj * to_print;
+	mg_obj * temp;
 	int children = node->num_children;
 	bool next = false;
 	switch (node->token) {
@@ -350,7 +373,8 @@ void eval_stmt(struct node * node) {
 			assign(node);
 			break;
 		case WHILE_LOOP: {
-			while (eval_bool(eval_expr(node->children[0]))) {
+			temp = eval_expr(node->children[0]);
+			while (eval_bool(temp)) {
 				try {
 					if (next) {
 						next = false;
@@ -362,6 +386,8 @@ void eval_stmt(struct node * node) {
 				} catch (next_except &e) {
 					next = true;
 				}
+				delete temp;
+				temp = eval_expr(node->children[0]);
 			}
 		} break;
 		
@@ -428,11 +454,13 @@ void eval_stmt(struct node * node) {
 		} break;
 		
 		case IF:
-			if (eval_bool(eval_expr(node->children[0]))) {
+			temp = eval_expr(node->children[0]);
+			if (eval_bool(temp)) {
 				eval_stmt(node->children[1]);
 			} else if (children == 3) {
 				eval_stmt(node->children[2]);
 			}
+			delete temp;
 			break;
 		case OPTION:
 			eval_option(node);
@@ -456,6 +484,7 @@ void eval_stmt(struct node * node) {
 					cout << ((mg_str *)to_print)->value << endl;
 					break;
 			}
+			delete to_print;
 			break;
 		case BREAK:
 			throw break_except();
