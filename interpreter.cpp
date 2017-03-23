@@ -61,7 +61,7 @@ void assign(struct node * n) {
 				delete value;
 				value = (mg_obj *) temp;
 			} else if (type != value->type) {
-				cerr << "ERROR: TYPE MISMATCH" << endl;
+				cerr << endl << "ERROR: TYPE MISMATCH" << endl;
 				exit(EXIT_FAILURE);
 			}
 			vars[id] = value;	
@@ -101,13 +101,21 @@ void assign(struct node * n) {
 			cout << original << endl;
 			value = (mg_obj *) new mg_str(original);
 		} else if (type == TYPE_FLOAT && value->type == TYPE_INTEGER) {
-				mg_flt * temp = new mg_flt(
-					(double)((mg_int *)value)->value
-				);
-				delete value;
-				value = (mg_obj *) temp;
+			mg_flt * temp = new mg_flt(
+				(double)((mg_int *)value)->value
+			);
+			delete value;
+			value = (mg_obj *) temp;
+		} else if (type == TYPE_INTEGER && value->type == TYPE_FLOAT) {
+			mg_int * temp = new mg_int(
+				(int)((mg_flt *)value)->value
+			);
+			delete value;
+			value = (mg_obj *) temp;
+	
 		} else if (type != value->type) {
-			cerr << "ERROR: TYPE MISMATCH" << endl;
+			cerr << "type = " << type << "; v->type = " << value->type;
+			cerr << endl << "ERROR: TYPE MISMATCH" << endl;
 			exit(EXIT_FAILURE);
 		}
 		delete vars[id];
