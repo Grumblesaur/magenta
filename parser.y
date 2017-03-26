@@ -92,6 +92,7 @@
 
 %token PRINT
 %token INPUT
+%token PASS
 
 %type<n> program statements statement expression disjunction
 %type<n> conjunction relation addend factor exponent term id
@@ -231,6 +232,9 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		$$ = make_node(FOR_LOOP, NULL);
 		attach($$, $2);
 		attach($$, $3);
+	} | PASS SEMICOLON {
+		// empty statement
+		$$ = make_node(PASS, NULL);
 	}
 
 from: FROM expression {

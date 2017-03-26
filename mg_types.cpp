@@ -45,6 +45,9 @@ std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
 		case TYPE_FLOAT:
 			os << ((mg_flt &)obj).value;
 			break;
+		default:
+			os << &obj;
+			break;
 	}
 	return os;
 }

@@ -77,6 +77,7 @@
 
 "print"    {return PRINT;         }
 "input"    {return INPUT;         }
+"pass"     {return PASS;          }
 
 "true" {
 	yylval.ival = 1;

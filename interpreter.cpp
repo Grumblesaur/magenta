@@ -212,7 +212,7 @@ mg_obj * eval_expr(struct node * node) {
 			result = new mg_str((char *)node->value);
 			break;
 		case INPUT:
-			getline(cin, id); // use already-allocated `id` var for holder
+			getline(cin, id); // use `id` for stdin str
 			result = new mg_str(id);
 			break;
 		case PAREN_OPEN:
@@ -314,7 +314,6 @@ bool eval_case(struct node * n, mg_obj * option, int option_type) {
 	bool match = false;
 	
 	switch (option_type) {
-		
 		case TYPE_INTEGER:
 			i_option = (mg_int *) option;
 			i_c = (mg_int *) c;
@@ -337,6 +336,7 @@ bool eval_case(struct node * n, mg_obj * option, int option_type) {
 			}
 			break;
 	}
+	delete c;
 	if (match) {
 		struct node * stmts = n->children[1];
 			try {
@@ -368,7 +368,6 @@ void eval_option(struct node * n) {
 }
 
 void eval_stmt(struct node * node) {
-	mg_obj * to_print;
 	mg_obj * temp;
 	int children = node->num_children;
 	bool next = false;
@@ -393,6 +392,8 @@ void eval_stmt(struct node * node) {
 				delete temp;
 				temp = eval_expr(node->children[0]);
 			}
+			// reclaim temp if loop exited at top of loop
+			delete temp;
 		} break;
 		
 		case FOR_LOOP: {
@@ -400,8 +401,9 @@ void eval_stmt(struct node * node) {
 			mg_int * ptr;
 			string iter_name;
 			struct node * child;
-			// handle variable arrangements of by/from/to clauses
-			for (int x = 0; x < children; x++) {
+			// handle variable arrangements of by/from/to clauses,
+			// detect name of for-loop iterator variable
+			for (int x = 0; x < children - 1; x++) {
 				child = node->children[x];
 				ch_token = child->token;
 				if (ch_token == IDENTIFIER) {
@@ -415,12 +417,13 @@ void eval_stmt(struct node * node) {
 						: ch_token == BY ? by
 						: error
 					) = ptr->value;
+					delete ptr;
 				}
 			}
-			// if there was a from clause, start the loop var from there
+			// initialize the iterator variable of the for-loop
 			((mg_int *)vars[iter_name])->value = from;
 			
-			// loop from `from` to `to` - 1 by `by`
+			// iterate upwards, from `from` to `to`-1 by `by` increments
 			if (from < to) {
 				for(int i = from; i < to; i += by) {
 					((mg_int *)vars[iter_name])->value = i;
@@ -436,6 +439,7 @@ void eval_stmt(struct node * node) {
 						next = true;
 					}
 				}
+			// iterate backwards if `to` < `from`
 			} else if (from > to) {
 				for (int i = from; i > to; i -= by) {
 					((mg_int *)vars[iter_name])->value = i;
@@ -458,6 +462,7 @@ void eval_stmt(struct node * node) {
 		} break;
 		
 		case IF:
+			// evaluate IF-expr and differentiate between IF and IF-ELSE
 			temp = eval_expr(node->children[0]);
 			if (eval_bool(temp)) {
 				eval_stmt(node->children[1]);
@@ -476,25 +481,24 @@ void eval_stmt(struct node * node) {
 			break;
 		
 		case PRINT:
-			to_print = eval_expr(node->children[0]);
-			switch (to_print->type) {
+			temp = eval_expr(node->children[0]);
+			switch (temp->type) {
+				// operator<< is overloaded in mg_types.cpp
 				case TYPE_INTEGER:
-					cout << *(mg_int *)to_print << endl;
+					cout << *(mg_int *)temp << endl;
 					break;
 				case TYPE_FLOAT:
-					cout << *(mg_flt *)to_print << endl;
+					cout << *(mg_flt *)temp << endl;
 					break;
 				case TYPE_STRING:
-					cout << *(mg_str *)to_print << endl;
+					cout << *(mg_str *)temp << endl;
 					break;
 			}
-			delete to_print;
+			delete temp;
 			break;
 		case BREAK:
 			throw break_except();
-			break;
 		case NEXT:
 			throw next_except();
-			break;
 	}
 }
