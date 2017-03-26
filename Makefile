@@ -1,7 +1,7 @@
 magenta: lex.yy.o parser.tab.o tree.o mg_types.o mg_string.o interpreter.o \
 mg_ops.o
-	g++ lex.yy.o parser.tab.o tree.o mg_types.o mg_string.o interpreter.o \
-	mg_ops.o -o magenta
+	g++ -g lex.yy.o parser.tab.o tree.o mg_types.o mg_string.o \
+	interpreter.o mg_ops.o -o magenta
 
 lex.yy.o: lex.yy.c parser.tab.h
 	g++ -g -c lex.yy.c

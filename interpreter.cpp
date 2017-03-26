@@ -42,6 +42,13 @@ bool declared(string id) {
 	return iter != vars.end();
 }
 
+void view_map(void) {
+	for (auto it = vars.begin(); it != vars.end(); ++it) {
+		cout << " " << it->first << " : " << *it->second;
+	}
+	cout << endl;
+}
+
 // given a node n this function will do one of the following:
 // 1 initialize a new variable and assign it a value
 // 2 reassign a initialized variable
@@ -64,7 +71,8 @@ void assign(struct node * n) {
 				cerr << endl << "ERROR: TYPE MISMATCH" << endl;
 				exit(EXIT_FAILURE);
 			}
-			vars[id] = value;	
+			vars[id] = value;
+			view_map();
 		} else {
 			cerr << "ERROR: IDENTIFIER CANNOT BE INITIALIZED ";
 			cerr << "MORE THAN ONCE." << endl;
@@ -87,10 +95,12 @@ void assign(struct node * n) {
 		} else {
 			id = string((char *)n->children[0]->value);
 		}
+		
 		if (!declared(id)) {
 			cerr << "ERROR: assignment to uninitialized identifier" << endl;
 			exit(EXIT_FAILURE);
 		}
+		
 		mg_obj * value = eval_expr(n->children[1]);
 		int type = vars[id]->type;
 		if (type != TYPE_STRING && has_index) {
@@ -291,7 +301,7 @@ mg_obj * eval_expr(struct node * node) {
 	} else {
 		delete left;
 		delete right;
-	}
+	} 
 	return result;
 }
 
@@ -375,6 +385,7 @@ void eval_stmt(struct node * node) {
 		case ASSIGN:
 			assign(node);
 			break;
+		
 		case WHILE_LOOP: {
 			temp = eval_expr(node->children[0]);
 			while (eval_bool(temp)) {
@@ -385,6 +396,7 @@ void eval_stmt(struct node * node) {
 					}
 					eval_stmt(node->children[1]);
 				} catch (break_except &e) {
+					delete temp;
 					break;
 				} catch (next_except &e) {
 					next = true;

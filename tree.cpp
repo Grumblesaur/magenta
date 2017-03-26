@@ -146,7 +146,7 @@ void print(struct node* node, int tabs) {
 			cout << *(double*)node->value << endl;
 			break;
 		case STRING_LITERAL:
-			cout << node->value << endl;
+			cout << std::string((char *)node->value) << endl;
 			break;
 		
 		case STATEMENT:     cout << "STATEMENT:"    << endl; break;
