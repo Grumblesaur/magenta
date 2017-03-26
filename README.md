@@ -7,13 +7,14 @@ https://trello.com/b/LEAOTeYg/magenta
   ```
   int i = 0;
   flt f = 0.0;
-  ```
   
-  str
-  `str s = "hello world!"`;
-  `str z = 'single quotes are also legal';
-  type
+  str s = "hello world!";
+  str z = 'single quotes are also legal';
   ```
+
+  type
+ 
+  # this is a feature yet to be implemented
   type Person {
     str name;
     int age;
@@ -24,6 +25,8 @@ https://trello.com/b/LEAOTeYg/magenta
   
 ### func & meth
   ```
+  # this is a feature yet to be implemented
+  
   # func-declared procedures have no side effects
   func add(int a, int b) : int {
     return a + b;
@@ -66,19 +69,19 @@ https://trello.com/b/LEAOTeYg/magenta
 ```
     ()    grouping,
     **    exponentiation,
-    ~     logarithm e.g. log base 2 of 3 is 2~3,
+    ~     logarithm (e.g. log base 2 of 3 is 2~3),
     //    integer division,
     *     multiplication,
     /     division,
     %     modulo,
     +     addition,
-    -     subtraction
+    -     subtraction,
     
-    >     greater than
-    <     less than
-    ==    equal
-    !=    not equal
-    >=    greater equal
+    >     greater than,
+    <     less than,
+    ==    equal,
+    !=    not equal,
+    >=    greater equal,
     <=    less equal
 ```
  
@@ -102,17 +105,19 @@ https://trello.com/b/LEAOTeYg/magenta
 # str
 ```
      +    concatenation,
-     *    string multiplication,
+     *    string multiplication (with an integer),
     []    character access (substring of length 1 at a character index)
            (slice operations to come later?)
 ```
 
 # Compounds
 ```
+     # This will be implemented with user-defined types
      .    member access (e.g. x.y S.T. y belongs to x)
 ```
  
 # arrays
 ```
+    # This will be implemented with containers
     []   element access
 ```
