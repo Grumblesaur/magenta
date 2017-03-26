@@ -10,7 +10,6 @@ https://trello.com/b/LEAOTeYg/magenta
   
   str s = "hello world!";
   str z = 'single quotes are also legal';
-  ```
 
   type
  
