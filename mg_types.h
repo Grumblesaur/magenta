@@ -1,6 +1,7 @@
 #ifndef MG_TYPES
 #define MG_TYPES
 
+#include <ostream>
 #include <string>
 
 class mg_obj {
@@ -29,5 +30,8 @@ class mg_str : public mg_obj{
 		~mg_str();
 		std::string value;
 };
+
+std::ostream & operator<<(std::ostream &, const mg_obj &);
+
 
 #endif

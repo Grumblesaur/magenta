@@ -78,6 +78,10 @@ void assign(struct node * n) {
 		if (n->children[0]->token == BRACKET_OPEN) {
 			id = string((char *)(n->children[0]->children[0]->value));
 			mg_obj * temp = eval_expr(n->children[0]->children[1]);
+			if (temp->type != TYPE_INTEGER) {
+				cerr << "invalid index expr : not integer" << endl;
+				exit(EXIT_FAILURE);
+			}
 			index = ((mg_int *)temp)->value;
 			delete temp;
 		} else {
@@ -414,7 +418,7 @@ void eval_stmt(struct node * node) {
 				}
 			}
 			// if there was a from clause, start the loop var from there
-			vars[iter_name] = (mg_obj *) new mg_int(from ? from : 0);
+			((mg_int *)vars[iter_name])->value = from;
 			
 			// loop from `from` to `to` - 1 by `by`
 			if (from < to) {
@@ -475,13 +479,13 @@ void eval_stmt(struct node * node) {
 			to_print = eval_expr(node->children[0]);
 			switch (to_print->type) {
 				case TYPE_INTEGER:
-					cout << ((mg_int *)to_print)->value << endl;
+					cout << *(mg_int *)to_print << endl;
 					break;
 				case TYPE_FLOAT:
-					cout << ((mg_flt *)to_print)->value << endl;
+					cout << *(mg_flt *)to_print << endl;
 					break;
 				case TYPE_STRING:
-					cout << ((mg_str *)to_print)->value << endl;
+					cout << *(mg_str *)to_print << endl;
 					break;
 			}
 			delete to_print;

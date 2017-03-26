@@ -33,3 +33,19 @@ mg_str::mg_str(std::string value) {
 mg_str::~mg_str() {
 	
 }
+
+std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
+	switch (obj.type) {
+		case TYPE_INTEGER:
+			os << ((mg_int &)obj).value;
+			break;
+		case TYPE_STRING:
+			os << ((mg_str &)obj).value;
+			break;
+		case TYPE_FLOAT:
+			os << ((mg_flt &)obj).value;
+			break;
+	}
+	return os;
+}
+
