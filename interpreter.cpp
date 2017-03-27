@@ -163,22 +163,31 @@ mg_obj * eval_index(mg_obj * left, mg_obj * right) {
 }
 
 mg_obj * eval_math(mg_obj * left, int token, mg_obj * right) {
+	mg_obj * out;
 	switch (token) {
 		case TIMES:
-			return multiply(left, right);
+			out = multiply(left, right);
+			break;
 		case DIVIDE:
-			return divide(left, right);
+			out = divide(left, right);
+			break;
 		case INT_DIVIDE:
-			return int_divide(left, right);
+			out = int_divide(left, right);
+			break;
 		case MODULO:
-			return mod(left, right);
+			out = mod(left, right);
+			break;
 		case PLUS:
-			return add(left, right);
+			out = add(left, right);
+			break;
 		case POWER:
-			return power(left, right);
+			out = power(left, right);
+			break;
 		case LOG:
-			return logarithm(left, right);
+			out = logarithm(left, right);
+			break;
 	}
+	return out;
 }
 
 mg_obj * eval_expr(struct node * node) {
@@ -463,7 +472,7 @@ void eval_stmt(struct node * node) {
 					} catch (break_except &e) {
 						break;
 					} catch (next_except &e) {
-						break;
+						next = true;
 					}
 				}
 			}
@@ -474,13 +483,19 @@ void eval_stmt(struct node * node) {
 		
 		case IF:
 			// evaluate IF-expr and differentiate between IF and IF-ELSE
+			// each block must delete the temporary object, since it is possible
+			// that eval_stmt() will lead us away from the current path of
+			// execution.
 			temp = eval_expr(node->children[0]);
 			if (eval_bool(temp)) {
+				mg_delete(temp);
 				eval_stmt(node->children[1]);
 			} else if (children == 3) {
+				mg_delete(temp);
 				eval_stmt(node->children[2]);
+			} else {
+				mg_delete(temp);
 			}
-			mg_delete(temp);
 			break;
 		case OPTION:
 			eval_option(node);

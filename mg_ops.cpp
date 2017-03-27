@@ -160,13 +160,14 @@ mg_obj * add(mg_obj * left, mg_obj * right) {
 	rval = right_is_float ?
 		((mg_flt *)right)->value : ((mg_int *)right)->value;
 	
-	if (!left_is_float && !right_is_float) {
-		result = lval + rval;
-		return new mg_int(result);
-	}
-	
+	mg_obj * out;
 	result = lval + rval;
-	return new mg_flt(result);
+	if (!left_is_float && !right_is_float) {
+		out = (mg_obj *) new mg_int(result);
+	} else {
+		out = (mg_obj *) new mg_flt(result);
+	}
+	return out;
 }
 
 mg_obj * subtract(mg_obj * left, mg_obj * right) {
