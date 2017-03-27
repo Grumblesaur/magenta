@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include "mg_types.h"
 #include "parser.tab.h"
@@ -32,6 +33,24 @@ mg_str::mg_str(std::string value) {
 
 mg_str::~mg_str() {
 	
+}
+
+void mg_delete(mg_obj * ptr) {
+	if (!ptr) return; // bail out if nullptr
+	switch (ptr->type) {
+		case TYPE_INTEGER:
+			delete (mg_int *) ptr;
+			break;
+		case TYPE_FLOAT:
+			delete (mg_flt *) ptr;
+			break;
+		case TYPE_STRING:
+			delete (mg_str *) ptr;
+			break;
+		default:
+			std::cerr << "deleting unknown object type at " << ptr << std::endl;
+			delete ptr;
+	}
 }
 
 std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {

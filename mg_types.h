@@ -33,5 +33,6 @@ class mg_str : public mg_obj{
 
 std::ostream & operator<<(std::ostream &, const mg_obj &);
 
+void mg_delete(mg_obj * ptr);
 
 #endif
