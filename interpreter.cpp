@@ -72,7 +72,6 @@ void assign(struct node * n) {
 				exit(EXIT_FAILURE);
 			}
 			vars[id] = value;
-			view_map();
 		} else {
 			cerr << "ERROR: IDENTIFIER CANNOT BE INITIALIZED ";
 			cerr << "MORE THAN ONCE." << endl;
