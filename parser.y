@@ -3,8 +3,8 @@
 	#include <stdlib.h>
 	#include "tree.h"
 	#include "interpreter.h"
+	extern int linecount;
 	int yydebug = 1;
-
 	int yywrap();
 	int yylex();
 
