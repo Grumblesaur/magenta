@@ -40,6 +40,7 @@
 "in"       {return IN;            }
 "break"    {return BREAK;         }
 "next"     {return NEXT;          }
+"return"   {return RETURN;        }
 
 "@"        {return ACCESS;        }
 "["        {return BRACKET_OPEN;  }

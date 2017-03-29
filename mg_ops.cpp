@@ -84,7 +84,7 @@ mg_obj * multiply(mg_obj * left, mg_obj * right) {
 		return new mg_str(str_product);
 
 	} else {
-		cerr << left->type << " ; " << right->type << endl;;
+		cerr << left->type << " ; " << right->type << endl;
 		cerr << "error: unsupported multiplication operation" << endl;
 		exit(EXIT_FAILURE);
 	}
