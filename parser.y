@@ -38,9 +38,9 @@
 %precedence IF         
 %precedence ELSE       
 %token FOR_LOOP
-%token FROM;
-%token TO;
-%token BY;        
+%token FROM
+%token TO
+%token BY        
 %token WHILE_LOOP
 %token IN
 %token BREAK
