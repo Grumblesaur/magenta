@@ -33,4 +33,4 @@ parser.tab.c: parser.y tree.h interpreter.h
 	bison -dv parser.y
 
 clean:
-	rm -f lex.yy.c parser.tab.h parser.tab.c *.o magenta
+	rm -f lex.yy.c parser.tab.h parser.tab.c *.o magenta *.output
