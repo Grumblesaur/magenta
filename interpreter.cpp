@@ -79,22 +79,7 @@ void assign(struct node * n) {
 		}
 	} else {
 		// reassignment
-		string id;
-		bool has_index = false;
-		int index = 0;
-		if (n->children[0]->token == BRACKET_OPEN) {
-			id = string((char *)(n->children[0]->children[0]->value));
-			mg_obj * temp = eval_expr(n->children[0]->children[1]);
-			if (temp->type != TYPE_INTEGER) {
-				cerr << "invalid index expr : not integer" << endl;
-				exit(EXIT_FAILURE);
-			}
-			index = ((mg_int *)temp)->value;
-			delete temp;
-		} else {
-			id = string((char *)n->children[0]->value);
-		}
-		
+		string id = string((char *)n->children[0]->value);
 		if (!declared(id)) {
 			cerr << "ERROR: assignment to uninitialized identifier" << endl;
 			exit(EXIT_FAILURE);
@@ -102,18 +87,7 @@ void assign(struct node * n) {
 		
 		mg_obj * value = eval_expr(n->children[1]);
 		int type = vars[id]->type;
-		if (type != TYPE_STRING && has_index) {
-			cerr << "ERROR: assignment to index of non-indexed data type";
-			cerr << endl;
-			exit(EXIT_FAILURE);
-		} else if (has_index) {
-			string replacement = ((mg_str *)value)->value;
-			string original = ((mg_str*)vars[id])->value;
-			original.replace(index, index + 1, replacement);
-			delete value;
-			//cout << original << endl;
-			value = (mg_obj *) new mg_str(original);
-		} else if (type == TYPE_FLOAT && value->type == TYPE_INTEGER) {
+		if (type == TYPE_FLOAT && value->type == TYPE_INTEGER) {
 			mg_flt * temp = new mg_flt(
 				(double)((mg_int *)value)->value
 			);
