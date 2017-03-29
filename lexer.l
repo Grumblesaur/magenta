@@ -34,29 +34,36 @@ unsigned int linecount = 0;
 "case"     {return CASE;          }
 "if"       {return IF;       	  }
 "else"     {return ELSE;     	  }
+
 "for"      {return FOR_LOOP;      }
 "from"     {return FROM;          }
 "to"       {return TO;            }
 "by"       {return BY;            }
+
 "while"    {return WHILE_LOOP;    }
 "in"       {return IN;            }
+
 "break"    {return BREAK;         }
 "next"     {return NEXT;          }
 "return"   {return RETURN;        }
+"pass"     {return PASS;          }
 
-"@"        {return ACCESS;        }
+"."        {return ACCESS;        }
 "["        {return BRACKET_OPEN;  }
 "]"        {return BRACKET_CLOSE; }
 "("        {return PAREN_OPEN;    }
 ")"        {return PAREN_CLOSE;   }
+
 "**"       {return POWER;         }
 "~"        {return LOG;           }
+
 "//"       {return INT_DIVIDE;    }
 "*"        {return TIMES;         }
 "/"        {return DIVIDE;        }
 "%"        {return MODULO;        }
 "+"        {return PLUS;          }
 "-"        {return MINUS;         }
+
 "<<"       {return LEFT_SHIFT;    }
 ">>"       {return RIGHT_SHIFT;   }
 
@@ -80,7 +87,6 @@ unsigned int linecount = 0;
 
 "print"    {return PRINT;         }
 "input"    {return INPUT;         }
-"pass"     {return PASS;          }
 
 "true" {
 	yylval.ival = 1;
