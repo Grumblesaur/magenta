@@ -1,7 +1,12 @@
-#include <iostream>
+#include <ostream>
 #include <string>
 #include "mg_types.h"
+#include "tree.h"
 #include "parser.tab.h"
+
+mg_obj::~mg_obj() {
+
+}
 
 mg_flt::mg_flt(double value) {
 	this->type = TYPE_FLOAT;
@@ -35,22 +40,13 @@ mg_str::~mg_str() {
 	
 }
 
-void mg_delete(mg_obj * ptr) {
-	if (!ptr) return; // bail out if nullptr
-	switch (ptr->type) {
-		case TYPE_INTEGER:
-			delete (mg_int *) ptr;
-			break;
-		case TYPE_FLOAT:
-			delete (mg_flt *) ptr;
-			break;
-		case TYPE_STRING:
-			delete (mg_str *) ptr;
-			break;
-		default:
-			std::cerr << "deleting unknown object type at " << ptr << std::endl;
-			delete ptr;
-	}
+mg_func::mg_func(struct node * start) {
+	this->type = TYPE_FUNCTION;
+	this->value = start;
+}
+
+mg_func::~mg_func() {
+	
 }
 
 std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
@@ -65,7 +61,7 @@ std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
 			os << ((mg_flt &)obj).value;
 			break;
 		default:
-			os << &obj;
+			os << obj.type << " : " << &obj;
 			break;
 	}
 	return os;

@@ -65,7 +65,7 @@ void assign(struct node * n) {
 				mg_flt * temp = new mg_flt(
 					(double)((mg_int *)value)->value
 				);
-				mg_delete(value);
+				delete value;
 				value = (mg_obj *) temp;
 			} else if (type != value->type) {
 				cerr << endl << "ERROR: TYPE MISMATCH" << endl;
@@ -80,7 +80,6 @@ void assign(struct node * n) {
 	} else {
 		// reassignment
 		string id = string((char *)n->children[0]->value);
-		
 		if (!declared(id)) {
 			cerr << "ERROR: assignment to uninitialized identifier" << endl;
 			exit(EXIT_FAILURE);
@@ -92,13 +91,14 @@ void assign(struct node * n) {
 			mg_flt * temp = new mg_flt(
 				(double)((mg_int *)value)->value
 			);
-			mg_delete(value);
+			delete value;
+			
 			value = (mg_obj *) temp;
 		} else if (type == TYPE_INTEGER && value->type == TYPE_FLOAT) {
 			mg_int * temp = new mg_int(
 				(int)((mg_flt *)value)->value
 			);
-			mg_delete(value);
+			delete value;
 			value = (mg_obj *) temp;
 	
 		} else if (type != value->type) {
@@ -106,7 +106,7 @@ void assign(struct node * n) {
 			cerr << endl << "ERROR: TYPE MISMATCH" << endl;
 			exit(EXIT_FAILURE);
 		}
-		mg_delete(vars[id]);
+		delete vars[id];
 		vars[id] = value;
 	}
 }
@@ -280,10 +280,10 @@ mg_obj * eval_expr(struct node * node) {
 			break;
 	}
 	if (left == right) {
-		mg_delete(left);
+		delete left;
 	} else {
-		mg_delete(left);
-		mg_delete(right);
+		delete left;
+		delete right;
 	} 
 	return result;
 }
@@ -329,7 +329,7 @@ bool eval_case(struct node * n, mg_obj * option, int option_type) {
 			}
 			break;
 	}
-	mg_delete(c);
+	delete c;
 	if (match) {
 		struct node * stmts = n->children[1];
 			try {
@@ -357,7 +357,7 @@ void eval_option(struct node * n) {
 			current = current->children[2];
 		}
 	} while (unbroken && current != previous);
-	mg_delete(option);
+	delete option;
 }
 
 void eval_stmt(struct node * node) {
@@ -379,16 +379,16 @@ void eval_stmt(struct node * node) {
 					}
 					eval_stmt(node->children[1]);
 				} catch (break_except &e) {
-					mg_delete(temp);
+					delete temp;
 					break;
 				} catch (next_except &e) {
 					next = true;
 				}
-				mg_delete(temp);
+				delete temp;
 				temp = eval_expr(node->children[0]);
 			}
 			// reclaim temp if loop exited at top of loop
-			mg_delete(temp);
+			delete temp;
 		} break;
 		
 		case FOR_LOOP: {
@@ -412,7 +412,7 @@ void eval_stmt(struct node * node) {
 						: ch_token == BY ? by
 						: error
 					) = ptr->value;
-					mg_delete(ptr);
+					delete ptr;
 				}
 			}
 			// initialize the iterator variable of the for-loop
@@ -452,24 +452,24 @@ void eval_stmt(struct node * node) {
 				}
 			}
 			// remove temporary loop variable from scope
-			mg_delete(vars[iter_name]);
+			delete vars[iter_name];
 			vars.erase(iter_name);
 		} break;
 		
 		case IF:
 			// evaluate IF-expr and differentiate between IF and IF-ELSE
-			// each block must delete the temporary object, since it is possible
-			// that eval_stmt() will lead us away from the current path of
-			// execution.
+			// each block must delete the temporary object,
+			// since it is possible that eval_stmt() will lead us away
+			// from the current path of execution.
 			temp = eval_expr(node->children[0]);
 			if (eval_bool(temp)) {
-				mg_delete(temp);
+				delete temp;
 				eval_stmt(node->children[1]);
 			} else if (children == 3) {
-				mg_delete(temp);
+				delete temp;
 				eval_stmt(node->children[2]);
 			} else {
-				mg_delete(temp);
+				delete temp;
 			}
 			break;
 		case OPTION:
@@ -495,7 +495,7 @@ void eval_stmt(struct node * node) {
 					cout << *(mg_str *)temp << endl;
 					break;
 			}
-			mg_delete(temp);
+			delete temp;
 			break;
 		case BREAK:
 			throw break_except();

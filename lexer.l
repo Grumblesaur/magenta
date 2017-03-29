@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include "parser.tab.h"
 
+unsigned int linecount = 0;
+
 %}
 
 %option noyywrap
@@ -40,6 +42,7 @@
 "in"       {return IN;            }
 "break"    {return BREAK;         }
 "next"     {return NEXT;          }
+"return"   {return RETURN;        }
 
 "@"        {return ACCESS;        }
 "["        {return BRACKET_OPEN;  }
@@ -114,7 +117,8 @@
 	return STRING_LITERAL;
 }
 
-"#".*      {/* comment */         }
-[ \t\n]+   {/* whitespace */      }
+"#".*         {/* comment */     }
+[ \t]+        {/* whitespace */  }
+[[\r\n]\n\r]+ {linecount += 1;   }
 
 %%
