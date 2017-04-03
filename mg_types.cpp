@@ -1,3 +1,4 @@
+#include <unordered_map>
 #include <ostream>
 #include <string>
 #include "mg_types.h"
@@ -41,8 +42,15 @@ mg_str::~mg_str() {
 }
 
 mg_func::mg_func(struct node * start) {
+	bool has_args = false;
 	this->type = TYPE_FUNCTION;
-	this->value = start;
+	this->value = start->children[start->num_children-1];
+	this->return_type = (
+		start->num_children == 4 
+			? has_args = true, start->children[2]->token
+			: start->children[1]->token
+		);
+	this->locals = std::unordered_map<std::string, mg_obj *>();
 }
 
 mg_func::~mg_func() {

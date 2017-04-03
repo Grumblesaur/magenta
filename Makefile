@@ -10,14 +10,14 @@ lex.yy.c: lexer.l parser.tab.h
 	flex lexer.l
 
 parser.tab.o: parser.tab.c tree.h
-	g++ -g -c parser.tab.c
+	g++ -g -c -std=c++11 parser.tab.c
 
 interpreter.o: interpreter.h interpreter.cpp tree.h mg_types.h \
 parser.tab.h except.h mg_string.h mg_ops.h
 	g++ -g -c -std=c++11 interpreter.cpp
 
 mg_types.o: mg_types.h mg_types.cpp
-	g++ -g -c mg_types.cpp
+	g++ -g -c -std=c++11 mg_types.cpp
 
 mg_string.o: mg_string.h mg_string.cpp
 	g++ -g -c mg_string.cpp
