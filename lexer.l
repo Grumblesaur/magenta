@@ -125,6 +125,6 @@ unsigned int linecount = 0;
 
 "#".*         {/* comment */     }
 [ \t]+        {/* whitespace */  }
-[[\r\n]\n\r]+ {linecount += 1;   }
+[(\r\n)\n\r]+ {linecount += 1;   }
 
 %%
