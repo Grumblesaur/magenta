@@ -20,13 +20,13 @@ mg_types.o: mg_types.h mg_types.cpp
 	g++ -g -c -std=c++11 mg_types.cpp
 
 mg_string.o: mg_string.h mg_string.cpp
-	g++ -g -c mg_string.cpp
+	g++ -g -c -std=c++11 mg_string.cpp
 
 mg_ops.o: mg_ops.h mg_ops.cpp
-	g++ -g -c mg_ops.cpp
+	g++ -g -c -std=c++11 mg_ops.cpp
 
 tree.o: tree.h tree.cpp parser.tab.h
-	g++ -g -c tree.cpp
+	g++ -g -c -std=c++11 tree.cpp
 
 parser.tab.h: parser.tab.c
 parser.tab.c: parser.y tree.h interpreter.h
