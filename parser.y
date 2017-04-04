@@ -260,6 +260,9 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 	} | PASS SEMICOLON {
 		// empty statement
 		$$ = make_node(PASS, NULL);
+	} | RETURN expression {
+		$$ = make_node(RETURN, NULL);
+		attach($$, $2);
 	} | function_definition { }
 
 from: FROM expression {
