@@ -87,18 +87,21 @@
 %token<str> FLOAT_LITERAL 
 %token<str> STRING_LITERAL 
 
-%token STATEMENT 
+%token STATEMENT
+%token PARAM 
 %token ARGUMENT
-%token ARG_LIST
 
 %token PRINT
 %token INPUT
 %token PASS
 
+%token F_CALL
+%token M_CALL
+
 %type<n> program statements statement expression disjunction
 %type<n> conjunction relation addend factor exponent term id
 %type<n> return_type type function_call function_definition
-%type<n> method_definition argument implication
+%type<n> method_definition argument implication parameter
 %type<n> case or_bit xor_bit and_bit imp_bit shift from to by
 %type<n> l_val
 
@@ -121,10 +124,10 @@ statements: statement statements {
 		attach($$, $1);
 	}
 	
-function_definition: TYPE_FUNCTION id argument COLON type statement {
+function_definition: TYPE_FUNCTION id parameter COLON type statement {
 		$$ = make_node(TYPE_FUNCTION, NULL);
 		attach($$, $2); //identifier
-		attach($$, $3); // arguments
+		attach($$, $3); // paramters
 		attach($$, $5); // return type
 		attach($$, $6); // statements
 	} | TYPE_FUNCTION id COLON type statement {
@@ -134,7 +137,7 @@ function_definition: TYPE_FUNCTION id argument COLON type statement {
 		attach($$, $5); // statements
 	}
 
-method_definition: TYPE_METHOD id argument COLON return_type statement {
+method_definition: TYPE_METHOD id parameter COLON return_type statement {
 		$$ = make_node(TYPE_METHOD, NULL);
 		attach($$, $2);
 		attach($$, $3);
@@ -142,15 +145,33 @@ method_definition: TYPE_METHOD id argument COLON return_type statement {
 		attach($$, $6);
 	}
 
-argument: type id COMMA argument {
-		$$ = make_node(ARGUMENT, NULL);
+parameter: type id COMMA parameter {
+		$$ = make_node(PARAM, NULL);
 		attach($$, $1);
 		attach($$, $2);
 		attach($$, $4);
 	} | type id { 
-		$$ = make_node(ARGUMENT, NULL);
+		$$ = make_node(PARAM, NULL);
 		attach($$, $1);
 		attach($$, $2);
+	}
+
+function_call: id PAREN_OPEN argument PAREN_CLOSE {
+		$$ = make_node(F_CALL);
+		attach($$, $1);
+		attach($$, $3);
+	} | id PAREN_OPEN PAREN_CLOSE {
+		$$ = make_node(F_CALL);
+		attach($$, $1);
+	}
+
+argument: expression COMMA argument {
+		$$ = make_node(ARGUMENT, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | expression {
+		$$ = make_node(ARGUMENT, NULL);
+		attach($$, $1);
 	}
 	
 statement: type id ASSIGN expression SEMICOLON { // declare a var w/value

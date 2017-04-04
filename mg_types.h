@@ -49,6 +49,7 @@ class mg_func : public mg_obj {
 		// flag that indicates the return type of a function for determining
 		// what subclass of mg_obj * to construct as the return value
 		int return_type;
+		int arg_count;
 };
 
 std::ostream & operator<<(std::ostream &, const mg_obj &);

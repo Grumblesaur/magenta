@@ -151,7 +151,6 @@ void print(struct node* node, int tabs) {
 		
 		case STATEMENT:     cout << "STATEMENT:"    << endl; break;
 		case ARGUMENT:      cout << "ARGUMENT:"     << endl; break;
-		case ARG_LIST:      cout << "ARG_LIST:"     << endl; break;
 		case PRINT:         cout << "PRINT:"        << endl; break;
 		case INPUT:         cout << "INPUT"         << endl; break;
 		
