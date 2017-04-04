@@ -157,13 +157,10 @@ parameter: type id COMMA parameter {
 	}
 
 function_call: id PAREN_OPEN argument PAREN_CLOSE {
-		$$ = make_node(F_CALL);
+		$$ = make_node(F_CALL, NULL);
 		attach($$, $1);
 		attach($$, $3);
-	} | id PAREN_OPEN PAREN_CLOSE {
-		$$ = make_node(F_CALL);
-		attach($$, $1);
-	}
+	} 
 
 argument: expression COMMA argument {
 		$$ = make_node(ARGUMENT, NULL);
@@ -172,6 +169,8 @@ argument: expression COMMA argument {
 	} | expression {
 		$$ = make_node(ARGUMENT, NULL);
 		attach($$, $1);
+	} | { 
+		$$ = make_node(ARGUMENT, NULL); 
 	}
 	
 statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
@@ -441,7 +440,10 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 		attach($$, $2);
 	} | INPUT {
 		$$ = make_node(INPUT, NULL);
-	} | id { }
+	} | id {
+		// whatever dude
+	} | function_call { }
+
 		
 
 id: IDENTIFIER {
