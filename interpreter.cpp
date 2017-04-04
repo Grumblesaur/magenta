@@ -18,7 +18,7 @@ using std::cin;
 using std::cout;
 using std::cerr;
 using std::endl;
-
+void eval_stmt(struct node * node);
 mg_obj * eval_expr(struct node * node);
 
 // mg_objs need to be cast to their appropriate subclasses to access value
@@ -34,6 +34,10 @@ mg_obj * eval_expr(struct node * node);
 
 /* This contains a mapping of <identifier name : value> for variables */
 std::unordered_map<string, mg_obj *> vars;
+
+/* This contains the output of the current mg_func call. */
+mg_obj * return_address;
+
 
 // returns whether id is an initialized variable name
 bool declared(string id) {
@@ -192,6 +196,10 @@ mg_obj * eval_expr(struct node * node) {
 					result = (mg_obj *) new mg_str(
 						((mg_str *)vars[id])->value
 					);
+					break;
+				case TYPE_FUNCTION:
+					eval_stmt(((mg_func *)vars[id])->value);
+					result = return_address;
 					break;
 			}
 			break;
@@ -367,6 +375,15 @@ void eval_stmt(struct node * node) {
 	switch (node->token) {
 		case ASSIGN:
 			assign(node);
+			break;
+		
+		case TYPE_FUNCTION: // Function definition
+			temp = new mg_func(node);
+			vars[string((char *)node->children[0]->value)] = temp;
+			break;
+		
+		case RETURN:
+			return_address = eval_expr(node->children[0]);
 			break;
 		
 		case WHILE_LOOP: {
