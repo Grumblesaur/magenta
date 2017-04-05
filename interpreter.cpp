@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <climits>
+#include <vector>
 #include "interpreter.h"
 #include "parser.tab.h"
 #include "tree.h"
@@ -169,6 +170,48 @@ mg_obj * eval_math(mg_obj * left, int token, mg_obj * right) {
 	return out;
 }
 
+mg_obj * eval_func(struct node * node) {
+
+	string id = string((char *)node->children[0]->value);
+	if (!declared(id)) {
+		cout << "Cannot find func named: " << id << endl;
+		exit(EXIT_FAILURE);
+	}
+
+	// evaluate arguments
+	std::vector<mg_obj *> args;
+	if (node->num_children > 1) {
+		struct node * n = node->children[1];
+		do {
+			mg_obj * arg = eval_expr(n->children[0]);
+			args.push_back(arg);
+			n = n->num_children == 2 ? n->children[1] : NULL;
+		} while (n != NULL);
+	}
+
+	// add arguments to local map
+	mg_func * f = (mg_func *)vars[id];
+	if (f->param_types.size() == args.size()) {
+		for (int i = 0; i < args.size(); i++) {
+			if (f->param_types[i] == args[i]->type) {
+				f->locals[f->param_names[i]] = args[i];
+			} else {
+				cout << "Invalid argument type in call to func:  " << id << endl;
+				exit(EXIT_FAILURE);
+			}
+		}
+	} else {
+		cout << "Incorrect arugment count for func: " << id << endl;
+		exit(EXIT_FAILURE);
+	}
+
+	// TODO: return something...
+	// maybe move this function to be a member of mg_func
+	// that way it can internall execute and handle all the scoping issues automatically
+	// maybe pass the correct var map as an arg to eval_stmts
+	// maybe use a global stack of maps and just use the top one
+}
+
 mg_obj * eval_expr(struct node * node) {
 	bool t_val;
 	mg_obj * left = NULL;
@@ -211,6 +254,9 @@ mg_obj * eval_expr(struct node * node) {
 			break;
 		case STRING_LITERAL:
 			result = new mg_str((char *)node->value);
+			break;
+		case F_CALL:
+			return_address = eval_func(node);
 			break;
 		case INPUT:
 			getline(cin, id); // use `id` for stdin str

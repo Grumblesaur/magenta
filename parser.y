@@ -124,25 +124,25 @@ statements: statement statements {
 		attach($$, $1);
 	}
 	
-function_definition: TYPE_FUNCTION id parameter COLON type statement {
+function_definition: TYPE_FUNCTION id PAREN_OPEN parameter PAREN_CLOSE COLON type statement {
 		$$ = make_node(TYPE_FUNCTION, NULL);
 		attach($$, $2); //identifier
-		attach($$, $3); // paramters
-		attach($$, $5); // return type
-		attach($$, $6); // statements
-	} | TYPE_FUNCTION id COLON type statement {
+		attach($$, $4); // paramters
+		attach($$, $7); // return type
+		attach($$, $8); // statements
+	} | TYPE_FUNCTION id PAREN_OPEN PAREN_CLOSE COLON type statement {
 		$$ = make_node(TYPE_FUNCTION, NULL);
 		attach($$, $2); //identifier
-		attach($$, $4); // return type
-		attach($$, $5); // statements
+		attach($$, $6); // return type
+		attach($$, $7); // statements
 	}
 
-method_definition: TYPE_METHOD id parameter COLON return_type statement {
+method_definition: TYPE_METHOD id PAREN_OPEN parameter PAREN_CLOSE COLON return_type statement {
 		$$ = make_node(TYPE_METHOD, NULL);
 		attach($$, $2);
-		attach($$, $3);
-		attach($$, $5);
-		attach($$, $6);
+		attach($$, $4);
+		attach($$, $7);
+		attach($$, $8);
 	}
 
 parameter: type id COMMA parameter {
@@ -160,7 +160,10 @@ function_call: id PAREN_OPEN argument PAREN_CLOSE {
 		$$ = make_node(F_CALL, NULL);
 		attach($$, $1);
 		attach($$, $3);
-	} 
+	} | id PAREN_OPEN PAREN_CLOSE {
+		$$ = make_node(F_CALL, NULL);
+		attach($$, $1);
+	}
 
 argument: expression COMMA argument {
 		$$ = make_node(ARGUMENT, NULL);
@@ -169,8 +172,6 @@ argument: expression COMMA argument {
 	} | expression {
 		$$ = make_node(ARGUMENT, NULL);
 		attach($$, $1);
-	} | { 
-		$$ = make_node(ARGUMENT, NULL); 
 	}
 	
 statement: type id ASSIGN expression SEMICOLON { // declare a var w/value

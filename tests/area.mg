@@ -1,8 +1,10 @@
 # pi is a language constant
 
-func area_circle (float radius) : flt {
+func area_circle (flt radius) : flt {
+	flt pi = 3.14;
 	return pi * (radius ** 2);
 }
 
-radius = flt(input("Radius of a circle: "))
-print(area_circle(radius));
+#radius = flt(input("Radius of a circle: "))
+flt radius = 1;
+print area_circle(radius);

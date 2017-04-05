@@ -42,25 +42,27 @@ mg_str::~mg_str() {
 }
 
 mg_func::mg_func(struct node * start) {
-	bool has_args = false;
 	this->type = TYPE_FUNCTION;
 	this->value = start->children[start->num_children-1];
 	this->return_type = (
 		start->num_children == 4 
-			? has_args = true, start->children[2]->token
+			? start->children[2]->token
 			: start->children[1]->token
 		);
 	this->locals = std::unordered_map<std::string, mg_obj *>();
-
-	struct node * n = start->children[1];
+	
+	node * n = start->children[1];
 	while (n->token == PARAM) {
-		arg_count++;
+		this->param_types.push_back(n->children[0]->token);
+		this->param_names.push_back(
+			std::string((char*)n->children[1]->value)
+			);
 		n = n->children[n->num_children-1];
 	}
 }
 
 mg_func::~mg_func() {
-	
+
 }
 
 std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
