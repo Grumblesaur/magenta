@@ -184,8 +184,6 @@ mg_obj * eval_math(mg_obj * left, int token, mg_obj * right) {
 
 mg_obj * eval_func(struct node * node) {
 	
-	cout << "EVAL_FUNC" << endl;
-	view_map();
 	string id = string((char *)node->children[0]->value);
 	
 	mg_func * variable = (mg_func *)lookup(id);
@@ -481,7 +479,6 @@ void eval_option(struct node * n) {
 }
 
 void eval_stmt(struct node * node) {
-	view_map();
 	mg_obj * temp;
 	int children = node->num_children;
 	bool next = false;
@@ -496,8 +493,6 @@ void eval_stmt(struct node * node) {
 			scope[current_scope][
 				s = string((char *)node->children[0]->value)
 			] = temp;
-			cout << "define function `" << s << "', " << *temp;
-			cout << " in scope " << current_scope << endl;
 		} break;
 		
 		case RETURN:
@@ -617,15 +612,8 @@ void eval_stmt(struct node * node) {
 			break;
 		
 		case PRINT:
-			cout << "print" << endl;
 			temp = eval_expr(node->children[0]);
-			cout << "node->children[0]: " << node->children[0]->token;
-			cout << endl;
-			cout << "temp" << endl;
-			cout << temp << endl;
-			cout << *temp << endl;
 			switch (temp->type) {
-				cout << "printswitch" << endl;
 				// operator<< is overloaded in mg_types.cpp
 				case TYPE_INTEGER:
 					cout << *(mg_int *)temp << endl;
