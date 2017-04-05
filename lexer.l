@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include "parser.tab.h"
 
-unsigned int linecount = 0;
+unsigned int linecount = 1;
 
 %}
 
@@ -87,6 +87,7 @@ unsigned int linecount = 0;
 
 "print"    {return PRINT;         }
 "input"    {return INPUT;         }
+"len"      {return LEN;           }
 
 "true" {
 	yylval.ival = 1;

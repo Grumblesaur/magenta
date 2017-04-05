@@ -93,6 +93,7 @@
 
 %token PRINT
 %token INPUT
+%token LEN
 %token PASS
 
 %token F_CALL
@@ -163,6 +164,9 @@ function_call: id PAREN_OPEN argument PAREN_CLOSE {
 	} | id PAREN_OPEN PAREN_CLOSE {
 		$$ = make_node(F_CALL, NULL);
 		attach($$, $1);
+	} | LEN PAREN_OPEN expression PAREN_CLOSE {
+		$$ = make_node(LEN, NULL);
+		attach($$, $3);
 	}
 
 argument: expression COMMA argument {
@@ -257,8 +261,10 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		$$ = make_node(FOR_LOOP, NULL);
 		attach($$, $2);
 		attach($$, $3);
-	} | PASS SEMICOLON {
+	} | SEMICOLON {
 		// empty statement
+		$$ = make_node(PASS, NULL);
+	} | PASS SEMICOLON {
 		$$ = make_node(PASS, NULL);
 	} | RETURN expression {
 		$$ = make_node(RETURN, NULL);
@@ -441,10 +447,7 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 		attach($$, $2);
 	} | INPUT {
 		$$ = make_node(INPUT, NULL);
-	} | id {
-		// whatever dude
-	} | function_call { }
-
+	} | id { } | function_call { }
 		
 
 id: IDENTIFIER {
@@ -485,22 +488,27 @@ int yywrap() {
 }
 
 void yyerror(const char* str) {
-	fprintf(stderr, "bad parse: '%s'.\n", str);
+	fprintf(stderr, "at line %d: `%s'.\n", linecount, str);
 	exit(EXIT_FAILURE);
 }
 
 int main(int argc, char **argv) {
-
-	FILE* orig_stdin = stdin;
-	stdin = fopen(argv[1], "r");
+	FILE* orig_stdin; 
+	if (argc-1) {
+		orig_stdin = stdin;
+		stdin = fopen(argv[1], "r");
+	} else {
+		printf("stdin mode. press ctrl-d to execute and exit.\n");
+	}
 	yyparse();
 	
 	
 	//print(result, 0);
 	eval_stmt(result);
 	
-
-	fclose(stdin);
-	stdin = orig_stdin;
+	if (argc-1) {
+		fclose(stdin);
+		stdin = orig_stdin;
+	}
 	return 0;
 }
