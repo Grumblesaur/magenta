@@ -26,6 +26,7 @@ using std::unordered_map;
 
 void eval_stmt(struct node * node);
 mg_obj * eval_expr(struct node * node);
+mg_obj * lookup(string id);
 
 // mg_objs need to be cast to their appropriate subclasses to access value
 // we need to use pointers for this.
@@ -187,11 +188,13 @@ mg_obj * eval_func(struct node * node) {
 	view_map();
 	string id = string((char *)node->children[0]->value);
 	
-	if (!declared(id)) {
-		cout << "Cannot find func named: " << id << endl;
+	mg_func * variable = (mg_func *)lookup(id);
+	if (!variable) {
+		cerr << "no such function `" << id << "' in scope ";
+		cerr << current_scope << endl;
 		exit(EXIT_FAILURE);
-	}	
-
+	}
+	
 	// evaluate arguments
 	vector<mg_obj *> args;
 	if (node->num_children > 1) {
@@ -218,6 +221,7 @@ mg_obj * eval_func(struct node * node) {
 		}
 		eval_stmt(f->value);
 		return return_address;
+
 	} else {
 		cout << "Incorrect arugment count for func: " << id << endl;
 		exit(EXIT_FAILURE);
@@ -226,6 +230,21 @@ mg_obj * eval_func(struct node * node) {
 	// maybe move this function to be a member of mg_func
 	// that way it can internall execute and handle all the
 	// scoping issues automatically
+}
+
+mg_obj * lookup(string id) {
+	unordered_map<string, mg_obj *>::const_iterator local_iter =
+		scope[current_scope].find(id);
+	unordered_map<string, mg_obj *>:: const_iterator global_iter =
+		scope[GLOBAL].find(id);
+	
+	if (local_iter != scope[current_scope].end()) {
+		return scope[current_scope][id];
+	}
+	if (global_iter != scope[GLOBAL].end()) {
+		return scope[GLOBAL][id];
+	}
+	return NULL;
 }
 
 mg_obj * eval_expr(struct node * node) {
@@ -259,7 +278,7 @@ mg_obj * eval_expr(struct node * node) {
 				exit(EXIT_FAILURE);
 			}
 			
-			t = scope[current_scope][id]->type;
+			t = variable->type;
 			switch (t) {
 				case TYPE_INTEGER:
 					result = (mg_obj *) new mg_int(
@@ -471,12 +490,15 @@ void eval_stmt(struct node * node) {
 			assign(node);
 			break;
 		
-		case TYPE_FUNCTION: // Function definition
+		case TYPE_FUNCTION: { // Function definition
+			string s = "";
 			temp = new mg_func(node);
 			scope[current_scope][
-				string((char *)node->children[0]->value)
+				s = string((char *)node->children[0]->value)
 			] = temp;
-			break;
+			cout << "define function `" << s << "', " << *temp;
+			cout << " in scope " << current_scope << endl;
+		} break;
 		
 		case RETURN:
 			return_address = eval_expr(node->children[0]);
@@ -595,8 +617,15 @@ void eval_stmt(struct node * node) {
 			break;
 		
 		case PRINT:
+			cout << "print" << endl;
 			temp = eval_expr(node->children[0]);
+			cout << "node->children[0]: " << node->children[0]->token;
+			cout << endl;
+			cout << "temp" << endl;
+			cout << temp << endl;
+			cout << *temp << endl;
 			switch (temp->type) {
+				cout << "printswitch" << endl;
 				// operator<< is overloaded in mg_types.cpp
 				case TYPE_INTEGER:
 					cout << *(mg_int *)temp << endl;
