@@ -231,10 +231,8 @@ mg_obj * eval_func(struct node * node) {
 }
 
 mg_obj * lookup(string id) {
-	unordered_map<string, mg_obj *>::const_iterator local_iter =
-		scope[current_scope].find(id);
-	unordered_map<string, mg_obj *>:: const_iterator global_iter =
-		scope[GLOBAL].find(id);
+	auto local_iter = scope[current_scope].find(id);
+	auto global_iter = scope[GLOBAL].find(id);
 	
 	if (local_iter != scope[current_scope].end()) {
 		return scope[current_scope][id];
