@@ -19,6 +19,9 @@ using std::cin;
 using std::cout;
 using std::cerr;
 using std::endl;
+using std::vector;
+using std::unordered_map;
+
 void eval_stmt(struct node * node);
 mg_obj * eval_expr(struct node * node);
 
@@ -42,7 +45,7 @@ mg_obj * return_address;
 
 // returns whether id is an initialized variable name
 bool declared(string id) {
-	std::unordered_map<string, mg_obj *>
+	unordered_map<string, mg_obj *>
 		::const_iterator iter = vars.find(id);
 	return iter != vars.end();
 }
@@ -179,7 +182,7 @@ mg_obj * eval_func(struct node * node) {
 	}
 
 	// evaluate arguments
-	std::vector<mg_obj *> args;
+	vector<mg_obj *> args;
 	if (node->num_children > 1) {
 		struct node * n = node->children[1];
 		do {
@@ -196,7 +199,8 @@ mg_obj * eval_func(struct node * node) {
 			if (f->param_types[i] == args[i]->type) {
 				f->locals[f->param_names[i]] = args[i];
 			} else {
-				cout << "Invalid argument type in call to func:  " << id << endl;
+				cout << "Invalid argument type in call to func: ";
+				cout << id << endl;
 				exit(EXIT_FAILURE);
 			}
 		}
@@ -222,7 +226,7 @@ mg_obj * eval_expr(struct node * node) {
 	int t;
 	switch(token) {
 		case IDENTIFIER:
-			id = std::string((char *) node->value);
+			id = string((char *) node->value);
 			t = vars[id]->type;
 			switch (t) {
 				case TYPE_INTEGER:
