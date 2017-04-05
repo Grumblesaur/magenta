@@ -177,13 +177,14 @@ mg_obj * eval_math(mg_obj * left, int token, mg_obj * right) {
 }
 
 mg_obj * eval_func(struct node * node) {
-
+	current_scope++;
+	cout << "EVAL_FUNC" << endl;
 	string id = string((char *)node->children[0]->value);
 	if (!declared(id)) {
 		cout << "Cannot find func named: " << id << endl;
 		exit(EXIT_FAILURE);
 	}
-
+	cout << 1 << endl;
 	// evaluate arguments
 	vector<mg_obj *> args;
 	if (node->num_children > 1) {
@@ -194,7 +195,7 @@ mg_obj * eval_func(struct node * node) {
 			n = n->num_children == 2 ? n->children[1] : NULL;
 		} while (n != NULL);
 	}
-
+	cout << 2 << endl;
 	// add arguments to local map
 	mg_func * f = (mg_func *)scope[current_scope][id];
 	if (f->param_types.size() == args.size()) {
@@ -265,6 +266,7 @@ mg_obj * eval_expr(struct node * node) {
 			break;
 		case F_CALL:
 			return_address = eval_func(node);
+			current_scope--;
 			break;
 		case INPUT:
 			getline(cin, id); // use `id` for stdin str
