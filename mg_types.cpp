@@ -74,6 +74,9 @@ std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
 		case TYPE_FLOAT:
 			os << ((mg_flt &)obj).value;
 			break;
+		case TYPE_FUNCTION:
+			os << "function object at " << &obj;
+			break;
 		default:
 			os << obj.type << " : " << &obj;
 			break;

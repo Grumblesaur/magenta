@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include "parser.tab.h"
 
-unsigned int linecount = 0;
+unsigned int linecount = 1;
 
 %}
 

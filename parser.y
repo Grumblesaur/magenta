@@ -257,8 +257,10 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		$$ = make_node(FOR_LOOP, NULL);
 		attach($$, $2);
 		attach($$, $3);
-	} | PASS SEMICOLON {
+	} | SEMICOLON {
 		// empty statement
+		$$ = make_node(PASS, NULL);
+	} | PASS SEMICOLON {
 		$$ = make_node(PASS, NULL);
 	} | RETURN expression {
 		$$ = make_node(RETURN, NULL);
@@ -482,22 +484,27 @@ int yywrap() {
 }
 
 void yyerror(const char* str) {
-	fprintf(stderr, "bad parse: '%s'.\n", str);
+	fprintf(stderr, "bad parse at line %d: `%s'.\n", linecount, str);
 	exit(EXIT_FAILURE);
 }
 
 int main(int argc, char **argv) {
-
-	FILE* orig_stdin = stdin;
-	stdin = fopen(argv[1], "r");
+	FILE* orig_stdin; 
+	if (argc-1) {
+		orig_stdin = stdin;
+		stdin = fopen(argv[1], "r");
+	} else {
+		printf("stdin mode. press ctrl-d to execute and exit.\n");
+	}
 	yyparse();
 	
 	
 	//print(result, 0);
 	eval_stmt(result);
 	
-
-	fclose(stdin);
-	stdin = orig_stdin;
+	if (argc-1) {
+		fclose(stdin);
+		stdin = orig_stdin;
+	}
 	return 0;
 }
