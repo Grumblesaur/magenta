@@ -36,8 +36,11 @@ mg_obj * eval_expr(struct node * node);
 // you can't directly cast mg_obj to any of its subclasses,
 // but you can cast pointers
 
-/* This contains a mapping of <identifier name : value> for variables */
-std::unordered_map<string, mg_obj *> vars;
+/* the stack of different scopes, with scope[0] being global */
+vector<unordered_map<string, mg_obj *> > scope(16);
+unsigned current_scope = 0;
+const unsigned GLOBAL = 0;
+
 
 /* This contains the output of the current mg_func call. */
 mg_obj * return_address;
@@ -46,12 +49,12 @@ mg_obj * return_address;
 // returns whether id is an initialized variable name
 bool declared(string id) {
 	unordered_map<string, mg_obj *>
-		::const_iterator iter = vars.find(id);
-	return iter != vars.end();
+		::const_iterator iter = scope[current_scope].find(id);
+	return iter != scope[current_scope].end();
 }
 
 void view_map(void) {
-	for (auto it = vars.begin(); it != vars.end(); ++it) {
+	for (auto it = scope[current_scope].begin(); it != scope[current_scope].end(); ++it) {
 		cout << " " << it->first << " : " << *it->second;
 	}
 	cout << endl;
@@ -79,7 +82,7 @@ void assign(struct node * n) {
 				cerr << endl << "ERROR: TYPE MISMATCH" << endl;
 				exit(EXIT_FAILURE);
 			}
-			vars[id] = value;
+			scope[current_scope][id] = value;
 		} else {
 			cerr << "ERROR: IDENTIFIER CANNOT BE INITIALIZED ";
 			cerr << "MORE THAN ONCE." << endl;
@@ -94,7 +97,7 @@ void assign(struct node * n) {
 		}
 		
 		mg_obj * value = eval_expr(n->children[1]);
-		int type = vars[id]->type;
+		int type = scope[current_scope][id]->type;
 		if (type == TYPE_FLOAT && value->type == TYPE_INTEGER) {
 			mg_flt * temp = new mg_flt(
 				(double)((mg_int *)value)->value
@@ -114,8 +117,8 @@ void assign(struct node * n) {
 			cerr << endl << "ERROR: TYPE MISMATCH" << endl;
 			exit(EXIT_FAILURE);
 		}
-		delete vars[id];
-		vars[id] = value;
+		delete scope[current_scope][id];
+		scope[current_scope][id] = value;
 	}
 }
 
@@ -193,7 +196,7 @@ mg_obj * eval_func(struct node * node) {
 	}
 
 	// add arguments to local map
-	mg_func * f = (mg_func *)vars[id];
+	mg_func * f = (mg_func *)scope[current_scope][id];
 	if (f->param_types.size() == args.size()) {
 		for (int i = 0; i < args.size(); i++) {
 			if (f->param_types[i] == args[i]->type) {
@@ -227,25 +230,25 @@ mg_obj * eval_expr(struct node * node) {
 	switch(token) {
 		case IDENTIFIER:
 			id = string((char *) node->value);
-			t = vars[id]->type;
+			t = scope[current_scope][id]->type;
 			switch (t) {
 				case TYPE_INTEGER:
 					result = (mg_obj *) new mg_int(
-						((mg_int *)vars[id])->value
+						((mg_int *)scope[current_scope][id])->value
 					);
 					break;
 				case TYPE_FLOAT:
 					result = (mg_obj *) new mg_flt(
-						((mg_flt *)vars[id])->value
+						((mg_flt *)scope[current_scope][id])->value
 					);
 					break;
 				case TYPE_STRING:
 					result = (mg_obj *) new mg_str(
-						((mg_str *)vars[id])->value
+						((mg_str *)scope[current_scope][id])->value
 					);
 					break;
 				case TYPE_FUNCTION:
-					eval_stmt(((mg_func *)vars[id])->value);
+					eval_stmt(((mg_func *)scope[current_scope][id])->value);
 					result = return_address;
 					break;
 			}
@@ -439,7 +442,7 @@ void eval_stmt(struct node * node) {
 		
 		case TYPE_FUNCTION: // Function definition
 			temp = new mg_func(node);
-			vars[string((char *)node->children[0]->value)] = temp;
+			scope[current_scope][string((char *)node->children[0]->value)] = temp;
 			break;
 		
 		case RETURN:
@@ -480,7 +483,7 @@ void eval_stmt(struct node * node) {
 				ch_token = child->token;
 				if (ch_token == IDENTIFIER) {
 					iter_name = string((char *) child->value);
-					vars[iter_name] = new mg_int(0);
+					scope[current_scope][iter_name] = new mg_int(0);
 				} else {
 					ptr = ((mg_int *)eval_expr(child->children[0]));
 					int error = 0;
@@ -493,12 +496,12 @@ void eval_stmt(struct node * node) {
 				}
 			}
 			// initialize the iterator variable of the for-loop
-			((mg_int *)vars[iter_name])->value = from;
+			((mg_int *)scope[current_scope][iter_name])->value = from;
 			
 			// iterate upwards, from `from` to `to`-1 by `by` increments
 			if (from < to) {
 				for(int i = from; i < to; i += by) {
-					((mg_int *)vars[iter_name])->value = i;
+					((mg_int *)scope[current_scope][iter_name])->value = i;
 					try {
 						if (next) {
 							next = false;
@@ -514,7 +517,7 @@ void eval_stmt(struct node * node) {
 			// iterate backwards if `to` < `from`
 			} else if (from > to) {
 				for (int i = from; i > to; i -= by) {
-					((mg_int *)vars[iter_name])->value = i;
+					((mg_int *)scope[current_scope][iter_name])->value = i;
 					try {
 						if (next) {
 							next = false;
@@ -529,8 +532,8 @@ void eval_stmt(struct node * node) {
 				}
 			}
 			// remove temporary loop variable from scope
-			delete vars[iter_name];
-			vars.erase(iter_name);
+			delete scope[current_scope][iter_name];
+			scope[current_scope].erase(iter_name);
 		} break;
 		
 		case IF:
