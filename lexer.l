@@ -87,6 +87,7 @@ unsigned int linecount = 1;
 
 "print"    {return PRINT;         }
 "input"    {return INPUT;         }
+"len"      {return LEN;           }
 
 "true" {
 	yylval.ival = 1;

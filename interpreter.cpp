@@ -286,6 +286,16 @@ mg_obj * eval_expr(struct node * node) {
 			}
 			result = subtract(left, right);
 			break;
+		
+		case LEN:
+			left = eval_expr(node->children[0]);
+			right = NULL;
+			if (left->type != TYPE_STRING) {
+				result = new mg_int(0);
+			} else {
+				result = new mg_int(((mg_str *)left)->value.length());
+			}
+			break;
 	}
 	if (left == right) {
 		delete left;

@@ -1,6 +1,4 @@
-# calculate factorials recursively
-
-func fact : int (int x) {
+func fact int x : int {
 	if x == 0 {
 		return 1;
 	} else {
@@ -8,5 +6,5 @@ func fact : int (int x) {
 	}
 }
 
-int x = int(input("Find factorial of: "));
+int x = int(input);
 print(fact(x));

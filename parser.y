@@ -93,6 +93,7 @@
 
 %token PRINT
 %token INPUT
+%token LEN
 %token PASS
 
 %token F_CALL
@@ -160,7 +161,13 @@ function_call: id PAREN_OPEN argument PAREN_CLOSE {
 		$$ = make_node(F_CALL, NULL);
 		attach($$, $1);
 		attach($$, $3);
-	} 
+	} | id PAREN_OPEN PAREN_CLOSE {
+		$$ = make_node(F_CALL, NULL);
+		attach($$, $1);
+	} | LEN PAREN_OPEN expression PAREN_CLOSE {
+		$$ = make_node(LEN, NULL);
+		attach($$, $3);
+	}
 
 argument: expression COMMA argument {
 		$$ = make_node(ARGUMENT, NULL);
@@ -169,8 +176,6 @@ argument: expression COMMA argument {
 	} | expression {
 		$$ = make_node(ARGUMENT, NULL);
 		attach($$, $1);
-	} | { 
-		$$ = make_node(ARGUMENT, NULL); 
 	}
 	
 statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
@@ -442,10 +447,7 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 		attach($$, $2);
 	} | INPUT {
 		$$ = make_node(INPUT, NULL);
-	} | id {
-		// whatever dude
-	} | function_call { }
-
+	} | id { } | function_call { }
 		
 
 id: IDENTIFIER {
@@ -486,7 +488,7 @@ int yywrap() {
 }
 
 void yyerror(const char* str) {
-	fprintf(stderr, "bad parse at line %d: `%s'.\n", linecount, str);
+	fprintf(stderr, "at line %d: `%s'.\n", linecount, str);
 	exit(EXIT_FAILURE);
 }
 
