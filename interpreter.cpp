@@ -200,6 +200,7 @@ mg_obj * eval_func(struct node * node) {
 				exit(EXIT_FAILURE);
 			}
 		}
+		eval_stmt(node->children[node->num_children-1]);
 	} else {
 		cout << "Incorrect arugment count for func: " << id << endl;
 		exit(EXIT_FAILURE);
