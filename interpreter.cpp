@@ -26,6 +26,7 @@ using std::unordered_map;
 
 void eval_stmt(struct node * node);
 mg_obj * eval_expr(struct node * node);
+mg_obj * lookup(string id);
 
 // mg_objs need to be cast to their appropriate subclasses to access value
 // we need to use pointers for this.
@@ -187,11 +188,13 @@ mg_obj * eval_func(struct node * node) {
 	view_map();
 	string id = string((char *)node->children[0]->value);
 	
-	if (!declared(id)) {
-		cout << "Cannot find func named: `" << id << "' in scope ";
-		cout << current_scope << endl;
+	mg_func * variable = (mg_func *)lookup(id);
+	if (!variable) {
+		cerr << "no such function `" << id << "' in scope ";
+		cerr << current_scope << endl;
 		exit(EXIT_FAILURE);
 	}
+	
 	cout << 1 << endl;
 	// evaluate arguments
 	current_scope++;
@@ -206,17 +209,20 @@ mg_obj * eval_func(struct node * node) {
 	}
 	cout << 2 << endl;
 	// add arguments to local map
-	mg_func * f = (mg_func *)scope[current_scope][id];
-	if (f->param_types.size() == args.size()) {
+	if (variable->param_types.size() == args.size()) {
+		cout << "if" << endl;
 		for (int i = 0; i < args.size(); i++) {
-			if (f->param_types[i] == args[i]->type) {
-				f->locals[f->param_names[i]] = args[i];
+			cout << "\tfor" << endl;
+			if (variable->param_types[i] == args[i]->type) {
+				cout << "\t\tif" << endl;
+				variable->locals[variable->param_names[i]] = args[i];
 			} else {
 				cout << "Invalid argument type in call to func: ";
 				cout << id << endl;
 				exit(EXIT_FAILURE);
 			}
 		}
+		cout << "execute" << endl;
 		eval_stmt(node->children[node->num_children-1]);
 	} else {
 		cout << "Incorrect arugment count for func: " << id << endl;
@@ -227,6 +233,21 @@ mg_obj * eval_func(struct node * node) {
 	// maybe move this function to be a member of mg_func
 	// that way it can internall execute and handle all the
 	// scoping issues automatically
+}
+
+mg_obj * lookup(string id) {
+	unordered_map<string, mg_obj *>::const_iterator local_iter =
+		scope[current_scope].find(id);
+	unordered_map<string, mg_obj *>:: const_iterator global_iter =
+		scope[GLOBAL].find(id);
+	
+	if (local_iter != scope[current_scope].end()) {
+		return scope[current_scope][id];
+	}
+	if (global_iter != scope[GLOBAL].end()) {
+		return scope[GLOBAL][id];
+	}
+	return NULL;
 }
 
 mg_obj * eval_expr(struct node * node) {
@@ -260,7 +281,7 @@ mg_obj * eval_expr(struct node * node) {
 				exit(EXIT_FAILURE);
 			}
 			
-			t = scope[current_scope][id]->type;
+			t = variable->type;
 			switch (t) {
 				case TYPE_INTEGER:
 					result = (mg_obj *) new mg_int(
@@ -598,8 +619,15 @@ void eval_stmt(struct node * node) {
 			break;
 		
 		case PRINT:
+			cout << "print" << endl;
 			temp = eval_expr(node->children[0]);
+			cout << "node->children[0]: " << node->children[0]->token;
+			cout << endl;
+			cout << "temp" << endl;
+			cout << temp << endl;
+			cout << *temp << endl;
 			switch (temp->type) {
+				cout << "printswitch" << endl;
 				// operator<< is overloaded in mg_types.cpp
 				case TYPE_INTEGER:
 					cout << *(mg_int *)temp << endl;
