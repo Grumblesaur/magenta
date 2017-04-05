@@ -54,7 +54,11 @@ bool declared(string id) {
 }
 
 void view_map(void) {
-	for (auto it = scope[current_scope].begin(); it != scope[current_scope].end(); ++it) {
+	for (
+		auto it = scope[current_scope].begin();
+		it != scope[current_scope].end();
+		++it
+	) {
 		cout << " " << it->first << " : " << *it->second;
 	}
 	cout << endl;
@@ -215,9 +219,8 @@ mg_obj * eval_func(struct node * node) {
 
 	// TODO: return something...
 	// maybe move this function to be a member of mg_func
-	// that way it can internall execute and handle all the scoping issues automatically
-	// maybe pass the correct var map as an arg to eval_stmts
-	// maybe use a global stack of maps and just use the top one
+	// that way it can internall execute and handle all the
+	// scoping issues automatically
 }
 
 mg_obj * eval_expr(struct node * node) {
@@ -443,7 +446,9 @@ void eval_stmt(struct node * node) {
 		
 		case TYPE_FUNCTION: // Function definition
 			temp = new mg_func(node);
-			scope[current_scope][string((char *)node->children[0]->value)] = temp;
+			scope[current_scope][
+				string((char *)node->children[0]->value)
+			] = temp;
 			break;
 		
 		case RETURN:
@@ -574,6 +579,9 @@ void eval_stmt(struct node * node) {
 					break;
 				case TYPE_STRING:
 					cout << *(mg_str *)temp << endl;
+					break;
+				case TYPE_FUNCTION:
+					cout << *(mg_func *)temp << endl;
 					break;
 			}
 			delete temp;
