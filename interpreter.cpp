@@ -50,8 +50,7 @@ mg_obj * return_address;
 
 // returns whether id is an initialized variable name
 bool declared(string id) {
-	unordered_map<string, mg_obj *>
-		::const_iterator iter = scope[current_scope].find(id);
+	auto iter = scope[current_scope].find(id);
 	return iter != scope[current_scope].end();
 }
 
@@ -183,9 +182,11 @@ mg_obj * eval_math(mg_obj * left, int token, mg_obj * right) {
 }
 
 mg_obj * eval_func(struct node * node) {
-	current_scope++;
+	
 	cout << "EVAL_FUNC" << endl;
+	view_map();
 	string id = string((char *)node->children[0]->value);
+	
 	if (!declared(id)) {
 		cout << "Cannot find func named: `" << id << "' in scope ";
 		cout << current_scope << endl;
@@ -193,6 +194,7 @@ mg_obj * eval_func(struct node * node) {
 	}
 	cout << 1 << endl;
 	// evaluate arguments
+	current_scope++;
 	vector<mg_obj *> args;
 	if (node->num_children > 1) {
 		struct node * n = node->children[1];
