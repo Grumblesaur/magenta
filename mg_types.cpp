@@ -49,7 +49,6 @@ mg_func::mg_func(struct node * start) {
 			? start->children[2]->token
 			: start->children[1]->token
 		);
-	this->locals = std::unordered_map<std::string, mg_obj *>();
 	
 	node * n = start->children[1];
 	while (n->token == PARAM) {

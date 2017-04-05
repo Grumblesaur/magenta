@@ -6,5 +6,5 @@ func area_circle (flt radius) : flt {
 }
 
 #radius = flt(input("Radius of a circle: "))
-flt radius = 1;
-print area_circle(radius);
+flt x = 1;
+print area_circle(x);

@@ -46,7 +46,6 @@ class mg_func : public mg_obj {
 		// a map of identifiers to objects holding the arguments and local
 		// variables for the function, to be populated when called and
 		// emptied on function return
-		std::unordered_map<std::string, mg_obj *> locals;
 		// flag that indicates the return type of a function for determining
 		// what subclass of mg_obj * to construct as the return value
 		int return_type;
