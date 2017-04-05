@@ -187,7 +187,8 @@ mg_obj * eval_func(struct node * node) {
 	cout << "EVAL_FUNC" << endl;
 	string id = string((char *)node->children[0]->value);
 	if (!declared(id)) {
-		cout << "Cannot find func named: " << id << endl;
+		cout << "Cannot find func named: `" << id << "' in scope ";
+		cout << current_scope << endl;
 		exit(EXIT_FAILURE);
 	}
 	cout << 1 << endl;
@@ -468,12 +469,15 @@ void eval_stmt(struct node * node) {
 			assign(node);
 			break;
 		
-		case TYPE_FUNCTION: // Function definition
+		case TYPE_FUNCTION: { // Function definition
+			string s = "";
 			temp = new mg_func(node);
 			scope[current_scope][
-				string((char *)node->children[0]->value)
+				s = string((char *)node->children[0]->value)
 			] = temp;
-			break;
+			cout << "define function `" << s << "', " << *temp;
+			cout << " in scope " << current_scope << endl;
+		} break;
 		
 		case RETURN:
 			return_address = eval_expr(node->children[0]);
