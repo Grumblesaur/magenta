@@ -1,4 +1,5 @@
-func fact int x : int {
+func fact (int x) : int {
+	print x;
 	if x == 0 {
 		return 1;
 	} else {
@@ -6,5 +7,5 @@ func fact int x : int {
 	}
 }
 
-int x = int(input);
-print(fact(x));
+int x = 6;
+print fact(x);

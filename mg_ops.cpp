@@ -100,13 +100,13 @@ mg_obj * divide(mg_obj * left, mg_obj * right) {
 		return new mg_flt(d_quotient);
 	} else if (left->type == TYPE_INTEGER && right->type == TYPE_FLOAT) {
 		d_quotient = ((mg_int *)left)->value / ((mg_flt *)right)->value;
-		return new mg_int(d_quotient);
+		return new mg_flt(d_quotient);
 	} else if (left->type == TYPE_FLOAT && right->type == TYPE_INTEGER) {
 		d_quotient = ((mg_flt *)left)->value / ((mg_int *)right)->value;
-		return new mg_int(d_quotient);
+		return new mg_flt(d_quotient);
 	} else if (left->type == TYPE_FLOAT && right->type == TYPE_FLOAT) {
 		d_quotient = ((mg_flt *)left)->value / ((mg_flt *)right)->value;
-		return new mg_int(d_quotient);
+		return new mg_flt(d_quotient);
 	} else {
 		cerr << "error: unsupported division operation" << endl;
 		exit(EXIT_FAILURE);
