@@ -8,3 +8,4 @@ func subtract (int a, int b) : int {
 
 print add(4, 6);
 print subtract(4, 6);
+print add(5, 10);

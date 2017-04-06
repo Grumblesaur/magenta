@@ -205,19 +205,19 @@ mg_obj * eval_func(struct node * node) {
 		} while (n != NULL);
 	}
 	// add arguments to local map
-	mg_func * f = (mg_func *)scope[current_scope][id];
+	mg_func * f = variable;
 	current_scope++;
-	if (f->param_types.size() == args.size()) {
+	if (variable->param_types.size() == args.size()) {
 		for (int i = 0; i < args.size(); i++) {
-			if (f->param_types[i] == args[i]->type) {
-				scope[current_scope][(f->param_names)[i]] = args[i];
+			if (variable->param_types[i] == args[i]->type) {
+				scope[current_scope][(variable->param_names)[i]] = args[i];
 			} else {
 				cout << "Invalid argument type in call to func: ";
 				cout << id << endl;
 				exit(EXIT_FAILURE);
 			}
 		}
-		eval_stmt(f->value);
+		eval_stmt(variable->value);
 		return return_address;
 
 	} else {
@@ -240,7 +240,7 @@ mg_obj * lookup(string id) {
 	if (global_iter != scope[GLOBAL].end()) {
 		return scope[GLOBAL][id];
 	}
-	return NULL;
+	cerr << "no such id `" << id << "'" << endl;
 }
 
 mg_obj * eval_expr(struct node * node) {
@@ -254,20 +254,7 @@ mg_obj * eval_expr(struct node * node) {
 	switch(token) {
 		case IDENTIFIER: {
 			id = string((char *) node->value);
-			// search for identifier provided in both global and local scope
-			unordered_map<string, mg_obj *>
-				::const_iterator iter = scope[current_scope].find(id);
-			unordered_map<string, mg_obj *>
-				::const_iterator global_iter = scope[GLOBAL].find(id);
-			
-			// if the identifier is local, use the local, else use the 
-			// global; error out if present in neither
-			mg_obj * variable = iter != scope[current_scope].end()
-				? scope[current_scope][id]
-					: global_iter != scope[GLOBAL].end()
-					? scope[GLOBAL][id]
-						: NULL;
-			
+			mg_obj * variable = lookup(id);	
 			if (!variable) {
 				cerr << "variable `" << id << "' not in scope at line ";
 				cerr << linecount << endl;
