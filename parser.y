@@ -125,7 +125,8 @@ statements: statement statements {
 		attach($$, $1);
 	}
 	
-function_definition: TYPE_FUNCTION id PAREN_OPEN parameter PAREN_CLOSE COLON type statement {
+function_definition:
+	TYPE_FUNCTION id PAREN_OPEN parameter PAREN_CLOSE COLON type statement {
 		$$ = make_node(TYPE_FUNCTION, NULL);
 		attach($$, $2); //identifier
 		attach($$, $4); // paramters
@@ -138,7 +139,9 @@ function_definition: TYPE_FUNCTION id PAREN_OPEN parameter PAREN_CLOSE COLON typ
 		attach($$, $7); // statements
 	}
 
-method_definition: TYPE_METHOD id PAREN_OPEN parameter PAREN_CLOSE COLON return_type statement {
+method_definition:
+	TYPE_METHOD id PAREN_OPEN parameter PAREN_CLOSE COLON return_type
+	statement {
 		$$ = make_node(TYPE_METHOD, NULL);
 		attach($$, $2);
 		attach($$, $4);

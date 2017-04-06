@@ -289,10 +289,17 @@ mg_obj * eval_expr(struct node * node) {
 		case STRING_LITERAL:
 			result = new mg_str((char *)node->value);
 			break;
-		case F_CALL:
+		case F_CALL: {
 			result = eval_func(node);
-			current_scope--;
-			break;
+			for (
+				auto it = scope[current_scope].begin();
+					it != scope[current_scope].end();
+					++it
+			) {
+				delete scope[current_scope][it->first];
+			}
+			scope[current_scope--].clear();
+		} break;
 		case INPUT:
 			getline(cin, id); // use `id` for stdin str
 			result = new mg_str(id);
