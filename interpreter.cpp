@@ -219,15 +219,10 @@ mg_obj * eval_func(struct node * node) {
 		}
 		eval_stmt(f->value);
 		return return_address;
-
 	} else {
 		cout << "Incorrect arugment count for func: " << id << endl;
 		exit(EXIT_FAILURE);
 	}
-	// TODO: return something...
-	// maybe move this function to be a member of mg_func
-	// that way it can internall execute and handle all the
-	// scoping issues automatically
 }
 
 mg_obj * lookup(string id) {
@@ -243,6 +238,41 @@ mg_obj * lookup(string id) {
 	return NULL;
 }
 
+mg_obj * get_value(string id) {
+	mg_obj * variable = lookup(id);
+			
+	if (!variable) {
+		cerr << "variable `" << id << "' not in scope at line ";
+		cerr << linecount << endl;
+		exit(EXIT_FAILURE);
+	}
+	
+	int t = variable->type;
+	mg_obj * result;
+	switch (t) {
+		case TYPE_INTEGER:
+			result = (mg_obj *) new mg_int(
+				((mg_int *)variable)->value
+			);
+			break;
+		case TYPE_FLOAT:
+			result = (mg_obj *) new mg_flt(
+				((mg_flt *)variable)->value
+			);
+			break;
+		case TYPE_STRING:
+			result = (mg_obj *) new mg_str(
+				((mg_str *)variable)->value
+			);
+			break;
+		case TYPE_FUNCTION:
+			eval_stmt(((mg_func *)variable)->value);
+			result = return_address;
+			break;
+	}
+	return result;
+}
+
 mg_obj * eval_expr(struct node * node) {
 	bool t_val;
 	mg_obj * left = NULL;
@@ -254,48 +284,7 @@ mg_obj * eval_expr(struct node * node) {
 	switch(token) {
 		case IDENTIFIER: {
 			id = string((char *) node->value);
-			// search for identifier provided in both global and local scope
-			unordered_map<string, mg_obj *>
-				::const_iterator iter = scope[current_scope].find(id);
-			unordered_map<string, mg_obj *>
-				::const_iterator global_iter = scope[GLOBAL].find(id);
-			
-			// if the identifier is local, use the local, else use the 
-			// global; error out if present in neither
-			mg_obj * variable = iter != scope[current_scope].end()
-				? scope[current_scope][id]
-					: global_iter != scope[GLOBAL].end()
-					? scope[GLOBAL][id]
-						: NULL;
-			
-			if (!variable) {
-				cerr << "variable `" << id << "' not in scope at line ";
-				cerr << linecount << endl;
-				exit(EXIT_FAILURE);
-			}
-			
-			t = variable->type;
-			switch (t) {
-				case TYPE_INTEGER:
-					result = (mg_obj *) new mg_int(
-						((mg_int *)variable)->value
-					);
-					break;
-				case TYPE_FLOAT:
-					result = (mg_obj *) new mg_flt(
-						((mg_flt *)variable)->value
-					);
-					break;
-				case TYPE_STRING:
-					result = (mg_obj *) new mg_str(
-						((mg_str *)variable)->value
-					);
-					break;
-				case TYPE_FUNCTION:
-					eval_stmt(((mg_func *)variable)->value);
-					result = return_address;
-					break;
-			}
+			result = get_value(id);
 		} break;
 		case INTEGER_LITERAL:
 			result = new mg_int(*(int *)node->value);
