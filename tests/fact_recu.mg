@@ -8,4 +8,3 @@ func fact (int x) : int {
 
 int x = 5;
 print fact(x);
-

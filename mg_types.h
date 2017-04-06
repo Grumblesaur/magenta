@@ -43,14 +43,12 @@ class mg_func : public mg_obj {
 		// a pointer to a subtree of the syntax tree where the code for the
 		// function is stored
 		node * value;
-		
+
 		// flag that indicates the return type of a function for determining
 		// what subclass of mg_obj * to construct as the return value
 		int return_type;
 		std::vector<std::string> param_names;
 		std::vector<int> param_types;
-
-
 };
 
 std::ostream & operator<<(std::ostream &, const mg_obj &);

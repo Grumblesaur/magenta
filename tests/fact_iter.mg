@@ -9,5 +9,5 @@ func fact (int x) : int {
 	return out;
 }
 
-int x = int(input("Find factorial for: "));
-print(fact(x));
+int x = 6;
+print fact(x);
