@@ -7,6 +7,7 @@
 #ifdef __cplusplus
 extern "C" {
 	void eval_stmt(struct node* node);
+	void cleanup(void);
 };
 #endif
 

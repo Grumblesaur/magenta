@@ -509,6 +509,8 @@ int main(int argc, char **argv) {
 	//print(result, 0);
 	eval_stmt(result);
 	
+	cleanup();
+	
 	if (argc-1) {
 		fclose(stdin);
 		stdin = orig_stdin;

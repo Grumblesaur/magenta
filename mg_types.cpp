@@ -55,13 +55,12 @@ mg_func::mg_func(struct node * start) {
 		this->param_types.push_back(n->children[0]->token);
 		this->param_names.push_back(
 			std::string((char*)n->children[1]->value)
-			);
+		);
 		n = n->children[n->num_children-1];
 	}
 }
 
 mg_func::~mg_func() {
-
 }
 
 std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {

@@ -46,6 +46,17 @@ vector<unordered_map<string, mg_obj *> > scope(16);
 unsigned current_scope = 0;
 const unsigned GLOBAL = 0;
 
+void cleanup() {
+	for (
+		auto it = scope[GLOBAL].begin();
+			it != scope[GLOBAL].end();
+			++it
+	) {	
+		delete scope[GLOBAL][it->first];
+	}
+	scope[GLOBAL].clear();
+}
+
 
 /* This contains the output of the current mg_func call. */
 mg_obj * return_address;
