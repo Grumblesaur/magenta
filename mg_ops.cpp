@@ -1,10 +1,14 @@
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
+#include "mg_error.h"
 #include "mg_ops.h"
 #include "mg_string.h"
 #include "mg_types.h"
 #include "parser.tab.h"
+
+extern unsigned linecount;
+
 using std::cerr;
 using std::endl;
 using std::string;
@@ -14,8 +18,7 @@ using std::string;
 // numeric types.
 mg_obj * power(mg_obj * left, mg_obj * right) {
 	if (left->type == TYPE_STRING || right->type == TYPE_STRING) {
-		cerr << "error: unsupported exponentiation operation." << endl;
-		exit(EXIT_FAILURE);
+		error("unsupported exponentiation operation", linecount);
 	}
 	bool left_is_float, right_is_float;
 	left_is_float = left->type == TYPE_FLOAT;
@@ -35,8 +38,7 @@ mg_obj * power(mg_obj * left, mg_obj * right) {
 
 mg_obj * logarithm(mg_obj * left, mg_obj * right) {
 	if (left->type == TYPE_STRING || right->type == TYPE_STRING) {
-		cerr << "ERROR: Unsupported logarithmic operation." << endl;
-		exit(EXIT_FAILURE);
+		error("unsupported logarithmic operation", linecount);
 	}
 	bool left_is_float = left->type == TYPE_FLOAT;
 	bool right_is_float = right->type == TYPE_FLOAT;
@@ -85,8 +87,7 @@ mg_obj * multiply(mg_obj * left, mg_obj * right) {
 
 	} else {
 		cerr << left->type << " ; " << right->type << endl;
-		cerr << "error: unsupported multiplication operation" << endl;
-		exit(EXIT_FAILURE);
+		error("unsupported multiplication operation", linecount);
 	}
 }
 
@@ -108,15 +109,14 @@ mg_obj * divide(mg_obj * left, mg_obj * right) {
 		d_quotient = ((mg_flt *)left)->value / ((mg_flt *)right)->value;
 		return new mg_flt(d_quotient);
 	} else {
-		cerr << "error: unsupported division operation" << endl;
-		exit(EXIT_FAILURE);
+		error("unsupported division operation", linecount);
 	}
 }
 
 // divide two numbers after coercing them to integers
 mg_obj * int_divide(mg_obj * left, mg_obj * right) {
 	if (left->type == TYPE_STRING || right->type == TYPE_STRING) {
-		cerr << "error: unsupported division operation" << endl;
+		error("unsupported division operation", linecount);
 	}
 	bool left_is_float = left->type == TYPE_FLOAT;
 	bool right_is_float = right->type == TYPE_FLOAT;
@@ -131,8 +131,7 @@ mg_obj * int_divide(mg_obj * left, mg_obj * right) {
 
 mg_obj * mod(mg_obj * left, mg_obj * right) {
 	if (left->type != TYPE_INTEGER && left->type != TYPE_INTEGER) {
-		cerr << "error: unsupported modulus operation" << endl;
-		exit(EXIT_FAILURE);
+		error("unsupported modulus operation", linecount);
 	} else if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
 		int i_mod = ((mg_int *)left)->value % ((mg_int *)right)->value;
 		return new mg_int(i_mod);
@@ -145,9 +144,7 @@ mg_obj * add(mg_obj * left, mg_obj * right) {
 		return new mg_str(concat);
 	} else if (left->type == TYPE_STRING && right->type != TYPE_STRING
 		|| left->type != TYPE_STRING && right->type == TYPE_STRING) {
-		
-		cerr << "error: unsupported addition operation" << endl;
-		exit(EXIT_FAILURE);
+		error("unsupported addition operation", linecount);
 	}
 		
 	bool left_is_float, right_is_float;
@@ -187,8 +184,7 @@ mg_obj * subtract(mg_obj * left, mg_obj * right) {
 	}
 	
 	if (left->type == TYPE_STRING || right->type == TYPE_STRING) {
-		cerr << "ERROR: unsupported subtraction operation" << endl;
-		exit(EXIT_FAILURE);
+		error("unsupported subtraction operation", linecount);
 	}
 	
 	left_is_float = left->type == TYPE_FLOAT;
@@ -230,9 +226,7 @@ mg_obj * eval_logical(mg_obj * left, int token, mg_obj * right) {
 mg_obj * eval_comp(mg_obj * left, int op, mg_obj * right) {
 	if (left->type == TYPE_STRING && left->type != right->type
 		|| right->type == TYPE_STRING && left->type != right->type) {
-		
-		cerr << "error: compares numeric type with string" << endl;
-		exit(EXIT_FAILURE);
+		error("comparison type mismatch", linecount);
 	}
 	
 	bool numeric = left->type != TYPE_STRING && right->type != TYPE_STRING;
@@ -276,8 +270,7 @@ mg_obj * eval_bitwise(mg_obj * left, int token, mg_obj * right) {
 	
 	// bitwise operations are only valid for integers
 	if (left->type != TYPE_INTEGER || right->type != TYPE_INTEGER) {
-		cerr << "Unsupported bitwise operation." << endl;
-		exit(EXIT_FAILURE);
+		error("unsupported bit twiddle", linecount);
 	}
 	
 	int lval, rval, out;

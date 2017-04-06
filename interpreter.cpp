@@ -12,11 +12,13 @@
 #include "tree.h"
 #include "mg_types.h"
 #include "mg_ops.h"
+#include "mg_error.h"
 #include "except.h"
 
 extern unsigned linecount;
 
 using std::string;
+using std::to_string;
 using std::cin;
 using std::cout;
 using std::cerr;
@@ -85,21 +87,17 @@ void assign(struct node * n) {
 				delete value;
 				value = (mg_obj *) temp;
 			} else if (type != value->type) {
-				cerr << endl << "ERROR: TYPE MISMATCH" << endl;
-				exit(EXIT_FAILURE);
+				error("type mismatch", linecount);
 			}
 			scope[current_scope][id] = value;
 		} else {
-			cerr << "ERROR: IDENTIFIER CANNOT BE INITIALIZED ";
-			cerr << "MORE THAN ONCE." << endl;
-			exit(EXIT_FAILURE);
+			error("multiple declaration", linecount);
 		}
 	} else {
 		// reassignment
 		string id = string((char *)n->children[0]->value);
 		if (!declared(id)) {
-			cerr << "ERROR: assignment to uninitialized identifier" << endl;
-			exit(EXIT_FAILURE);
+			error("uninitialized identifier", linecount);
 		}
 		
 		mg_obj * value = eval_expr(n->children[1]);
@@ -120,8 +118,7 @@ void assign(struct node * n) {
 	
 		} else if (type != value->type) {
 			cerr << "type = " << type << "; v->type = " << value->type;
-			cerr << endl << "ERROR: TYPE MISMATCH" << endl;
-			exit(EXIT_FAILURE);
+			error("type mismatch", linecount);
 		}
 		delete scope[current_scope][id];
 		scope[current_scope][id] = value;
@@ -132,8 +129,7 @@ void assign(struct node * n) {
 mg_obj * eval_index(mg_obj * left, mg_obj * right) {
 	// TODO: amend this later when we support vector types
 	if (!(left->type == TYPE_STRING && right->type == TYPE_INTEGER)) {
-		cout << "Unsupported index operation." << endl;
-		exit(EXIT_FAILURE);
+		error("unsupported index operation", linecount);
 	}
 	
 	string text = ((mg_str *)left)->value;
@@ -142,8 +138,7 @@ mg_obj * eval_index(mg_obj * left, mg_obj * right) {
 	int position = ((mg_int *)right)->value;
 	
 	if (abs(position) >= length) {
-		cout << "Index out of bounds." << endl;
-		exit(EXIT_FAILURE);
+		error("index out of bounds", linecount);
 	}
 	
 	if (position < 0) {
@@ -188,9 +183,11 @@ mg_obj * eval_func(struct node * node) {
 	
 	mg_func * variable = (mg_func *)lookup(id);
 	if (!variable) {
-		cerr << "no such function `" << id << "' in scope ";
-		cerr << current_scope << endl;
-		exit(EXIT_FAILURE);
+		error(
+			"no such function `" + id + "' in scope "
+			+ to_string(current_scope),
+			linecount
+		);
 	}
 	
 	// evaluate arguments
@@ -212,16 +209,16 @@ mg_obj * eval_func(struct node * node) {
 			if (variable->param_types[i] == args[i]->type) {
 				scope[current_scope][(variable->param_names)[i]] = args[i];
 			} else {
-				cout << "Invalid argument type in call to func: ";
-				cout << id << endl;
-				exit(EXIT_FAILURE);
+				error(
+					"invalid argument type for func `" + id + "'",
+					linecount
+				);
 			}
 		}
 		eval_stmt(variable->value);
 		return return_address;
 	} else {
-		cout << "Incorrect arugment count for func: " << id << endl;
-		exit(EXIT_FAILURE);
+		error("invalid arg count for func `" + id + "'", linecount);
 	}
 }
 
@@ -235,16 +232,13 @@ mg_obj * lookup(string id) {
 	if (global_iter != scope[GLOBAL].end()) {
 		return scope[GLOBAL][id];
 	}
-	cerr << "no such id `" << id << "'" << endl;
 }
 
 mg_obj * get_value(string id) {
 	mg_obj * variable = lookup(id);
 			
 	if (!variable) {
-		cerr << "variable `" << id << "' not in scope at line ";
-		cerr << linecount << endl;
-		exit(EXIT_FAILURE);
+		error("variable `" + id + "' not in scope", linecount);
 	}
 	
 	int t = variable->type;
@@ -402,8 +396,7 @@ mg_obj * eval_expr(struct node * node) {
 bool eval_case(struct node * n, mg_obj * option, int option_type) {
 	mg_obj * c = eval_expr(n->children[0]);
 	if (c->type != option_type) {
-		cerr << "ERROR: case type and option type do not match" << endl;
-		exit(EXIT_FAILURE);
+		error("case and option type mismatch", linecount);
 	}
 	
 	mg_int * i_option, * i_c;
