@@ -216,6 +216,8 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 	} | PRINT expression SEMICOLON {
 		$$ = make_node(PRINT, NULL);
 		attach($$, $2);
+	} | PRINT SEMICOLON {
+		$$ = make_node(PRINT, NULL);
 	} | BREAK SEMICOLON{ 
 		$$ = make_node(BREAK, NULL);
 	} | NEXT SEMICOLON {

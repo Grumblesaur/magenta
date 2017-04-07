@@ -23,17 +23,48 @@ int strnqcpy(char * destination, char * target) {
 		return -1; // not a string literal
 	}
 	
+	// bail out if quotes are matched improperly or null-term the end quote
 	if (target[strlen(target)-1] != delim) {
-		return -1; // improperly matched quotes or missing final quote
+		return -1;
+	} else {
+		target[strlen(target)-1] = '\0';
 	}
+	
+	// skip past the starting quote and write the whole string to the
+	// destination array
 	target++;
 	int c = 0;
-	while (target[c] != delim) {
+	while (target[c]) {
 		destination[c] = target[c++];
 	}
 	destination[c] = '\0'; // write in the null-terminator
 	return c;
 }
+
+std::string escape(char * str) {
+	std::string s;
+	while (*str) {
+		if (*str == '\\') {
+			switch (*(str + 1)) {
+				case 'n' : s += "\n"; break;
+				case 'r' : s += "\r"; break;
+				case 'f' : s += "\f"; break;
+				case 't' : s += "\t"; break;
+				case '"' : s += "\""; break;
+				case '\'': s += "'" ; break;
+				case '\\': s += "\\"; break;
+				default:
+					s += "\\" + std::string(1, *(str+1));
+			}
+			str++;
+		} else {
+			s += std::string(1, *str);
+		}
+		str++;
+	}
+	return s;
+}
+
 
 struct node* make_node(int token, void* value) {
 	struct node* n = new struct node;
@@ -44,7 +75,12 @@ struct node* make_node(int token, void* value) {
 			// drop two characters from the array because we're not
 			// allocating space for the quotes
 			n->value = new char[strlen((char*)value)-1];
-			strnqcpy((char*)n->value, (char*)value);
+			strnqcpy((char*) n->value, (char*)value);
+			// process escape sequences and resize character array
+			std::string temp = escape((char *)n->value);
+			delete [] (char *) n->value;
+			n->value = new char[temp.length()];
+			strcpy((char *)n->value, temp.c_str());
 		} else if (token == IDENTIFIER) {
 			n->value = new char[strlen((char*)value)+1];
 			strcpy((char*)n->value, (char*)value);
