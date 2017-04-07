@@ -32,7 +32,7 @@ mg_obj * eval_expr(struct node * node);
 mg_obj * lookup(string id);
 
 /* the stack of different scopes, with scope[0] being global */
-vector<unordered_map<string, mg_obj *> > scope(16);
+vector<unordered_map<string, mg_obj *> > scope(1);
 
 /* a "pointer" to the current stack frame in the `scope` vector */
 unsigned current_scope = 0;
@@ -493,9 +493,7 @@ void eval_option(struct node * n) {
 }
 
 void eval_stmt(struct node * node) {
-	
-	cout << "scope length =  " << scope.size() << endl;	
-	cout << "current scope =  " << current_scope << endl;	
+		
 	mg_obj * temp;
 	int children = node->num_children;
 	bool next = false;
