@@ -23,6 +23,7 @@
 %token BRACE_CLOSE     
 %token ASSIGN          
 %token COLON 
+%token QUESTION
 %token SEMICOLON          
 %token COMMA
 
@@ -104,7 +105,7 @@
 %type<n> return_type type function_call function_definition
 %type<n> method_definition argument implication parameter
 %type<n> case or_bit xor_bit and_bit imp_bit shift from to by
-%type<n> l_val
+%type<n> l_val ternary
 
 %error-verbose
 
@@ -302,6 +303,16 @@ case: CASE expression COLON statements case {
 		attach($$, $4);
 	} 
 
+ternary: expression QUESTION expression COLON expression {
+		$$ = make_node(QUESTION, NULL);
+		attach($$, $1);
+		attach($$, $3);
+		attach($$, $5);
+	} | expression QUESTION COLON expression {
+		$$ = make_node(QUESTION, NULL);
+		attach($$, $1);
+		attach($$, $4);
+	}
 
 expression: expression LOG_OR disjunction {
 		$$ = make_node(LOG_OR, NULL);
@@ -311,8 +322,8 @@ expression: expression LOG_OR disjunction {
 		$$ = make_node(LOG_XOR, NULL);
 		attach($$, $1);
 		attach($$, $3);
-	} | disjunction { }
-
+	} | disjunction {
+	} | ternary { }
 
 disjunction: disjunction LOG_AND conjunction {
 		$$ = make_node(LOG_AND, NULL);
