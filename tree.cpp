@@ -68,6 +68,7 @@ struct node* make_node(int token, void* value) {
 			// allocating space for the quotes
 			n->value = new char[strlen((char*)value)-1];
 			strnqcpy((char*) n->value, (char*)value);
+			// process escape sequences and resize character array
 			std::string temp = escape((char *)n->value);
 			delete [] (char *) n->value;
 			n->value = new char[temp.length()];
