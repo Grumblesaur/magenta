@@ -114,18 +114,18 @@ unsigned int linecount = 1;
 	return FLOAT_LITERAL;
 }
 
-\"(\\.|[^"\\])*\" {
+\"(\\.|[^\\"])*\" {
 	yylval.str = yytext;
 	return STRING_LITERAL;
 }
 
-'(\\.|[^'\\])*' {
+'(\\.|[^\\'])*' {
 	yylval.str = yytext;
 	return STRING_LITERAL;
 }
 
 "#".*         {/* comment */     }
 [ \t]+        {/* whitespace */  }
-[(\r\n)\n\r]+ {linecount += 1;   }
+[(\r\n)\n\r]? {linecount += 1;   }
 
 %%

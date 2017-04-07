@@ -23,12 +23,18 @@ int strnqcpy(char * destination, char * target) {
 		return -1; // not a string literal
 	}
 	
+	// bail out if quotes are matched improperly or null-term the end quote
 	if (target[strlen(target)-1] != delim) {
-		return -1; // improperly matched quotes or missing final quote
+		return -1;
+	} else {
+		target[strlen(target)-1] = '\0';
 	}
+	
+	// skip past the starting quote and write the whole string to the
+	// destination array
 	target++;
 	int c = 0;
-	while (target[c] != delim) {
+	while (target[c]) {
 		destination[c] = target[c++];
 	}
 	destination[c] = '\0'; // write in the null-terminator
@@ -47,6 +53,8 @@ std::string escape(char * str) {
 				case '"' : s += "\""; break;
 				case '\'': s += "'" ; break;
 				case '\\': s += "\\"; break;
+				default:
+					s += "\\" + std::string(1, *(str+1));
 			}
 			str++;
 		} else {
