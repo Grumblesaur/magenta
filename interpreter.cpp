@@ -206,6 +206,10 @@ mg_obj * eval_func(struct node * node) {
 	// add arguments to local map
 	mg_func * f = variable;
 	current_scope++;
+	if (current_scope >= scope.size()) {
+		unordered_map<string, mg_obj *> u;
+		scope.push_back(u);
+	}
 	if (variable->param_types.size() == args.size()) {
 		for (int i = 0; i < args.size(); i++) {
 			if (variable->param_types[i] == args[i]->type) {
@@ -305,6 +309,7 @@ mg_obj * eval_expr(struct node * node) {
 				delete scope[current_scope][it->first];
 			}
 			scope[current_scope--].clear();
+			scope.pop_back();
 		} break;
 		case INPUT: {
 			string buffer;
@@ -488,6 +493,9 @@ void eval_option(struct node * n) {
 }
 
 void eval_stmt(struct node * node) {
+	
+	cout << "scope length =  " << scope.size() << endl;	
+	cout << "current scope =  " << current_scope << endl;	
 	mg_obj * temp;
 	int children = node->num_children;
 	bool next = false;
