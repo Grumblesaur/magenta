@@ -217,8 +217,12 @@ mg_obj * eval_func(struct node * node) {
 		try {
 			eval_stmt(variable->value);
 		} catch (return_except &e) {
+			if (return_address->type != f->return_type) {
+				error("Invalid return type in func " + id, linecount);
+			}
 			return return_address;
 		}
+		error("func " + id + " executed but did not return a value", linecount);
 	} else {
 		error("invalid arg count for func `" + id + "'", linecount);
 	}
@@ -500,10 +504,10 @@ void eval_stmt(struct node * node) {
 			] = temp;
 		} break;
 		
-		case RETURN:
+		case RETURN: {
 			return_address = eval_expr(node->children[0]);
 			throw return_except();
-			break;
+		} break;
 		
 		case WHILE_LOOP: {
 			temp = eval_expr(node->children[0]);

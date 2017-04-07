@@ -9,5 +9,5 @@ func fact (int x) : int {
 	return out;
 }
 
-int x = 6;
+int x = 5;
 print fact(x);
