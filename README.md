@@ -11,7 +11,7 @@ https://trello.com/b/LEAOTeYg/magenta
   str s = "hello world!";
   str z = 'single quotes are also legal';
 
-  type
+  # type
  
   # this is a feature yet to be implemented
   type Person {
@@ -81,7 +81,8 @@ https://trello.com/b/LEAOTeYg/magenta
     ==    equal,
     !=    not equal,
     >=    greater equal,
-    <=    less equal
+    <=    less equal,
+    ?:    ternary or null-coalescing
 ```
  
 ## bool
