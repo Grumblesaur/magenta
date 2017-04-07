@@ -78,6 +78,7 @@ void print(struct node* node, int tabs) {
 	switch (node->token) {
 		// unholy
 		using std::cout; using std::endl;
+		case RETURN:        cout << "RETURN"        << endl; break;
 		case BRACE_OPEN:    cout << "BRACE_OPEN"    << endl; break;
 		case BRACE_CLOSE:   cout << "BRACE_CLOSE"   << endl; break;
 		case ASSIGN:        cout << "ASSIGN"        << endl; break;
@@ -86,6 +87,8 @@ void print(struct node* node, int tabs) {
 		case COMMA:         cout << "COMMA"         << endl; break;
 		
 		case TYPE_FUNCTION: cout << "TYPE_FUNCTION" << endl; break;
+		case PARAM:         cout << "PARAM"         << endl; break;
+		case FUNC_CALL:     cout << "FUNC_CALL"     << endl; break;
 		case TYPE_METHOD:   cout << "TYPE_METHOD"   << endl; break;
 		case TYPE_INTEGER:  cout << "TYPE_INTEGER"  << endl; break;
 		case TYPE_STRING:   cout << "TYPE_STRING"   << endl; break;

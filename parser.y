@@ -96,7 +96,7 @@
 %token LEN
 %token PASS
 
-%token F_CALL
+%token FUNC_CALL
 %token M_CALL
 
 %type<n> program statements statement expression disjunction
@@ -161,11 +161,11 @@ parameter: type id COMMA parameter {
 	}
 
 function_call: id PAREN_OPEN argument PAREN_CLOSE {
-		$$ = make_node(F_CALL, NULL);
+		$$ = make_node(FUNC_CALL, NULL);
 		attach($$, $1);
 		attach($$, $3);
 	} | id PAREN_OPEN PAREN_CLOSE {
-		$$ = make_node(F_CALL, NULL);
+		$$ = make_node(FUNC_CALL, NULL);
 		attach($$, $1);
 	} | LEN PAREN_OPEN expression PAREN_CLOSE {
 		$$ = make_node(LEN, NULL);
@@ -506,7 +506,7 @@ int main(int argc, char **argv) {
 	yyparse();
 	
 	
-	//print(result, 0);
+	print(result, 0);
 	eval_stmt(result);
 	
 	cleanup();

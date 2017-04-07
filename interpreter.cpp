@@ -300,7 +300,7 @@ mg_obj * eval_expr(struct node * node) {
 		case STRING_LITERAL:
 			result = new mg_str((char *)node->value);
 			break;
-		case F_CALL: {
+		case FUNC_CALL: {
 			result = eval_func(node);
 			for (
 				auto it = scope[current_scope].begin();
