@@ -36,6 +36,7 @@ vector<unordered_map<string, mg_obj *> > scope(16);
 
 /* a "pointer" to the current stack frame in the `scope` vector */
 unsigned current_scope = 0;
+
 /* a constant "pointer" to the global scope */
 const unsigned GLOBAL = 0;
 
@@ -181,9 +182,7 @@ mg_obj * eval_math(mg_obj * left, int token, mg_obj * right) {
 }
 
 mg_obj * eval_func(struct node * node) {
-	
 	string id = string((char *)node->children[0]->value);
-	
 	mg_func * variable = (mg_func *)lookup(id);
 	if (!variable) {
 		error(
@@ -382,6 +381,23 @@ mg_obj * eval_expr(struct node * node) {
 				result = new mg_int(((mg_str *)left)->value.length());
 			}
 			break;
+		case QUESTION: {
+			int nodes = node->num_children;
+			mg_obj * test;
+			if (nodes == 3) {
+				test = eval_expr(node->children[0]);
+				left = eval_expr(node->children[1]);
+				right = eval_expr(node->children[2]);
+				result = eval_bool(test) ? left : right;
+				delete test;
+			} else {
+				left = eval_expr(node->children[0]);
+				right = eval_expr(node->children[1]);
+				result = eval_bool(left) ? left : right;
+			}
+		} 
+		if (result == left) delete right; else delete left;
+		return result;
 	}
 	// avoid double-delete error when contending with `ident .op. ident`
 	if (left == right) {
@@ -606,7 +622,6 @@ void eval_stmt(struct node * node) {
 				eval_stmt(node->children[i]);
 			}
 			break;
-		
 		case PRINT:
 			if (!node->num_children) {
 				cout << endl;

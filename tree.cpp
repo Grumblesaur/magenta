@@ -11,17 +11,13 @@
 // called on anything but a string literal node.
 int strnqcpy(char * destination, char * target) {
 	char delim;
-	if (!strlen(target)) {
-		return 0;
-	}
+	if (!target || !strlen(target)) return 0;
 	
-	if (target[0] == '"') {
-		delim = '"';
-	} else if (target[0] == '\'') {
-		delim = '\'';
-	} else {
-		return -1; // not a string literal
-	}
+	delim = target[0] == '"'
+		? '"'  : target[0] == '\''
+		? '\'' : '\0';
+	
+	if (!delim) return -1;
 	
 	// bail out if quotes are matched improperly or null-term the end quote
 	if (target[strlen(target)-1] != delim) {
@@ -37,8 +33,7 @@ int strnqcpy(char * destination, char * target) {
 	while (target[c]) {
 		destination[c] = target[c++];
 	}
-	destination[c] = '\0'; // write in the null-terminator
-	return c;
+	return destination[c] = '\0', c;
 }
 
 std::string escape(char * str) {
@@ -65,29 +60,34 @@ std::string escape(char * str) {
 	return s;
 }
 
-
 struct node* make_node(int token, void* value) {
 	struct node* n = new struct node;
 	n->token = token;
 
 	if (value != NULL) {
-		if (token == STRING_LITERAL) {
-			// drop two characters from the array because we're not
-			// allocating space for the quotes
-			n->value = new char[strlen((char*)value)-1];
-			strnqcpy((char*) n->value, (char*)value);
-			// process escape sequences and resize character array
-			std::string temp = escape((char *)n->value);
-			delete [] (char *) n->value;
-			n->value = new char[temp.length()];
-			strcpy((char *)n->value, temp.c_str());
-		} else if (token == IDENTIFIER) {
-			n->value = new char[strlen((char*)value)+1];
-			strcpy((char*)n->value, (char*)value);
-		} else if (token == INTEGER_LITERAL) {
-			n->value = new int(*(int*)value);
-		} else if (token == FLOAT_LITERAL) {
-			n->value = new double(* (double *) value);
+		switch (token) {
+			case STRING_LITERAL: {
+				// drop two characters from the array because we're not
+				// allocating space for the quotes
+				n->value = new char[strlen((char*)value)-1];
+				strnqcpy((char*) n->value, (char*)value);
+
+				// process escape sequences and resize character array
+				std::string temp = escape((char *)n->value);
+				delete [] (char *) n->value;
+				n->value = new char[temp.length()];
+				strcpy((char *)n->value, temp.c_str());
+			} break;
+			case IDENTIFIER:
+				n->value = new char[strlen((char*)value)+1];
+				strcpy((char*)n->value, (char*)value);
+				break;
+			case INTEGER_LITERAL:
+				n->value = new int(*(int*)value);
+				break;
+			case FLOAT_LITERAL:
+				n->value = new double(* (double *) value);
+				break;
 		}
 	}
 

@@ -19,6 +19,7 @@ unsigned int linecount = 1;
 "}"        {return BRACE_CLOSE;   }
 "="        {return ASSIGN;        }
 ":"        {return COLON;         }
+"?"        {return QUESTION;      }
 ";"        {return SEMICOLON;     }
 ","        {return COMMA;         }
 
