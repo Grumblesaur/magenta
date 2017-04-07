@@ -1,8 +1,9 @@
 func fact (int x) : int {
-	print x;
-	if x == 1 
+	if x == 1 {
 		return x;
-	return x * fact(x - 1);
+	} else {
+		return x * fact(x - 1);
+	}
 }
 
 int x = 5;

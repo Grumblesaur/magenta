@@ -214,8 +214,11 @@ mg_obj * eval_func(struct node * node) {
 				error("invalid arg type for func `" + id + "'", linecount);
 			}
 		}
-		eval_stmt(variable->value);
-		return return_address;
+		try {
+			eval_stmt(variable->value);
+		} catch (return_except &e) {
+			return return_address;
+		}
 	} else {
 		error("invalid arg count for func `" + id + "'", linecount);
 	}
@@ -499,6 +502,7 @@ void eval_stmt(struct node * node) {
 		
 		case RETURN:
 			return_address = eval_expr(node->children[0]);
+			throw return_except();
 			break;
 		
 		case WHILE_LOOP: {

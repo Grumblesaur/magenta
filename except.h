@@ -13,4 +13,10 @@ class next_except : public std::exception {
 		~next_except() {};
 };
 
+class return_except : public std::exception {
+	public:
+		return_except() {};
+		~return_except() {};
+};
+
 #endif
