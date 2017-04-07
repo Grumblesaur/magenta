@@ -271,7 +271,7 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 		$$ = make_node(PASS, NULL);
 	} | PASS SEMICOLON {
 		$$ = make_node(PASS, NULL);
-	} | RETURN expression {
+	} | RETURN expression SEMICOLON {
 		$$ = make_node(RETURN, NULL);
 		attach($$, $2);
 	} | function_definition { }
