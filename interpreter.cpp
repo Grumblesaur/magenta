@@ -15,6 +15,7 @@
 #include "mg_error.h"
 #include "except.h"
 
+/* roughly tracks what line the interpreter is on */
 extern unsigned linecount;
 
 using std::string;
@@ -30,28 +31,19 @@ void eval_stmt(struct node * node);
 mg_obj * eval_expr(struct node * node);
 mg_obj * lookup(string id);
 
-// mg_objs need to be cast to their appropriate subclasses to access value
-// we need to use pointers for this.
-// e.g. map<string, mg_obj *> 
-// 		mg_obj * o;
-// 		if (mg_obj->type == TYPE_INTEGER) {
-// 			int value = ((mg_int *)o)->value;
-// 		}
-// you can't access value from mg_obj because it doesn't have that field
-// you can't directly cast mg_obj to any of its subclasses,
-// but you can cast pointers
-
 /* the stack of different scopes, with scope[0] being global */
 vector<unordered_map<string, mg_obj *> > scope(16);
+
+/* a "pointer" to the current stack frame in the `scope` vector */
 unsigned current_scope = 0;
+/* a constant "pointer" to the global scope */
 const unsigned GLOBAL = 0;
 
+/* clear out the global scope before we exit to prevent leaks (called in
+	parser.y before program exit)
+*/
 void cleanup() {
-	for (
-		auto it = scope[GLOBAL].begin();
-			it != scope[GLOBAL].end();
-			++it
-	) {	
+	for (auto it = scope[GLOBAL].begin(); it != scope[GLOBAL].end(); ++it) {
 		delete scope[GLOBAL][it->first];
 	}
 	scope[GLOBAL].clear();
@@ -62,16 +54,17 @@ void cleanup() {
 mg_obj * return_address;
 
 
-// returns whether id is an initialized variable name
+// detect identifier `id` within the current stack frame
 bool declared(string id) {
 	auto iter = scope[current_scope].find(id);
 	return iter != scope[current_scope].end();
 }
 
-void view_map(void) {
+// view all variables in the provided scope
+void view_map(unsigned stack_frame) {
 	for (
-		auto it = scope[current_scope].begin();
-		it != scope[current_scope].end();
+		auto it = scope[stack_frame].begin();
+		it != scope[stack_frame].end();
 		++it
 	) {
 		cout << " " << it->first << " : " << *it->second;
@@ -128,7 +121,6 @@ void assign(struct node * n) {
 			value = (mg_obj *) temp;
 	
 		} else if (type != value->type) {
-			cerr << "type = " << type << "; v->type = " << value->type;
 			error("type mismatch", linecount);
 		}
 		delete scope[current_scope][id];
@@ -220,10 +212,7 @@ mg_obj * eval_func(struct node * node) {
 			if (variable->param_types[i] == args[i]->type) {
 				scope[current_scope][(variable->param_names)[i]] = args[i];
 			} else {
-				error(
-					"invalid argument type for func `" + id + "'",
-					linecount
-				);
+				error("invalid arg type for func `" + id + "'", linecount);
 			}
 		}
 		eval_stmt(variable->value);
@@ -249,7 +238,7 @@ mg_obj * get_value(string id) {
 	mg_obj * variable = lookup(id);
 			
 	if (!variable) {
-		error("variable `" + id + "' not in scope", linecount);
+		error("var `" + id + "' not in local or global scope", linecount);
 	}
 	
 	int t = variable->type;
@@ -304,20 +293,20 @@ mg_obj * eval_expr(struct node * node) {
 			result = eval_func(node);
 			for (
 				auto it = scope[current_scope].begin();
-					it != scope[current_scope].end();
-					++it
+				it != scope[current_scope].end();
+				++it
 			) {
 				delete scope[current_scope][it->first];
 			}
 			scope[current_scope--].clear();
 		} break;
-		case INPUT:
-			getline(cin, id); // use `id` for stdin str
-			result = new mg_str(id);
-			break;
+		case INPUT: {
+			string buffer;
+			getline(cin, buffer);
+			result = new mg_str(buffer);
+		} break;
 		case PAREN_OPEN:
 			return eval_expr(node->children[0]);
-		
 		case BRACKET_OPEN:
 			left = eval_expr(node->children[0]);
 			right = eval_expr(node->children[1]);
@@ -373,7 +362,6 @@ mg_obj * eval_expr(struct node * node) {
 			right = eval_expr(node->children[1]);
 			result = eval_math(left, token, right);
 			break;
-		
 		case MINUS:
 			// unary minus
 			if (node->num_children == 1) {
@@ -385,8 +373,7 @@ mg_obj * eval_expr(struct node * node) {
 			}
 			result = subtract(left, right);
 			break;
-		
-		case LEN:
+		case LEN: // a built-in called like a function, handled like an op
 			left = eval_expr(node->children[0]);
 			right = NULL;
 			if (left->type != TYPE_STRING) {
@@ -396,6 +383,7 @@ mg_obj * eval_expr(struct node * node) {
 			}
 			break;
 	}
+	// avoid double-delete error when contending with `ident .op. ident`
 	if (left == right) {
 		delete left;
 	} else {
@@ -414,7 +402,7 @@ mg_obj * eval_expr(struct node * node) {
 bool eval_case(struct node * n, mg_obj * option, int option_type) {
 	mg_obj * c = eval_expr(n->children[0]);
 	if (c->type != option_type) {
-		error("case and option type mismatch", linecount);
+		error("case type and option type do not match", linecount);
 	}
 	
 	mg_int * i_option, * i_c;
@@ -507,6 +495,7 @@ void eval_stmt(struct node * node) {
 					}
 					eval_stmt(node->children[1]);
 				} catch (break_except &e) {
+					// clean up on interrupted control flow
 					delete temp;
 					break;
 				} catch (next_except &e) {
@@ -520,7 +509,7 @@ void eval_stmt(struct node * node) {
 		} break;
 		
 		case FOR_LOOP: {
-			int from = 0, to = INT_MAX, by = 1, ch_token = 0;
+			int from = 0, to = INT_MAX, by = 1, ch_token = 0, bad = 0;
 			mg_int * ptr;
 			string iter_name;
 			struct node * child;
@@ -534,15 +523,24 @@ void eval_stmt(struct node * node) {
 					scope[current_scope][iter_name] = new mg_int(0);
 				} else {
 					ptr = ((mg_int *)eval_expr(child->children[0]));
-					int error = 0;
 					(ch_token == FROM ? from
 						: ch_token == TO ? to
 						: ch_token == BY ? by
-						: error
+						: bad
 					) = ptr->value;
 					delete ptr;
 				}
 			}
+			if (bad) {
+				error("invalid for loop", linecount);
+			}	
+			
+			// a "do what I mean" feature; looping from x to y where x > y
+			// with a negative number will work the same as a positive one
+			// (i.e. no going for ages by looping around past the overflow
+			// point
+			by = abs(by);
+			
 			// initialize the iterator variable of the for-loop
 			((mg_int *)scope[current_scope][iter_name])->value = from;
 			
@@ -610,6 +608,10 @@ void eval_stmt(struct node * node) {
 			break;
 		
 		case PRINT:
+			if (!node->num_children) {
+				cout << endl;
+				break;
+			}
 			temp = eval_expr(node->children[0]);
 			switch (temp->type) {
 				// operator<< is overloaded in mg_types.cpp

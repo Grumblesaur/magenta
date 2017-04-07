@@ -32,3 +32,7 @@ for inf_test {
 	x = x + 1;
 	if x > 11 break;
 }
+
+for x from 10 to 1 by -1 {
+	print "help me";
+}
