@@ -35,6 +35,29 @@ int strnqcpy(char * destination, char * target) {
 	return c;
 }
 
+std::string escape(char * str) {
+	std::string s;
+	while (*str) {
+		if (*str == '\\') {
+			switch (*(str + 1)) {
+				case 'n' : s += "\n"; break;
+				case 'r' : s += "\r"; break;
+				case 'f' : s += "\f"; break;
+				case 't' : s += "\t"; break;
+				case '"' : s += "\""; break;
+				case '\'': s += "'" ; break;
+				case '\\': s += "\\"; break;
+			}
+			str++;
+		} else {
+			s += std::string(1, *str);
+		}
+		str++;
+	}
+	return s;
+}
+
+
 struct node* make_node(int token, void* value) {
 	struct node* n = new struct node;
 	n->token = token;
@@ -44,7 +67,11 @@ struct node* make_node(int token, void* value) {
 			// drop two characters from the array because we're not
 			// allocating space for the quotes
 			n->value = new char[strlen((char*)value)-1];
-			strnqcpy((char*)n->value, (char*)value);
+			strnqcpy((char*) n->value, (char*)value);
+			std::string temp = escape((char *)n->value);
+			delete [] (char *) n->value;
+			n->value = new char[temp.length()];
+			strcpy((char *)n->value, temp.c_str());
 		} else if (token == IDENTIFIER) {
 			n->value = new char[strlen((char*)value)+1];
 			strcpy((char*)n->value, (char*)value);
