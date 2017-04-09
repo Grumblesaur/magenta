@@ -102,7 +102,7 @@ void assign(struct node * n) {
 		// reassignment
 		string id = string((char *)n->children[0]->value);
 		if (!declared(id)) {
-			error("uninitialized identifier", linecount);
+			error("uninitialized identifier`" + id + "'", linecount);
 		}
 		
 		mg_obj * value = eval_expr(n->children[1]);
@@ -215,14 +215,14 @@ mg_obj * eval_func(struct node * node) {
 			if (variable->param_types[i] == args[i]->type) {
 				scope[current_scope][(variable->param_names)[i]] = args[i];
 			} else {
-				error("invalid arg type for func `" + id + "'", linecount);
+				error("wrong arg type for func `" + id + "'", linecount);
 			}
 		}
 		try {
 			eval_stmt(variable->value);
 		} catch (return_except &e) {
 			if (return_address->type != f->return_type) {
-				error("Invalid return type in func " + id, linecount);
+				error("wrong return type in func `" + id + "'", linecount);
 			}
 			return return_address;
 		}
@@ -411,8 +411,9 @@ mg_obj * eval_expr(struct node * node) {
 				right = eval_expr(node->children[1]);
 				result = eval_bool(left) ? left : right;
 			}
-		} 
-		if (result == left) delete right; else delete left;
+		}
+		// handle deletion and return separately from binary operators
+		delete (mg_obj *) (result == left ? right : left);
 		return result;
 	}
 	// avoid double-delete error when contending with `ident .op. ident`
