@@ -1,4 +1,6 @@
-if 1 < 2
-	print 3;
-if 2 > 1
-	print 4;
+func add(int a, int b) : int {
+	print 'hello';
+	return 7;
+}
+
+add(1,2);

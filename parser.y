@@ -33,7 +33,6 @@
 %token TYPE_STRING     
 %token TYPE_FLOAT      
 %token TYPE_TYPE
-%token TYPE_VOID
 %token OPTION    
 %token CASE       
 %precedence IF         
@@ -102,8 +101,8 @@
 
 %type<n> program statements statement expression disjunction
 %type<n> conjunction relation addend factor exponent term id
-%type<n> return_type type function_call function_definition
-%type<n> method_definition argument implication parameter
+%type<n> type function_call function_definition
+%type<n> argument implication parameter
 %type<n> case or_bit xor_bit and_bit imp_bit shift from to by
 %type<n> l_val ternary
 
@@ -138,16 +137,6 @@ function_definition:
 		attach($$, $2); //identifier
 		attach($$, $6); // return type
 		attach($$, $7); // statements
-	}
-
-method_definition:
-	TYPE_METHOD id PAREN_OPEN parameter PAREN_CLOSE COLON return_type
-	statement {
-		$$ = make_node(TYPE_METHOD, NULL);
-		attach($$, $2);
-		attach($$, $4);
-		attach($$, $7);
-		attach($$, $8);
 	}
 
 parameter: type id COMMA parameter {
@@ -275,7 +264,7 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 	} | RETURN expression SEMICOLON {
 		$$ = make_node(RETURN, NULL);
 		attach($$, $2);
-	} | function_definition { }
+	} | function_definition { } | function_call { }
 
 from: FROM expression {
 	$$ = make_node(FROM, NULL);
@@ -476,12 +465,6 @@ l_val: id BRACKET_OPEN expression BRACKET_CLOSE {
 		attach($$, $1);
 		attach($$, $3);
 	} | id { }
-
-
-return_type: TYPE_VOID {
-		$$ = make_node(TYPE_VOID, NULL);
-	} | type { }
-
 
 type: TYPE_INTEGER {
 		$$ = make_node(TYPE_INTEGER, NULL);

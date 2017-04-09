@@ -130,7 +130,6 @@ void print(struct node* node, int tabs) {
 		case TYPE_STRING:   cout << "TYPE_STRING"   << endl; break;
 		case TYPE_FLOAT:    cout << "TYPE_FLOAT"    << endl; break;
 		case TYPE_TYPE:     cout << "USER TYPE"     << endl; break;
-		case TYPE_VOID:     cout << "TYPE_VOID"     << endl; break;
 		case OPTION:        cout << "OPTION"        << endl; break;
 		case CASE:          cout << "CASE"          << endl; break;
 		case IF:            cout << "IF"            << endl; break;

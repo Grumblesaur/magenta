@@ -226,7 +226,7 @@ mg_obj * eval_func(struct node * node) {
 			}
 			return return_address;
 		}
-		error("func " + id + " executed but did not return a value", linecount);
+		error("func " + id + " must return a value", linecount);
 	} else {
 		error("invalid arg count for func `" + id + "'", linecount);
 	}
@@ -277,6 +277,18 @@ mg_obj * get_value(string id) {
 	return result;
 }
 
+void func_cleanup() {
+	for (
+		auto it = scope[current_scope].begin();
+		it != scope[current_scope].end();
+		++it
+	) {
+		delete scope[current_scope][it->first];
+	}
+	scope[current_scope--].clear();
+	scope.pop_back();
+}
+
 mg_obj * eval_expr(struct node * node) {
 	bool t_val;
 	mg_obj * left = NULL;
@@ -301,15 +313,7 @@ mg_obj * eval_expr(struct node * node) {
 			break;
 		case FUNC_CALL: {
 			result = eval_func(node);
-			for (
-				auto it = scope[current_scope].begin();
-				it != scope[current_scope].end();
-				++it
-			) {
-				delete scope[current_scope][it->first];
-			}
-			scope[current_scope--].clear();
-			scope.pop_back();
+			func_cleanup();
 		} break;
 		case INPUT: {
 			string buffer;
@@ -510,6 +514,11 @@ void eval_stmt(struct node * node) {
 			] = temp;
 		} break;
 		
+		case FUNC_CALL: {
+			temp = eval_func(node);
+			func_cleanup();
+		} break;
+
 		case RETURN: {
 			return_address = eval_expr(node->children[0]);
 			throw return_except();
