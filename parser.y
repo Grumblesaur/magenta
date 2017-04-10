@@ -33,6 +33,7 @@
 %token TYPE_STRING     
 %token TYPE_FLOAT      
 %token TYPE_TYPE
+%token TYPE_LIST
 %token TYPE_VOID
 %token OPTION    
 %token CASE       
@@ -86,11 +87,13 @@
 %token<str> IDENTIFIER      
 %token<str> INTEGER_LITERAL
 %token<str> FLOAT_LITERAL 
-%token<str> STRING_LITERAL 
+%token<str> STRING_LITERAL
+%token LIST_LITERAL
 
 %token STATEMENT
 %token PARAM 
 %token ARGUMENT
+%token ELEMENT
 
 %token PRINT
 %token INPUT
@@ -105,7 +108,7 @@
 %type<n> return_type type function_call function_definition
 %type<n> method_definition argument implication parameter
 %type<n> case or_bit xor_bit and_bit imp_bit shift from to by
-%type<n> l_val ternary
+%type<n> l_val ternary list_literal element
 
 %error-verbose
 
@@ -463,7 +466,23 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 		attach($$, $2);
 	} | INPUT {
 		$$ = make_node(INPUT, NULL);
-	} | id { } | function_call { }
+	} | id { } | function_call { } | list_literal { }
+
+element: expression COMMA element {
+		$$ = make_node(ELEMENT, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | expression {
+		$$ = make_node(ELEMENT, NULL);
+		attach($$, $1);
+	}
+
+list_literal: BRACKET_OPEN element BRACKET_CLOSE {
+		$$ = make_node(LIST_LITERAL, NULL);
+		attach($$, $2);
+	} | BRACKET_OPEN BRACKET_CLOSE {
+		$$ = make_node(LIST_LITERAL, NULL);
+	}
 		
 
 id: IDENTIFIER {
@@ -495,6 +514,8 @@ type: TYPE_INTEGER {
 		$$ = make_node(TYPE_METHOD, NULL);
 	} | TYPE_TYPE {
 		$$ = make_node(TYPE_TYPE, NULL);
+	} | TYPE_LIST {
+		$$ = make_node(TYPE_LIST, NULL);
 	}
 
 %%
@@ -519,7 +540,7 @@ int main(int argc, char **argv) {
 	yyparse();
 	
 	
-	print(result, 0);
+	//print(result, 0);
 	eval_stmt(result);
 	
 	cleanup();

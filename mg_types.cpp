@@ -1,12 +1,12 @@
 #include <unordered_map>
-#include <ostream>
+#include <vector>
+#include <iostream>
 #include <string>
 #include "mg_types.h"
 #include "tree.h"
 #include "parser.tab.h"
 
 mg_obj::~mg_obj() {
-
 }
 
 mg_flt::mg_flt(double value) {
@@ -63,6 +63,24 @@ mg_func::mg_func(struct node * start) {
 mg_func::~mg_func() {
 }
 
+mg_list::mg_list(std::vector<mg_obj *> objs) {
+	this->type = TYPE_LIST;
+	for(auto it = objs.begin(); it != objs.end(); it++) {
+		this->value.push_back(*it);
+	}
+}
+
+mg_list::mg_list(void) {
+	this->type = TYPE_LIST;
+	this->value = std::vector<mg_obj *>();	
+}
+
+mg_list::~mg_list(void) {
+	for (auto it = 0; it < value.size(); it++) {
+		delete value[it];
+	}
+}
+
 std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
 	switch (obj.type) {
 		case TYPE_INTEGER:
@@ -75,8 +93,16 @@ std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
 			os << ((mg_flt &)obj).value;
 			break;
 		case TYPE_FUNCTION:
-			os << "function object at " << &obj;
+			os << "(function object at " << &obj << ")";
 			break;
+		case TYPE_LIST: {
+			mg_list l = (mg_list &)obj;
+			os << "[ ";
+			for (auto it = l.value.begin(); it != l.value.end(); it++) {
+				os << **it << " ";
+			}
+			os << "]";
+		} break;
 		default:
 			os << obj.type << " : " << &obj;
 			break;

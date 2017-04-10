@@ -187,9 +187,11 @@ void print(struct node* node, int tabs) {
 		case STRING_LITERAL:
 			cout << std::string((char *)node->value) << endl;
 			break;
+		case LIST_LITERAL:  cout << "LIST LITERAL:" << endl; break;
 		
 		case STATEMENT:     cout << "STATEMENT:"    << endl; break;
 		case ARGUMENT:      cout << "ARGUMENT:"     << endl; break;
+		case ELEMENT:       cout << "ELEMENT:"      << endl; break;
 		case PRINT:         cout << "PRINT:"        << endl; break;
 		case INPUT:         cout << "INPUT"         << endl; break;
 		

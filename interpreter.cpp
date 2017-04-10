@@ -44,7 +44,7 @@ const unsigned GLOBAL = 0;
 	parser.y before program exit)
 */
 void cleanup() {
-	for (auto it = scope[GLOBAL].begin(); it != scope[GLOBAL].end(); ++it) {
+	for (auto it = scope[GLOBAL].begin(); it != scope[GLOBAL].end(); ++it){
 		delete scope[GLOBAL][it->first];
 	}
 	scope[GLOBAL].clear();
@@ -288,6 +288,21 @@ mg_obj * eval_expr(struct node * node) {
 		case STRING_LITERAL:
 			result = new mg_str((char *)node->value);
 			break;
+		case LIST_LITERAL: {
+			vector<mg_obj *> ptrs;
+			if (!node->num_children) {
+				result = new mg_list();
+			} else {
+				struct node * n = node->children[0];
+				while(n) {
+					ptrs.push_back(eval_expr(n));
+					n = n->num_children == 2 ? n->children[1] : NULL;
+				}
+				result = new mg_list(ptrs);
+			}
+		} break;
+		case ELEMENT:
+			return eval_expr(node->children[0]);
 		case FUNC_CALL: {
 			result = eval_func(node);
 			for (
@@ -345,7 +360,7 @@ mg_obj * eval_expr(struct node * node) {
 		case NOT_EQUAL:
 		case GREATER_THAN:
 		case GREATER_EQUAL:
-			// use token passed in to determine the operation in eval_comp()
+			// use token passed in to determine the operation in eval_comp
 			left = eval_expr(node->children[0]);
 			right = eval_expr(node->children[1]);
 			result = eval_comp(left, token, right);
@@ -642,8 +657,15 @@ void eval_stmt(struct node * node) {
 				case TYPE_FUNCTION:
 					cout << *(mg_func *)temp << endl;
 					break;
+				case TYPE_LIST:
+					cout << *(mg_list *)temp << endl;
+					break;
 			}
-			delete temp;
+			// XXX prevents invalid `delete` but leaks memory. requires
+			// more study and experimentation.
+			if (temp->type != TYPE_LIST) {
+				delete temp;
+			}
 			break;
 		case BREAK:
 			throw break_except();

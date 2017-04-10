@@ -35,6 +35,14 @@ class mg_str : public mg_obj {
 		std::string value;
 };
 
+class mg_list : public mg_obj {
+	public:
+		mg_list(std::vector<mg_obj *>);
+		mg_list();
+		~mg_list();
+		std::vector<mg_obj *> value;
+};
+
 class mg_func : public mg_obj {
 	public:
 		mg_func(struct node * start);
