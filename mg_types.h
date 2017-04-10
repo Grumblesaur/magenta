@@ -55,7 +55,6 @@ class mg_type : public mg_obj {
 	public:
 		mg_type(struct node * node);
 		~mg_type();
-		std::string name;
 		std::vector<std::string> field_names;
 		std::vector<int> field_types;
 };

@@ -31,6 +31,9 @@ void eval_stmt(struct node * node);
 mg_obj * eval_expr(struct node * node);
 mg_obj * lookup(string id);
 
+unsigned next_available_type = 1000;
+unordered_map<string, int> custom_types;
+
 /* the stack of different scopes, with scope[0] being global */
 vector<unordered_map<string, mg_obj *> > scope(1);
 
@@ -504,15 +507,15 @@ void eval_stmt(struct node * node) {
 			break;
 		
 		case TYPE_TYPE: {
-			int x = 0;
+			string id = string((char *)node->children[0]->value);
+			// temp = new mg_type(node);
+			// custom_types[id] = temp;
 		} break;
 
 		case TYPE_FUNCTION: { // Function definition
-			string s = "";
+			string id = string((char *)node->children[0]->value);
 			temp = new mg_func(node);
-			scope[current_scope][
-				s = string((char *)node->children[0]->value)
-			] = temp;
+			scope[current_scope][id] = temp;
 		} break;
 		
 		case FUNC_CALL: {

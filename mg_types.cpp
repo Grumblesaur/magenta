@@ -65,7 +65,6 @@ mg_func::~mg_func() {
 
 mg_type::mg_type(struct node * node) {
 	this->type = TYPE_TYPE;
-	this->name = std::string((char*)node->children[0]->value);
 	struct node * n = node->children[1];
 	while (n->token == PARAM) {
 		this->field_types.push_back(n->children[0]->token);
@@ -77,7 +76,7 @@ mg_type::mg_type(struct node * node) {
 }
 
 mg_type::~mg_type() {
-	
+
 }
 
 std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
