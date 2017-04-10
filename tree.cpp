@@ -125,7 +125,6 @@ void print(struct node* node, int tabs) {
 		case TYPE_FUNCTION: cout << "TYPE_FUNCTION" << endl; break;
 		case PARAM:         cout << "PARAM"         << endl; break;
 		case FUNC_CALL:     cout << "FUNC_CALL"     << endl; break;
-		case TYPE_METHOD:   cout << "TYPE_METHOD"   << endl; break;
 		case TYPE_INTEGER:  cout << "TYPE_INTEGER"  << endl; break;
 		case TYPE_STRING:   cout << "TYPE_STRING"   << endl; break;
 		case TYPE_FLOAT:    cout << "TYPE_FLOAT"    << endl; break;

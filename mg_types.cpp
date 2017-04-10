@@ -63,6 +63,23 @@ mg_func::mg_func(struct node * start) {
 mg_func::~mg_func() {
 }
 
+mg_type::mg_type(struct node * node) {
+	this->type = TYPE_TYPE;
+	this->name = std::string((char*)node->children[0]->value);
+	struct node * n = node->children[1];
+	while (n->token == PARAM) {
+		this->field_types.push_back(n->children[0]->token);
+		this->field_names.push_back(
+			std::string((char*)n->children[1]->value)
+		);
+		n = n->children[n->num_children-1];
+	}
+}
+
+mg_type::~mg_type() {
+	
+}
+
 std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
 	switch (obj.type) {
 		case TYPE_INTEGER:

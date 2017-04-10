@@ -51,6 +51,15 @@ class mg_func : public mg_obj {
 		std::vector<int> param_types;
 };
 
+class mg_type : public mg_obj {
+	public:
+		mg_type(struct node * node);
+		~mg_type();
+		std::string name;
+		std::vector<std::string> field_names;
+		std::vector<int> field_types;
+};
+
 std::ostream & operator<<(std::ostream &, const mg_obj &);
 
 #endif

@@ -24,7 +24,6 @@ unsigned int linecount = 1;
 ","        {return COMMA;         }
 
 "func"     {return TYPE_FUNCTION; }
-"meth"     {return TYPE_METHOD;   }
 "int"      {return TYPE_INTEGER;  }
 "str"      {return TYPE_STRING;   }
 "flt"      {return TYPE_FLOAT;    }

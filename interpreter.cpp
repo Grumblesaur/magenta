@@ -84,20 +84,16 @@ void assign(struct node * n) {
 		string id = string((char *)n->children[1]->value);
 		int type = n->children[0]->token;
 		mg_obj * value = eval_expr(n->children[2]);
-		if (!declared(id)) {
-			if (type == TYPE_FLOAT && value->type == TYPE_INTEGER) {
-				mg_flt * temp = new mg_flt(
-					(double)((mg_int *)value)->value
-				);
-				delete value;
-				value = (mg_obj *) temp;
-			} else if (type != value->type) {
-				error("type mismatch", linecount);
-			}
-			scope[current_scope][id] = value;
-		} else {
-			error("multiple declaration", linecount);
+		if (type == TYPE_FLOAT && value->type == TYPE_INTEGER) {
+			mg_flt * temp = new mg_flt(
+				(double)((mg_int *)value)->value
+			);
+			delete value;
+			value = (mg_obj *) temp;
+		} else if (type != value->type) {
+			error("type mismatch", linecount);
 		}
+		scope[current_scope][id] = value;
 	} else {
 		// reassignment
 		string id = string((char *)n->children[0]->value);
@@ -507,6 +503,10 @@ void eval_stmt(struct node * node) {
 			assign(node);
 			break;
 		
+		case TYPE_TYPE: {
+			int x = 0;
+		} break;
+
 		case TYPE_FUNCTION: { // Function definition
 			string s = "";
 			temp = new mg_func(node);
