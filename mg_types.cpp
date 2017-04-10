@@ -63,8 +63,8 @@ mg_func::mg_func(struct node * start) {
 mg_func::~mg_func() {
 }
 
-mg_type::mg_type(struct node * node) {
-	this->type = TYPE_TYPE;
+mg_type::mg_type(struct node * node, int type) {
+	this->type = type;
 	struct node * n = node->children[1];
 	while (n->token == PARAM) {
 		this->field_types.push_back(n->children[0]->token);

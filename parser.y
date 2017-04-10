@@ -480,7 +480,9 @@ type: TYPE_INTEGER {
 		$$ = make_node(TYPE_STRING, NULL);
 	} | TYPE_FUNCTION {
 		$$ = make_node(TYPE_FUNCTION, NULL);
-	}
+	} | TYPE_TYPE {
+		$$ = make_node(TYPE_TYPE, NULL);
+	} |id { }
 
 %%
 

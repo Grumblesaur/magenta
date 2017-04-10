@@ -53,7 +53,7 @@ class mg_func : public mg_obj {
 
 class mg_type : public mg_obj {
 	public:
-		mg_type(struct node * node);
+		mg_type(struct node * node, int type);
 		~mg_type();
 		std::vector<std::string> field_names;
 		std::vector<int> field_types;

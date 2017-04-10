@@ -31,9 +31,6 @@ void eval_stmt(struct node * node);
 mg_obj * eval_expr(struct node * node);
 mg_obj * lookup(string id);
 
-unsigned next_available_type = 1000;
-unordered_map<string, int> custom_types;
-
 /* the stack of different scopes, with scope[0] being global */
 vector<unordered_map<string, mg_obj *> > scope(1);
 
@@ -42,6 +39,20 @@ unsigned current_scope = 0;
 
 /* a constant "pointer" to the global scope */
 const unsigned GLOBAL = 0;
+
+/* This contains the output of the current mg_func call. */
+mg_obj * return_address;
+
+// mapping of custom type names to interger flags
+unordered_map<string, int> custom_types;
+
+// the next available integer to use as a custom type flag
+int next_type = 1024;
+
+bool is_type(string type_name) {
+	auto iter = custom_types.find(type_name);
+	return iter != custom_types.end();
+}
 
 /* clear out the global scope before we exit to prevent leaks (called in
 	parser.y before program exit)
@@ -52,11 +63,6 @@ void cleanup() {
 	}
 	scope[GLOBAL].clear();
 }
-
-
-/* This contains the output of the current mg_func call. */
-mg_obj * return_address;
-
 
 // detect identifier `id` within the current stack frame
 bool declared(string id) {
@@ -507,9 +513,9 @@ void eval_stmt(struct node * node) {
 			break;
 		
 		case TYPE_TYPE: {
-			string id = string((char *)node->children[0]->value);
-			// temp = new mg_type(node);
-			// custom_types[id] = temp;
+			string type_name = string((char *)node->children[0]->value);
+			custom_types[type_name] = next_type;
+			next_type++;
 		} break;
 
 		case TYPE_FUNCTION: { // Function definition
