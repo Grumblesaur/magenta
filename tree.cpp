@@ -122,6 +122,7 @@ void print(struct node* node, int tabs) {
 		case SEMICOLON:     cout << "SEMICOLON"     << endl; break;
 		case COMMA:         cout << "COMMA"         << endl; break;
 		
+		case OBJECT:        cout << "OBJECT"        << endl; break;
 		case TYPE_FUNCTION: cout << "TYPE_FUNCTION" << endl; break;
 		case PARAM:         cout << "PARAM"         << endl; break;
 		case FUNC_CALL:     cout << "FUNC_CALL"     << endl; break;

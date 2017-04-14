@@ -98,9 +98,12 @@
 %token FUNC_CALL
 %token M_CALL
 
+%token OBJECT
+%token INSTANCE
+
 %type<n> program statements statement expression disjunction
 %type<n> conjunction relation addend factor exponent term id
-%type<n> type function_call function_definition
+%type<n> type function_call function_definition anonymous_obj
 %type<n> argument implication parameter type_definition
 %type<n> case or_bit xor_bit and_bit imp_bit shift from to by
 %type<n> l_val ternary
@@ -163,8 +166,8 @@ function_call: id PAREN_OPEN argument PAREN_CLOSE {
 
 type_definition: TYPE_TYPE id BRACE_OPEN parameter BRACE_CLOSE {
 		$$ = make_node(TYPE_TYPE, NULL);
-		attach($2, $$);
-		attach($4, $$);
+		attach($$, $2);
+		attach($$, $4);
 	}
 
 argument: expression COMMA argument {
@@ -459,8 +462,13 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 		attach($$, $2);
 	} | INPUT {
 		$$ = make_node(INPUT, NULL);
-	} | id { } | function_call { }
-		
+	} | id { } | function_call { } | anonymous_obj { }
+
+
+anonymous_obj: BRACE_OPEN argument BRACE_CLOSE {
+		$$ = make_node(OBJECT, NULL);
+		attach($$, $2);
+	}		
 
 id: IDENTIFIER {
 		$$ = make_node(IDENTIFIER, $1);
@@ -506,7 +514,7 @@ int main(int argc, char **argv) {
 	yyparse();
 	
 	
-	// print(result, 0);
+	print(result, 0);
 	eval_stmt(result);
 	
 	cleanup();

@@ -5,27 +5,21 @@
 #include "tree.h"
 #include "parser.tab.h"
 
-mg_obj::~mg_obj() {
-
-}
+mg_obj::~mg_obj() { }
 
 mg_flt::mg_flt(double value) {
 	this->type = TYPE_FLOAT;
 	this->value = value;
 }
 
-mg_flt::~mg_flt() {
-	
-}
+mg_flt::~mg_flt() { }
 
 mg_int::mg_int(int value) {
 	this->type = TYPE_INTEGER;
 	this->value = value;
 }
 
-mg_int::~mg_int() {
-	
-}
+mg_int::~mg_int() { }
 
 mg_str::mg_str(char * value) {
 	this->type = TYPE_STRING;
@@ -37,9 +31,7 @@ mg_str::mg_str(std::string value) {
 	this->value = value;
 }
 
-mg_str::~mg_str() {
-	
-}
+mg_str::~mg_str() { }
 
 mg_func::mg_func(struct node * start) {
 	this->type = TYPE_FUNCTION;
@@ -60,11 +52,11 @@ mg_func::mg_func(struct node * start) {
 	}
 }
 
-mg_func::~mg_func() {
-}
+mg_func::~mg_func() { }
 
 mg_type::mg_type(struct node * node, int type) {
-	this->type = type;
+	this->type = TYPE_TYPE;
+	this->magenta_type = type;
 	struct node * n = node->children[1];
 	while (n->token == PARAM) {
 		this->field_types.push_back(n->children[0]->token);
@@ -75,9 +67,18 @@ mg_type::mg_type(struct node * node, int type) {
 	}
 }
 
-mg_type::~mg_type() {
+mg_type::~mg_type() { }
 
+mg_instance::mg_instance(mg_type * type_def, std::vector<mg_obj *> * args) {
+	this->type = INSTANCE;
+	this->magenta_type = type_def->magenta_type;
+	for (int i = 0; i < args->size(); i++) {
+		this->fields[type_def->field_names[i]] = args->at(i);
+	}
+	delete args;
 }
+
+mg_instance::~mg_instance() { }
 
 std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
 	switch (obj.type) {

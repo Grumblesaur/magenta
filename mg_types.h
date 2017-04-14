@@ -7,6 +7,8 @@
 #include <string>
 #include "tree.h"
 
+using std::string;
+
 class mg_obj {
 	public:
 		int type;
@@ -30,9 +32,9 @@ class mg_int : public mg_obj {
 class mg_str : public mg_obj {
 	public:
 		mg_str(char * value);
-		mg_str(std::string value);
+		mg_str(string value);
 		~mg_str();
-		std::string value;
+		string value;
 };
 
 class mg_func : public mg_obj {
@@ -47,7 +49,7 @@ class mg_func : public mg_obj {
 		// flag that indicates the return type of a function for determining
 		// what subclass of mg_obj * to construct as the return value
 		int return_type;
-		std::vector<std::string> param_names;
+		std::vector<string> param_names;
 		std::vector<int> param_types;
 };
 
@@ -55,8 +57,17 @@ class mg_type : public mg_obj {
 	public:
 		mg_type(struct node * node, int type);
 		~mg_type();
-		std::vector<std::string> field_names;
+		std::vector<string> field_names;
 		std::vector<int> field_types;
+		int magenta_type;
+};
+
+class mg_instance : public mg_obj {
+	public:
+		mg_instance(mg_type * type_def, std::vector<mg_obj *> * args);
+		~mg_instance();
+		int magenta_type;
+		std::unordered_map< string, mg_obj *> fields;
 };
 
 std::ostream & operator<<(std::ostream &, const mg_obj &);

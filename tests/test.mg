@@ -1,18 +1,11 @@
-func add(int a, int b) : int {
-	return a + b;
+type point {
+	int a, int b
 }
 
-func add(int c, int b) : int {
-	return c + b;
+func a(): int {
+	return 7;
 }
 
-func p(int x) : int {
-	print x;
-	return 0;
-}
+#print a();
 
-p(p(add(add(3,4),2)));
-
-int x = 1;
-int x = 3;
-print x;
+point x = {0,0};

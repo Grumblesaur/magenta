@@ -82,12 +82,83 @@ void view_map(unsigned stack_frame) {
 	cout << endl;
 }
 
+// given the first argument node in an argument chain,
+// returns vector<mg_obj *> which are the evaluated arguments
+vector<mg_obj *> * eval_args(struct node * n) {
+
+	vector<mg_obj *> * args = new vector<mg_obj *>();
+	do {
+		mg_obj * arg = eval_expr(n->children[0]);
+		args->push_back(arg);
+		n = n->num_children == 2 ? n->children[1] : NULL;
+	} while (n != NULL);
+	return args;
+}
+
+// returns whether an the structure of a given type_def and anonymouse object match
+bool structure_matches(mg_type * type, vector<mg_obj *> * object) {
+	cout << "mark" << endl;
+	cout << type << endl;
+	if (type->field_names.size() != object->size()) {
+		return false;
+	}
+	cout << "mark" << endl;
+	for (int i = 0; i < object->size(); i++) {
+		if (type->field_types[i] != object->at(i)->type) {
+			return false;
+		}
+	}
+	return true;
+}
+
+void assign_type(struct node * n) {
+	string id;
+	int type;
+	vector<mg_obj *> * args;
+	mg_type * type_def;
+	if (n->num_children == 3) {
+		string type_name = string((char*)n->children[0]->value);
+		type = custom_types[type_name];
+		id = string((char*)n->children[1]->value);
+		if (!is_type(type_name)) {
+			error("Unknown type declartion", linecount);
+		}
+		view_map(current_scope);
+		type_def = (mg_type*)scope[current_scope][type_name];
+		args = eval_args(n->children[2]->children[0]);
+	} else {
+		id = string((char*)n->children[0]);
+		if (declared(id)) {
+			mg_instance * value = (mg_instance* )scope[current_scope][id];
+
+			if (value->magenta_type != type) {
+				error("type mismatch on assignment", linecount);
+			}
+		} else {
+			error("uninitialized indentifier '" + id + "'", linecount);
+		}
+	}
+
+	cout << args->size() << endl;
+	cout << args << endl;
+	if (structure_matches(type_def, args)) {
+		scope[current_scope][id] = new mg_instance(type_def, args);
+	} else {
+		error("value does not match type structure", linecount);
+	}
+}
+
 // given a node n this function will do one of the following:
 // 1 initialize a new variable and assign it a value
 // 2 reassign a initialized variable
 // 3 throw a type mismatch error
 // 4 throw a multiple initialization error
 void assign(struct node * n) {
+
+	if ( n->children[0]->token == IDENTIFIER) {
+		assign_type(n);
+		return;
+	}
 	//assignment 
 	if (n->num_children == 3) {
 		string id = string((char *)n->children[1]->value);
@@ -198,16 +269,11 @@ mg_obj * eval_func(struct node * node) {
 	}
 	
 	// evaluate arguments
-	vector<mg_obj *> args;
+	vector<mg_obj *> * args;
 	if (node->num_children > 1) {
-		struct node * n = node->children[1];
-
-		do {
-			mg_obj * arg = eval_expr(n->children[0]);
-			args.push_back(arg);
-			n = n->num_children == 2 ? n->children[1] : NULL;
-		} while (n != NULL);
+		args = eval_args(node->children[1]);
 	}
+	
 	// add arguments to local map
 	mg_func * f = variable;
 	current_scope++;
@@ -215,10 +281,10 @@ mg_obj * eval_func(struct node * node) {
 		unordered_map<string, mg_obj *> u;
 		scope.push_back(u);
 	}
-	if (variable->param_types.size() == args.size()) {
-		for (int i = 0; i < args.size(); i++) {
-			if (variable->param_types[i] == args[i]->type) {
-				scope[current_scope][(variable->param_names)[i]] = args[i];
+	if (variable->param_types.size() == args->size()) {
+		for (int i = 0; i < args->size(); i++) {
+			if (variable->param_types[i] == args->at(i)->type) {
+				scope[current_scope][(variable->param_names)[i]] = args->at(i);
 			} else {
 				error("wrong arg type for func `" + id + "'", linecount);
 			}
@@ -470,6 +536,8 @@ bool eval_case(struct node * n, mg_obj * option, int option_type) {
 				match = true;
 			}
 			break;
+		default:
+			error("Invalid type used in option block", linecount);
 	}
 	delete c;
 	if (match) {
@@ -515,6 +583,7 @@ void eval_stmt(struct node * node) {
 		case TYPE_TYPE: {
 			string type_name = string((char *)node->children[0]->value);
 			custom_types[type_name] = next_type;
+			scope[current_scope][type_name] = new mg_type(node, next_type);
 			next_type++;
 		} break;
 
