@@ -2,9 +2,12 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <cassert>
 #include "mg_types.h"
 #include "tree.h"
 #include "parser.tab.h"
+
+extern unsigned linecount;
 
 mg_obj::~mg_obj() {
 }
@@ -76,9 +79,15 @@ mg_list::mg_list(void) {
 }
 
 mg_list::~mg_list(void) {
-	for (auto it = 0; it < value.size(); it++) {
-		delete value[it];
-	}
+	static unsigned u = 0;
+	std::cout << std::endl;
+	if (u) {
+		for (auto it = 0; it < value.size(); it++) {
+			std::cout << "deleting: " << *value[it] << std::endl;
+			delete value[it];
+		}
+	} u++;
+	std::cout << "list destructor" << std::endl;
 }
 
 std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
