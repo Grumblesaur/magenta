@@ -2,11 +2,14 @@
 #include <iterator>
 #include <iostream>
 #include <string>
+#include <vector>
+
 #include <cstring>
 #include <cstdlib>
 #include <cmath>
 #include <climits>
-#include <vector>
+#include <cassert>
+
 #include "interpreter.h"
 #include "parser.tab.h"
 #include "tree.h"
@@ -262,6 +265,11 @@ mg_obj * get_value(string id) {
 			eval_stmt(((mg_func *)variable)->value);
 			result = return_address;
 			break;
+		case TYPE_LIST:
+			result = (mg_obj *) new mg_list(
+				((mg_list *)variable)->value
+			);
+			break;
 	}
 	return result;
 }
@@ -278,6 +286,7 @@ mg_obj * eval_expr(struct node * node) {
 		case IDENTIFIER: {
 			id = string((char *) node->value);
 			result = get_value(id);
+			assert(("IDENTIFIER: result != null", result != NULL));
 		} break;
 		case INTEGER_LITERAL:
 			result = new mg_int(*(int *)node->value);
@@ -643,6 +652,8 @@ void eval_stmt(struct node * node) {
 				break;
 			}
 			temp = eval_expr(node->children[0]);
+			cout << "debug print switch" << endl;
+			assert(("temp != NULL", temp != NULL));
 			switch (temp->type) {
 				// operator<< is overloaded in mg_types.cpp
 				case TYPE_INTEGER:
@@ -658,6 +669,7 @@ void eval_stmt(struct node * node) {
 					cout << *(mg_func *)temp << endl;
 					break;
 				case TYPE_LIST:
+					cout << "debug list print call" << endl;
 					cout << *(mg_list *)temp << endl;
 					break;
 			}

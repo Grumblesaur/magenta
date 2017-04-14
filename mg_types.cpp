@@ -96,6 +96,7 @@ std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
 			os << "(function object at " << &obj << ")";
 			break;
 		case TYPE_LIST: {
+			std::cout << "list debug op<<" << std::endl;
 			mg_list l = (mg_list &)obj;
 			os << "[ ";
 			for (auto it = l.value.begin(); it != l.value.end(); it++) {
