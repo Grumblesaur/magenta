@@ -9,3 +9,5 @@ func a(): int {
 #print a();
 
 point x = {0,0};
+
+print 1;

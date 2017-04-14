@@ -97,12 +97,9 @@ vector<mg_obj *> * eval_args(struct node * n) {
 
 // returns whether an the structure of a given type_def and anonymouse object match
 bool structure_matches(mg_type * type, vector<mg_obj *> * object) {
-	cout << "mark" << endl;
-	cout << type << endl;
 	if (type->field_names.size() != object->size()) {
 		return false;
 	}
-	cout << "mark" << endl;
 	for (int i = 0; i < object->size(); i++) {
 		if (type->field_types[i] != object->at(i)->type) {
 			return false;
@@ -123,7 +120,6 @@ void assign_type(struct node * n) {
 		if (!is_type(type_name)) {
 			error("Unknown type declartion", linecount);
 		}
-		view_map(current_scope);
 		type_def = (mg_type*)scope[current_scope][type_name];
 		args = eval_args(n->children[2]->children[0]);
 	} else {
@@ -139,8 +135,6 @@ void assign_type(struct node * n) {
 		}
 	}
 
-	cout << args->size() << endl;
-	cout << args << endl;
 	if (structure_matches(type_def, args)) {
 		scope[current_scope][id] = new mg_instance(type_def, args);
 	} else {
@@ -571,7 +565,7 @@ void eval_option(struct node * n) {
 }
 
 void eval_stmt(struct node * node) {
-		
+	view_map(current_scope);
 	mg_obj * temp;
 	int children = node->num_children;
 	bool next = false;

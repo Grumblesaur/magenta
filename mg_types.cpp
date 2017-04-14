@@ -94,6 +94,12 @@ std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
 		case TYPE_FUNCTION:
 			os << "function object at " << &obj;
 			break;
+		case TYPE_TYPE:
+			os << "type definition object at " << &obj;
+			break;
+		case INSTANCE:
+			os << "instance object at " << &obj;
+			break;
 		default:
 			os << obj.type << " : " << &obj;
 			break;
