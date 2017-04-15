@@ -460,6 +460,10 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 	} | MINUS term { 
 		$$ = make_node(MINUS, NULL);
 		attach($$, $2);
+	} | id ACCESS id {
+		$$ = make_node(ACCESS, NULL);
+		attach($$, $1);
+		attach($$, $3);	
 	} | INPUT {
 		$$ = make_node(INPUT, NULL);
 	} | id { } | function_call { } | anonymous_obj { }

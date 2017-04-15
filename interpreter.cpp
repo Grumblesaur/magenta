@@ -338,6 +338,12 @@ mg_obj * get_value(string id) {
 			eval_stmt(((mg_func *)variable)->value);
 			result = return_address;
 			break;
+		case TYPE_TYPE:
+			result = (mg_obj *) variable;
+			break;
+		case INSTANCE:
+			result = (mg_obj *) variable;
+			break;
 	}
 	return result;
 }
@@ -352,6 +358,25 @@ void func_cleanup() {
 	}
 	scope[current_scope--].clear();
 	scope.pop_back();
+}
+
+bool has_field(mg_instance * object, string field_name) {
+	auto iter = object->fields.find(field_name);
+	return iter != object->fields.end();
+}
+
+mg_obj * eval_access(mg_obj * object, string field_name) {
+	cout << object->type << endl;
+	cout << INSTANCE << endl;
+	cout << TYPE_TYPE << endl;
+	if (object->type != INSTANCE) {
+		error("access of non-instance type", linecount);
+	}
+	mg_instance * instance = ((mg_instance *)object);
+	if (!has_field(instance, field_name)) {
+		error("field" + field_name + " not found in object", linecount);
+	}
+	return instance->fields[field_name];
 }
 
 mg_obj * eval_expr(struct node * node) {
@@ -392,6 +417,11 @@ mg_obj * eval_expr(struct node * node) {
 			right = eval_expr(node->children[1]);
 			result = eval_index(left, right);
 			break;
+		case ACCESS:
+			left = eval_expr(node->children[0]);
+			id = string((char *)(node->children[1]->value));
+			result = eval_access(left, id);
+			break;	
 		case LOG_NOT:
 			right = eval_expr(node->children[0]);
 			t_val = !eval_bool(right);

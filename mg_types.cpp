@@ -75,7 +75,7 @@ mg_instance::mg_instance(mg_type * type_def, std::vector<mg_obj *> * args) {
 	for (int i = 0; i < args->size(); i++) {
 		this->fields[type_def->field_names[i]] = args->at(i);
 	}
-	delete args;
+	//delete args;
 }
 
 mg_instance::~mg_instance() { }
