@@ -67,7 +67,10 @@ mg_type::mg_type(struct node * node, int type) {
 	}
 }
 
-mg_type::~mg_type() { }
+mg_type::~mg_type() {
+	this->field_types.clear();
+	this->field_names.clear();
+}
 
 mg_instance::mg_instance(mg_type * type_def, std::vector<mg_obj *> * args) {
 	this->type = INSTANCE;
@@ -75,7 +78,7 @@ mg_instance::mg_instance(mg_type * type_def, std::vector<mg_obj *> * args) {
 	for (int i = 0; i < args->size(); i++) {
 		this->fields[type_def->field_names[i]] = args->at(i);
 	}
-	//delete args;
+	delete args;
 }
 
 mg_instance::~mg_instance() { }

@@ -86,7 +86,7 @@ void view_map(unsigned stack_frame) {
 // returns vector<mg_obj *> which are the evaluated arguments
 vector<mg_obj *> * eval_args(struct node * n) {
 
-	vector<mg_obj *> * args = new vector<mg_obj *>();
+	vector<mg_obj *> * args = new vector<mg_obj*>();
 	do {
 		mg_obj * arg = eval_expr(n->children[0]);
 		args->push_back(arg);
@@ -366,9 +366,7 @@ bool has_field(mg_instance * object, string field_name) {
 }
 
 mg_obj * eval_access(mg_obj * object, string field_name) {
-	cout << object->type << endl;
-	cout << INSTANCE << endl;
-	cout << TYPE_TYPE << endl;
+
 	if (object->type != INSTANCE) {
 		error("access of non-instance type", linecount);
 	}
@@ -417,11 +415,11 @@ mg_obj * eval_expr(struct node * node) {
 			right = eval_expr(node->children[1]);
 			result = eval_index(left, right);
 			break;
-		case ACCESS:
-			left = eval_expr(node->children[0]);
+		case ACCESS:{
+			mg_obj * temp = eval_expr(node->children[0]);
 			id = string((char *)(node->children[1]->value));
-			result = eval_access(left, id);
-			break;	
+			result = eval_access(temp, id);
+		} break;	
 		case LOG_NOT:
 			right = eval_expr(node->children[0]);
 			t_val = !eval_bool(right);
