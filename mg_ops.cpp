@@ -4,6 +4,7 @@
 #include "mg_error.h"
 #include "mg_ops.h"
 #include "mg_string.h"
+#include "mg_list.h"
 #include "mg_types.h"
 #include "parser.tab.h"
 
@@ -142,6 +143,8 @@ mg_obj * add(mg_obj * left, mg_obj * right) {
 	if (left->type == TYPE_STRING && right->type == TYPE_STRING) {
 		string concat = ((mg_str *)left)->value + ((mg_str *)right)->value;
 		return new mg_str(concat);
+	} else if (left->type == TYPE_LIST && right->type == TYPE_LIST) {
+		return combine((mg_list *) left, (mg_list *)right);
 	} else if (left->type == TYPE_STRING && right->type != TYPE_STRING
 		|| left->type != TYPE_STRING && right->type == TYPE_STRING) {
 		error("unsupported addition operation", linecount);

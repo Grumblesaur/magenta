@@ -428,8 +428,10 @@ mg_obj * eval_expr(struct node * node) {
 	}
 	// avoid double-delete error when contending with `ident .op. ident`
 	if (left == right && left) {
+		cout << "debug delete left only" << endl;
 		delete left;
 	} else if (left != right) {
+		cout << "delete both" << endl;
 		delete left;
 		delete right;
 	} 
@@ -677,9 +679,9 @@ void eval_stmt(struct node * node) {
 						if (it + 1 != ((mg_list *)temp)->value.end()) {
 							cout << ", ";
 						}
-						**it++;
+						it++;
 					}
-					cout << "]" << endl;;
+					cout << "]" << endl;
 					break;
 			}
 		} break;

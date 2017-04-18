@@ -68,9 +68,7 @@ mg_func::~mg_func() {
 
 mg_list::mg_list(std::vector<mg_obj *> objs) {
 	this->type = TYPE_LIST;
-	for(auto it = objs.begin(); it != objs.end(); it++) {
-		this->value.push_back(*it);
-	}
+	this->value = std::vector<mg_obj *>(objs);
 }
 
 mg_list::mg_list(void) {
@@ -79,7 +77,7 @@ mg_list::mg_list(void) {
 }
 
 mg_list::~mg_list(void) {
-	std::cout << std::endl;
+	std::cout << "list destructor called" << std::endl;
 	for (auto it = value.begin(); it != value.end(); it++) {
 		delete *it;
 	}
