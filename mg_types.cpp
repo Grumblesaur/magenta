@@ -79,15 +79,11 @@ mg_list::mg_list(void) {
 }
 
 mg_list::~mg_list(void) {
-	static unsigned u = 0;
 	std::cout << std::endl;
-	if (u) {
-		for (auto it = 0; it < value.size(); it++) {
-			std::cout << "deleting: " << *value[it] << std::endl;
-			delete value[it];
-		}
-	} u++;
-	std::cout << "list destructor" << std::endl;
+	for (auto it = value.begin(); it != value.end(); it++) {
+		delete *it;
+	}
+	value.clear();
 }
 
 std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
@@ -105,13 +101,8 @@ std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
 			os << "(function object at " << &obj << ")";
 			break;
 		case TYPE_LIST: {
-			std::cout << "list debug op<<" << std::endl;
-			mg_list l = (mg_list &)obj;
-			os << "[ ";
-			for (auto it = l.value.begin(); it != l.value.end(); it++) {
-				os << **it << " ";
-			}
-			os << "]";
+			throw "operator << should not be called with objects of "
+				"TYPE_LIST due to scoping and memory management issues";
 		} break;
 		default:
 			os << obj.type << " : " << &obj;

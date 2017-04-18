@@ -287,7 +287,6 @@ mg_obj * eval_expr(struct node * node) {
 	switch(token) {
 		case IDENTIFIER: {
 			id = string((char *) node->value);
-			cout << "get value of `" << id << "`" << endl;
 			result = get_value(id);
 		} break;
 		case INTEGER_LITERAL:
@@ -401,10 +400,12 @@ mg_obj * eval_expr(struct node * node) {
 		case LEN: // a built-in called like a function, handled like an op
 			left = eval_expr(node->children[0]);
 			right = NULL;
-			if (left->type != TYPE_STRING) {
+			if (left->type != TYPE_STRING && left->type != TYPE_LIST) {
 				result = new mg_int(-1);
-			} else {
+			} else if (left->type == TYPE_STRING) {
 				result = new mg_int(((mg_str *)left)->value.length());
+			} else {
+				result = new mg_int(((mg_list *)left)->value.size());
 			}
 			break;
 		case QUESTION: {
@@ -427,10 +428,8 @@ mg_obj * eval_expr(struct node * node) {
 	}
 	// avoid double-delete error when contending with `ident .op. ident`
 	if (left == right && left) {
-		cout << "eval_expr idempotent cleanup debug" << endl;
 		delete left;
 	} else if (left != right) {
-		cout << "eval_expr cleanup debug" << endl;
 		delete left;
 		delete right;
 	} 
@@ -650,13 +649,12 @@ void eval_stmt(struct node * node) {
 				eval_stmt(node->children[i]);
 			}
 			break;
-		case PRINT:
+		case PRINT: {
 			if (!node->num_children) {
 				cout << endl;
 				break;
 			}
 			temp = eval_expr(node->children[0]);
-			cout << "temp = " << temp << "; pre-switch debug" << endl;
 			switch (temp->type) {
 				// operator<< is overloaded in mg_types.cpp
 				case TYPE_INTEGER:
@@ -672,16 +670,19 @@ void eval_stmt(struct node * node) {
 					cout << *(mg_func *)temp << endl;
 					break;
 				case TYPE_LIST:
-					cout << "switch: list?" << endl;
-					cout << *(mg_list *)temp << endl;
+					cout << "[";
+					auto it = ((mg_list *)temp)->value.begin();
+					while (it != ((mg_list *)temp)->value.end()) {
+						cout << **it;
+						if (it + 1 != ((mg_list *)temp)->value.end()) {
+							cout << ", ";
+						}
+						**it++;
+					}
+					cout << "]" << endl;;
 					break;
 			}
-			// XXX prevents invalid `delete` but leaks memory. requires
-			// more study and experimentation.
-			cout << &(((mg_list *)temp)->value[0]);
-			cout << " vs. " << &(((mg_list *)scope[GLOBAL]["a"])->value[0]);
-			//delete temp;
-			break;
+		} break;
 		case BREAK:
 			throw break_except();
 		case NEXT:
