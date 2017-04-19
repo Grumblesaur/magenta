@@ -521,7 +521,7 @@ int main(int argc, char **argv) {
 	yyparse();
 	
 	
-	print(result, 0);
+	//print(result, 0);
 	eval_stmt(result);
 	
 	cleanup();

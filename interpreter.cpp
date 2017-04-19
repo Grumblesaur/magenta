@@ -105,11 +105,6 @@ bool structure_matches(mg_type * type, vector<mg_obj *> * object) {
 					((mg_instance*)object->at(i))->magenta_type :
 					object->at(i)->type;
 		if (type->field_types[i] != o_type) {
-			cout << INSTANCE << endl;
-			cout << TYPE_TYPE << endl;
-			cout << IDENTIFIER << endl;
-			cout << type->field_types[i] << endl;
-			cout << o_type << endl;
 			return false;
 		}
 	}
@@ -138,7 +133,7 @@ void assign_type(struct node * n) {
 			mg_obj * expr = eval_expr(n->children[2]);
 			if (expr->type == INSTANCE && type == ((mg_instance*)expr)->magenta_type) {
 				delete scope[current_scope][id];
-				scope[current_scope][id] = expr;
+				scope[current_scope][id] = (mg_obj*)new mg_instance(((mg_instance*)expr)->fields);
 				return;
 			}
 		}

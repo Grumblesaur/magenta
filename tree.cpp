@@ -76,7 +76,7 @@ struct node* make_node(int token, void* value) {
 				std::string temp = escape((char *)n->value);
 				delete [] (char *) n->value;
 				n->value = new char[temp.length()];
-				strcpy((char *)n->value, temp.c_str());
+				strcpy((char *)n->value, (char*)temp.c_str());
 			} break;
 			case IDENTIFIER:
 				n->value = new char[strlen((char*)value)+1];
