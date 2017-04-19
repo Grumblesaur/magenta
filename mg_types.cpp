@@ -54,12 +54,17 @@ mg_func::mg_func(struct node * start) {
 
 mg_func::~mg_func() { }
 
-mg_type::mg_type(struct node * node, int type) {
+mg_type::mg_type(struct node * node, int type, std::unordered_map<string, int> &custom_types) {
 	this->type = TYPE_TYPE;
 	this->magenta_type = type;
 	struct node * n = node->children[1];
 	while (n->token == PARAM) {
-		this->field_types.push_back(n->children[0]->token);
+		if (n->children[0]->token == IDENTIFIER) {
+			string type_name = string((char*)n->children[0]->value);
+			this->field_types.push_back(custom_types[type_name]);
+		} else {
+			this->field_types.push_back(n->children[0]->token);
+		}
 		this->field_names.push_back(
 			std::string((char*)n->children[1]->value)
 		);

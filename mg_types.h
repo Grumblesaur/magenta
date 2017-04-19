@@ -55,7 +55,7 @@ class mg_func : public mg_obj {
 
 class mg_type : public mg_obj {
 	public:
-		mg_type(struct node * node, int type);
+		mg_type(struct node * node, int type, std::unordered_map<string, int> &custom_types);
 		~mg_type();
 		std::vector<string> field_names;
 		std::vector<int> field_types;

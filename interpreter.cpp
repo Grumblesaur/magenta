@@ -101,7 +101,15 @@ bool structure_matches(mg_type * type, vector<mg_obj *> * object) {
 		return false;
 	}
 	for (int i = 0; i < object->size(); i++) {
-		if (type->field_types[i] != object->at(i)->type) {
+		int o_type = object->at(i)->type == INSTANCE ?
+					((mg_instance*)object->at(i))->magenta_type :
+					object->at(i)->type;
+		if (type->field_types[i] != o_type) {
+			cout << INSTANCE << endl;
+			cout << TYPE_TYPE << endl;
+			cout << IDENTIFIER << endl;
+			cout << type->field_types[i] << endl;
+			cout << o_type << endl;
 			return false;
 		}
 	}
@@ -612,7 +620,7 @@ void eval_stmt(struct node * node) {
 		case TYPE_TYPE: {
 			string type_name = string((char *)node->children[0]->value);
 			custom_types[type_name] = next_type;
-			scope[current_scope][type_name] = new mg_type(node, next_type);
+			scope[current_scope][type_name] = new mg_type(node, next_type, custom_types);
 			next_type++;
 		} break;
 
