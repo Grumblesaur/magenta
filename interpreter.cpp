@@ -288,6 +288,8 @@ mg_obj * eval_expr(struct node * node) {
 		case IDENTIFIER: {
 			id = string((char *) node->value);
 			result = get_value(id);
+			cout << endl << id << " : " << result << endl;
+			cout << "stored : " << scope[current_scope][id] << endl;
 		} break;
 		case INTEGER_LITERAL:
 			result = new mg_int(*(int *)node->value);
@@ -428,10 +430,11 @@ mg_obj * eval_expr(struct node * node) {
 	}
 	// avoid double-delete error when contending with `ident .op. ident`
 	if (left == right && left) {
-		cout << "debug delete left only" << endl;
 		delete left;
 	} else if (left != right) {
-		cout << "delete both" << endl;
+		cout << endl << "delete both" << endl;
+		cout << "left : " << left << endl;
+		cout << "right : " << right << endl;
 		delete left;
 		delete right;
 	} 

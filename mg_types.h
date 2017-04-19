@@ -15,22 +15,28 @@ class mg_obj {
 
 class mg_flt : public mg_obj {
 	public:
-		mg_flt(double value);
+		mg_flt(void);
+		mg_flt(double);
+		mg_flt(const mg_flt &);
 		~mg_flt();
 		double value;
 };
 
 class mg_int : public mg_obj {
 	public:
+		mg_int(void);
 		mg_int(int value);
+		mg_int(const mg_int &);
 		~mg_int();
 		int value;
 };
 
 class mg_str : public mg_obj {
 	public:
-		mg_str(char * value);
-		mg_str(std::string value);
+		mg_str(void);
+		mg_str(char *);
+		mg_str(const mg_str &);
+		mg_str(std::string);
 		~mg_str();
 		std::string value;
 };
@@ -38,6 +44,7 @@ class mg_str : public mg_obj {
 class mg_list : public mg_obj {
 	public:
 		mg_list(std::vector<mg_obj *>);
+		mg_list(const mg_list &);
 		mg_list();
 		~mg_list();
 		std::vector<mg_obj *> value;

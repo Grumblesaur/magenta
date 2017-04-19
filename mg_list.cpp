@@ -5,64 +5,62 @@
 #include "mg_list.h"
 
 using std::vector;
-
+using std::cout;
+using std::endl;
 
 mg_list * combine(const mg_list * left, const mg_list * right) {
-	vector<mg_obj *> combination;
-	std::cout << "enter combine()" << std::endl;
-	std::cout << "start with left list" << std::endl;
+	vector<mg_obj *> combination = vector<mg_obj *>();
+	mg_obj * temp;
+	cout << endl << "left hand list (" << left << "): " << endl << "\t";
 	for (auto it = left->value.begin(); it != left->value.end(); it++) {
-		std::cout << "type of current value: " << (*it)->type << std::endl;
-		std::cout << "\tpush back " << **it << std::endl;
 		switch ((*it)->type) {
 			case TYPE_INTEGER:
-				combination.push_back(new mg_int((*(mg_int *) *it).value));
-				break;
-			case TYPE_FLOAT:
-				combination.push_back(new mg_flt((*(mg_flt *) *it).value));
+				temp = new mg_int(*(mg_int*)*it);
 				break;
 			case TYPE_STRING:
-				combination.push_back(new mg_str((*(mg_str *) *it).value));
+				temp = new mg_str(*(mg_str*)*it);
+				break;
+			case TYPE_FLOAT:
+				temp = new mg_flt(*(mg_flt*)*it);
 				break;
 			case TYPE_LIST:
-				combination.push_back(
-					new mg_list((*(mg_list *) *it).value)
-				);
+				temp = new mg_list(*(mg_list*)*it);
 				break;
 			case TYPE_FUNCTION:
-				combination.push_back(*it);
+				temp = *it;
 				break;
 		}
+		cout << temp << " ";
+		combination.push_back(temp);
 	}
-	std::cout << "now add right list " << std::endl;
+	cout << endl << "right hand list (" << right << "): " << endl << "\t";
 	for (auto it = right->value.begin(); it != right->value.end(); it++) {
-		std::cout << "type of current value: " << (*it)->type << std::endl;
-		std::cout << "\t push back " << **it << std::endl;
 		switch ((*it)->type) {
 			case TYPE_INTEGER:
-				combination.push_back(new mg_int((*(mg_int *) *it).value));
-				break;
-			case TYPE_FLOAT:
-				combination.push_back(new mg_flt((*(mg_flt *) *it).value));
+				temp = new mg_int(*(mg_int*)*it);
 				break;
 			case TYPE_STRING:
-				combination.push_back(new mg_str((*(mg_str *) *it).value));
+				temp = new mg_str(*(mg_str*)*it);
+				break;
+			case TYPE_FLOAT:
+				temp = new mg_flt(*(mg_flt*)*it);
 				break;
 			case TYPE_LIST:
-				combination.push_back(
-					new mg_list((*(mg_list *) *it).value)
-				);
+				temp = new mg_list(*(mg_list *)*it);
 				break;
 			case TYPE_FUNCTION:
-				combination.push_back(*it);
+				temp = *it;
 				break;
 		}
+		cout << temp << " ";
+		combination.push_back(temp);
+	}
+	cout << endl << "combination : " << endl;
+	
+	for (auto it = combination.begin(); it != combination.end(); it++) {
+		cout << "\t" << *it << endl;
 	}
 	
-	std::cout << "check right for integrity" << std::endl;
-	for (auto it = right->value.begin(); it != right->value.end(); it++) {
-		std::cout << **it << std::endl;
-	}
 	return new mg_list(combination);
 }
 
