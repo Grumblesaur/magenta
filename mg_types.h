@@ -65,6 +65,7 @@ class mg_type : public mg_obj {
 class mg_instance : public mg_obj {
 	public:
 		mg_instance(mg_type * type_def, std::vector<mg_obj *> * args);
+		mg_instance(std::unordered_map<string, mg_obj *> u);
 		~mg_instance();
 		int magenta_type;
 		std::unordered_map< string, mg_obj *> fields;

@@ -94,6 +94,7 @@
 %token INPUT
 %token LEN
 %token PASS
+%token NIL
 
 %token FUNC_CALL
 %token M_CALL
@@ -466,6 +467,8 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 		attach($$, $3);	
 	} | INPUT {
 		$$ = make_node(INPUT, NULL);
+	} | NIL {
+		$$ = make_node(NIL, NULL);
 	} | id { } | function_call { } | anonymous_obj { }
 
 

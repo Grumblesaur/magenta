@@ -1,13 +1,16 @@
 type point {
-	int a, int b
+	int a, int b, str c, flt d
 }
 
-func a(): int {
+func at(): int {
 	return 7;
 }
 
-print a();
+print at();
 
-#point x = {0,0};
+point x = {0, 1, 'taylor', 7.654321};
 
-#print x.a;
+print x.a;
+print x.b;
+print x.c;
+print x.d;

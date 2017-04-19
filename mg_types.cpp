@@ -81,6 +81,11 @@ mg_instance::mg_instance(mg_type * type_def, std::vector<mg_obj *> * args) {
 	delete args;
 }
 
+mg_instance::mg_instance(std::unordered_map<string, mg_obj *> u) {
+	this->type = INSTANCE;
+	this->fields = u;
+}
+
 mg_instance::~mg_instance() { }
 
 std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {

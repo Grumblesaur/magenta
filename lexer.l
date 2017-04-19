@@ -46,6 +46,7 @@ unsigned int linecount = 1;
 "next"     {return NEXT;          }
 "return"   {return RETURN;        }
 "pass"     {return PASS;          }
+"nil"      {return NIL;           }
 
 "."        {return ACCESS;        }
 "["        {return BRACKET_OPEN;  }

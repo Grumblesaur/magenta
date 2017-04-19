@@ -121,21 +121,25 @@ void assign_type(struct node * n) {
 			error("Unknown type declartion", linecount);
 		}
 		type_def = (mg_type*)scope[current_scope][type_name];
-		args = eval_args(n->children[2]->children[0]);
+		if (n->children[2]->token == OBJECT) {
+			args = eval_args(n->children[2]->children[0]);
+		} else if (n->children[2]->token == NIL) {
+			args = NULL;
+		}
 	} else {
 		id = string((char*)n->children[0]);
 		if (declared(id)) {
-			mg_instance * value = (mg_instance* )scope[current_scope][id];
-
-			if (value->magenta_type != type) {
-				error("type mismatch on assignment", linecount);
-			}
-		} else {
+		// 	if (value->magenta_type != type) {
+		// 		error("type mismatch on assignment", linecount);
+		// 	}
+		// } else {
 			error("uninitialized indentifier '" + id + "'", linecount);
 		}
 	}
 
-	if (structure_matches(type_def, args)) {
+	if (args == NULL) {
+		scope[current_scope][id] = NULL;
+	} else if (structure_matches(type_def, args)) {
 		scope[current_scope][id] = new mg_instance(type_def, args);
 	} else {
 		error("value does not match type structure", linecount);
@@ -341,10 +345,10 @@ mg_obj * get_value(string id) {
 			result = return_address;
 			break;
 		case TYPE_TYPE:
-			result = (mg_obj *) variable;
+			result = variable;
 			break;
 		case INSTANCE:
-			result = (mg_obj *) variable;
+			result = variable;
 			break;
 	}
 	return result;
@@ -421,7 +425,8 @@ mg_obj * eval_expr(struct node * node) {
 			mg_obj * temp = eval_expr(node->children[0]);
 			id = string((char *)(node->children[1]->value));
 			result = eval_access(temp, id);
-		} break;	
+		} break;
+		case NIL: break;	
 		case LOG_NOT:
 			right = eval_expr(node->children[0]);
 			t_val = !eval_bool(right);
@@ -595,7 +600,7 @@ void eval_option(struct node * n) {
 }
 
 void eval_stmt(struct node * node) {
-	view_map(current_scope);
+	// view_map(current_scope);
 	mg_obj * temp;
 	int children = node->num_children;
 	bool next = false;
