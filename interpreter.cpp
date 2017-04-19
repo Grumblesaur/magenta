@@ -58,7 +58,7 @@ bool is_type(string type_name) {
 	parser.y before program exit)
 */
 void cleanup() {
-	for (auto it = scope[GLOBAL].begin(); it != scope[GLOBAL].end(); ++it) {
+	for (auto it = scope[GLOBAL].begin(); it != scope[GLOBAL].end(); it++) {
 		delete scope[GLOBAL][it->first];
 	}
 	scope[GLOBAL].clear();
@@ -117,6 +117,7 @@ bool structure_matches(mg_type * type, vector<mg_obj *> * object) {
 }
 
 void assign_type(struct node * n) {
+
 	string id;
 	int type;
 	vector<mg_obj *> * args;
@@ -133,21 +134,21 @@ void assign_type(struct node * n) {
 			args = eval_args(n->children[2]->children[0]);
 		} else if (n->children[2]->token == NIL) {
 			args = NULL;
-		}
-	} else {
-		id = string((char*)n->children[0]);
-		if (declared(id)) {
-		// 	if (value->magenta_type != type) {
-		// 		error("type mismatch on assignment", linecount);
-		// 	}
-		// } else {
-			error("uninitialized indentifier '" + id + "'", linecount);
+		} else {
+			mg_obj * expr = eval_expr(n->children[2]);
+			if (expr->type == INSTANCE && type == ((mg_instance*)expr)->magenta_type) {
+				delete scope[current_scope][id];
+				scope[current_scope][id] = expr;
+				return;
+			}
 		}
 	}
 
 	if (args == NULL) {
+		delete scope[current_scope][id];
 		scope[current_scope][id] = NULL;
 	} else if (structure_matches(type_def, args)) {
+		delete scope[current_scope][id];
 		scope[current_scope][id] = new mg_instance(type_def, args);
 	} else {
 		error("value does not match type structure", linecount);

@@ -91,7 +91,8 @@ mg_instance::mg_instance(std::unordered_map<string, mg_obj *> u) {
 	this->fields = u;
 }
 
-mg_instance::~mg_instance() { }
+mg_instance::~mg_instance() {
+}
 
 std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
 	switch (obj.type) {
