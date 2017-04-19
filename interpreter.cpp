@@ -264,10 +264,11 @@ mg_obj * eval_func(struct node * node) {
 	
 	// evaluate arguments
 	vector<mg_obj *> * args;
+	int arg_count = 0;
 	if (node->num_children > 1) {
 		args = eval_args(node->children[1]);
+		arg_count = args->size();
 	}
-	
 	// add arguments to local map
 	mg_func * f = variable;
 	current_scope++;
@@ -275,8 +276,9 @@ mg_obj * eval_func(struct node * node) {
 		unordered_map<string, mg_obj *> u;
 		scope.push_back(u);
 	}
-	if (variable->param_types.size() == args->size()) {
-		for (int i = 0; i < args->size(); i++) {
+
+	if (variable->param_types.size() == arg_count) {
+		for (int i = 0; i < arg_count; i++) {
 			if (variable->param_types[i] == args->at(i)->type) {
 				scope[current_scope][(variable->param_names)[i]] = args->at(i);
 			} else {
