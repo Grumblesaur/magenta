@@ -75,7 +75,7 @@ struct node* make_node(int token, void* value) {
 				// process escape sequences and resize character array
 				std::string temp = escape((char *)n->value);
 				delete [] (char *) n->value;
-				n->value = new char[temp.length()];
+				n->value = new char[temp.length()+1];
 				strcpy((char *)n->value, (char*)temp.c_str());
 			} break;
 			case IDENTIFIER:
