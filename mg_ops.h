@@ -5,6 +5,8 @@
 
 using std::string;
 
+mg_obj * list_index(mg_list *, mg_int *);
+mg_obj * str_index(mg_str *, mg_int *);
 mg_obj * power(mg_obj * left, mg_obj * right);
 mg_obj * logarithm(mg_obj * left, mg_obj * right);
 mg_obj * multiply(mg_obj * left, mg_obj * right);

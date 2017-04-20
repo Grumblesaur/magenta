@@ -4,6 +4,7 @@
 #include "mg_error.h"
 #include "mg_ops.h"
 #include "mg_string.h"
+#include "mg_list.h"
 #include "mg_types.h"
 #include "parser.tab.h"
 
@@ -12,6 +13,43 @@ extern unsigned linecount;
 using std::cerr;
 using std::endl;
 using std::string;
+
+// list bracket operations
+mg_obj * list_index(mg_list * list, mg_int * index) {
+	mg_obj * val = list->value[index->value];
+	mg_obj * out;
+	switch (val->type) {
+		case TYPE_FUNCTION:
+			out = val;
+			break;
+		case TYPE_INTEGER:
+			out = new mg_int(*(mg_int *) val);
+			break;
+		case TYPE_STRING:
+			out = new mg_str(*(mg_str *) val);
+			break;
+		case TYPE_FLOAT:
+			out = new mg_flt(*(mg_flt *) val);
+			break;
+		case TYPE_LIST:
+			out = new mg_list(*(mg_list *) val);
+			break;
+		}
+	return out;
+}
+
+// string bracket operations
+mg_obj * str_index(mg_str * str, mg_int * index) {
+	string text = str->value;
+	unsigned length = text.length();
+	int position = index->value;
+	string out;
+	if (abs(position) >= length) {
+		error("index out of bounds", linecount);
+	}
+	out = position < 0 ? text[length + position] : text[position];
+	return new mg_str(out);
+}
 
 
 // Handle computation of expressions of the form x ** y where x and y are
@@ -142,6 +180,8 @@ mg_obj * add(mg_obj * left, mg_obj * right) {
 	if (left->type == TYPE_STRING && right->type == TYPE_STRING) {
 		string concat = ((mg_str *)left)->value + ((mg_str *)right)->value;
 		return new mg_str(concat);
+	} else if (left->type == TYPE_LIST && right->type == TYPE_LIST) {
+		return combine((mg_list *) left, (mg_list *)right);
 	} else if (left->type == TYPE_STRING && right->type != TYPE_STRING
 		|| left->type != TYPE_STRING && right->type == TYPE_STRING) {
 		error("unsupported addition operation", linecount);

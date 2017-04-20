@@ -2,11 +2,15 @@
 #include <iterator>
 #include <iostream>
 #include <string>
+#include <vector>
+#include <typeinfo>
+
 #include <cstring>
 #include <cstdlib>
 #include <cmath>
 #include <climits>
-#include <vector>
+#include <cassert>
+
 #include "interpreter.h"
 #include "parser.tab.h"
 #include "tree.h"
@@ -28,6 +32,7 @@ using std::vector;
 using std::unordered_map;
 
 void eval_stmt(struct node * node);
+void view_map(unsigned);
 mg_obj * eval_expr(struct node * node);
 mg_obj * lookup(string id);
 
@@ -58,7 +63,7 @@ bool is_type(string type_name) {
 	parser.y before program exit)
 */
 void cleanup() {
-	for (auto it = scope[GLOBAL].begin(); it != scope[GLOBAL].end(); it++) {
+	for (auto it = scope[GLOBAL].begin(); it != scope[GLOBAL].end(); ++it){
 		delete scope[GLOBAL][it->first];
 	}
 	scope[GLOBAL].clear();
@@ -234,25 +239,19 @@ void assign(struct node * n) {
 
 mg_obj * eval_index(mg_obj * left, mg_obj * right) {
 	// TODO: amend this later when we support vector types
-	if (!(left->type == TYPE_STRING && right->type == TYPE_INTEGER)) {
+	mg_obj * out;
+	if (right->type != TYPE_INTEGER) {
 		error("unsupported index operation", linecount);
 	}
 	
-	string text = ((mg_str *)left)->value;
-	int length = text.length();
-	string out;
-	int position = ((mg_int *)right)->value;
-	
-	if (abs(position) >= length) {
-		error("index out of bounds", linecount);
-	}
-	
-	if (position < 0) {
-		out = text[length + position];
+	if (left->type == TYPE_LIST) {
+		out = list_index((mg_list*) left, (mg_int*) right);
+	} else if (left->type == TYPE_STRING) {
+		out = str_index((mg_str *) left, (mg_int *) right);
 	} else {
-		out = text[position];
+		error("unsupported index operation", linecount);
 	}
-	return new mg_str(out);
+	return out;
 }
 
 mg_obj * eval_math(mg_obj * left, int token, mg_obj * right) {
@@ -338,13 +337,14 @@ mg_obj * eval_func(struct node * node) {
 mg_obj * lookup(string id) {
 	auto local_iter = scope[current_scope].find(id);
 	auto global_iter = scope[GLOBAL].find(id);
-	
+	mg_obj * out;
 	if (local_iter != scope[current_scope].end()) {
-		return scope[current_scope][id];
+		out = scope[current_scope][id];
 	}
 	if (global_iter != scope[GLOBAL].end()) {
-		return scope[GLOBAL][id];
+		out = scope[GLOBAL][id];
 	}
+	return out;
 }
 
 mg_obj * get_value(string id) {
@@ -381,6 +381,11 @@ mg_obj * get_value(string id) {
 			break;
 		case INSTANCE:
 			result = variable;
+			break;
+		case TYPE_LIST:
+			result = (mg_obj *) new mg_list(
+				* (mg_list *) variable
+			);
 			break;
 	}
 	return result;
@@ -437,6 +442,21 @@ mg_obj * eval_expr(struct node * node) {
 		case STRING_LITERAL:
 			result = new mg_str((char *)node->value);
 			break;
+		case LIST_LITERAL: {
+			vector<mg_obj *> ptrs;
+			if (!node->num_children) {
+				result = new mg_list();
+			} else {
+				struct node * n = node->children[0];
+				while(n) {
+					ptrs.push_back(eval_expr(n));
+					n = n->num_children == 2 ? n->children[1] : NULL;
+				}
+				result = new mg_list(ptrs);
+			}
+		} break;
+		case ELEMENT:
+			return eval_expr(node->children[0]);
 		case FUNC_CALL: {
 			result = eval_func(node);
 			func_cleanup();
@@ -495,7 +515,7 @@ mg_obj * eval_expr(struct node * node) {
 		case NOT_EQUAL:
 		case GREATER_THAN:
 		case GREATER_EQUAL:
-			// use token passed in to determine the operation in eval_comp()
+			// use token passed in to determine the operation in eval_comp
 			left = eval_expr(node->children[0]);
 			right = eval_expr(node->children[1]);
 			result = eval_comp(left, token, right);
@@ -525,10 +545,12 @@ mg_obj * eval_expr(struct node * node) {
 		case LEN: // a built-in called like a function, handled like an op
 			left = eval_expr(node->children[0]);
 			right = NULL;
-			if (left->type != TYPE_STRING) {
+			if (left->type != TYPE_STRING && left->type != TYPE_LIST) {
 				result = new mg_int(-1);
-			} else {
+			} else if (left->type == TYPE_STRING) {
 				result = new mg_int(((mg_str *)left)->value.length());
+			} else {
+				result = new mg_int(((mg_list *)left)->value.size());
 			}
 			break;
 		case QUESTION: {
@@ -546,14 +568,13 @@ mg_obj * eval_expr(struct node * node) {
 				result = eval_bool(left) ? left : right;
 			}
 		}
-		// handle deletion and return separately from binary operators
 		delete (mg_obj *) (result == left ? right : left);
 		return result;
 	}
 	// avoid double-delete error when contending with `ident .op. ident`
-	if (left == right) {
+	if (left == right && left) {
 		delete left;
-	} else {
+	} else if (left != right) {
 		delete left;
 		delete right;
 	} 
@@ -789,7 +810,7 @@ void eval_stmt(struct node * node) {
 				eval_stmt(node->children[i]);
 			}
 			break;
-		case PRINT:
+		case PRINT: {
 			if (!node->num_children) {
 				cout << endl;
 				break;
@@ -798,16 +819,19 @@ void eval_stmt(struct node * node) {
 			switch (temp->type) {
 				// operator<< is overloaded in mg_types.cpp
 				case TYPE_INTEGER:
-					cout << *(mg_int *)temp << endl;
+					cout << *(mg_int *)temp;
 					break;
 				case TYPE_FLOAT:
-					cout << *(mg_flt *)temp << endl;
+					cout << *(mg_flt *)temp;
 					break;
 				case TYPE_STRING:
-					cout << *(mg_str *)temp << endl;
+					cout << *(mg_str *)temp;
 					break;
 				case TYPE_FUNCTION:
-					cout << *(mg_func *)temp << endl;
+					cout << *(mg_func *)temp;
+					break;
+				case TYPE_LIST:
+					cout << *(mg_list *)temp;
 					break;
 				case TYPE_TYPE:
 					cout << *(mg_type *)temp << endl;
@@ -819,8 +843,7 @@ void eval_stmt(struct node * node) {
 					cout << *(mg_nil *)temp << endl;
 					break;
 			}
-			delete temp;
-			break;
+		} break;
 		case BREAK:
 			throw break_except();
 		case NEXT:

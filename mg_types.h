@@ -17,29 +17,44 @@ class mg_obj {
 
 class mg_flt : public mg_obj {
 	public:
-		mg_flt(double value);
+		mg_flt(void);
+		mg_flt(double);
+		mg_flt(const mg_flt &);
 		~mg_flt();
 		double value;
 };
 
 class mg_int : public mg_obj {
 	public:
+		mg_int(void);
 		mg_int(int value);
+		mg_int(const mg_int &);
 		~mg_int();
 		int value;
 };
 
 class mg_str : public mg_obj {
 	public:
-		mg_str(char * value);
-		mg_str(string value);
+		mg_str(void);
+		mg_str(char *);
+		mg_str(const mg_str &);
+		mg_str(std::string);
 		~mg_str();
 		string value;
 };
 
+class mg_list : public mg_obj {
+	public:
+		mg_list(std::vector<mg_obj *>);
+		mg_list(const mg_list &);
+		mg_list();
+		~mg_list();
+		std::vector<mg_obj *> value;
+};
+
 class mg_func : public mg_obj {
 	public:
-		mg_func(struct node * start, std::unordered_map<string, int> &custom_types);
+		mg_func(struct node *, std::unordered_map<string, int> &);
 		~mg_func();
 
 		// a pointer to a subtree of the syntax tree where the code for the
@@ -55,7 +70,7 @@ class mg_func : public mg_obj {
 
 class mg_type : public mg_obj {
 	public:
-		mg_type(struct node * node, int type, std::unordered_map<string, int> &custom_types);
+		mg_type(struct node *, int, std::unordered_map<string, int> &);
 		~mg_type();
 		std::vector<string> field_names;
 		std::vector<int> field_types;
@@ -78,5 +93,5 @@ class mg_nil : public mg_obj {
 };
 
 std::ostream & operator<<(std::ostream &, const mg_obj &);
-
+std::ostream & operator<<(std::ostream &, const mg_list &);
 #endif

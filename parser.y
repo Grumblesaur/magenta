@@ -32,6 +32,8 @@
 %token TYPE_STRING     
 %token TYPE_FLOAT      
 %token TYPE_TYPE
+%token TYPE_LIST
+%token TYPE_VOID
 %token OPTION    
 %token CASE       
 %precedence IF         
@@ -84,11 +86,13 @@
 %token<str> IDENTIFIER      
 %token<str> INTEGER_LITERAL
 %token<str> FLOAT_LITERAL 
-%token<str> STRING_LITERAL 
+%token<str> STRING_LITERAL
+%token LIST_LITERAL
 
 %token STATEMENT
 %token PARAM 
 %token ARGUMENT
+%token ELEMENT
 
 %token PRINT
 %token INPUT
@@ -107,7 +111,7 @@
 %type<n> type function_call function_definition anonymous_obj
 %type<n> argument implication parameter type_definition
 %type<n> case or_bit xor_bit and_bit imp_bit shift from to by
-%type<n> l_val ternary
+%type<n> l_val ternary list_literal element
 
 %error-verbose
 
@@ -475,8 +479,24 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 anonymous_obj: BRACE_OPEN argument BRACE_CLOSE {
 		$$ = make_node(OBJECT, NULL);
 		attach($$, $2);
-	}		
+	} | id { } | function_call { } | list_literal { }
 
+element: expression COMMA element {
+		$$ = make_node(ELEMENT, NULL);
+		attach($$, $1);
+		attach($$, $3);
+	} | expression {
+		$$ = make_node(ELEMENT, NULL);
+		attach($$, $1);
+	}
+
+list_literal: BRACKET_OPEN element BRACKET_CLOSE {
+		$$ = make_node(LIST_LITERAL, NULL);
+		attach($$, $2);
+	} | BRACKET_OPEN BRACKET_CLOSE {
+		$$ = make_node(LIST_LITERAL, NULL);
+	}
+		
 id: IDENTIFIER {
 		$$ = make_node(IDENTIFIER, $1);
 	}
@@ -497,7 +517,10 @@ type: TYPE_INTEGER {
 		$$ = make_node(TYPE_FUNCTION, NULL);
 	} | TYPE_TYPE {
 		$$ = make_node(TYPE_TYPE, NULL);
-	} |id { }
+	} |id {
+	} | TYPE_LIST {
+		$$ = make_node(TYPE_LIST, NULL);
+	}
 
 %%
 
