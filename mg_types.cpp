@@ -15,6 +15,7 @@ using std::cout;
 using std::endl;
 
 mg_obj::~mg_obj() {
+
 }
 
 /* floating point objects */
@@ -135,7 +136,28 @@ mg_list::mg_list(std::vector<mg_obj *> objs) {
 // copy constructor
 mg_list::mg_list(const mg_list & rhs) {
 	this->type = rhs.type;
-	this->value = std::vector<mg_obj *>(rhs.value);
+	this->value = std::vector<mg_obj *>(rhs.value.size());
+	int itemtype;
+	for (int i = 0; i < this->value.size(); i++) {
+		itemtype = rhs.value[i]->type;
+		switch (itemtype) {
+			case TYPE_FUNCTION:
+				this->value[i] = rhs.value[i];
+				break;
+			case TYPE_INTEGER:
+				this->value[i] = new mg_int(*(mg_int *) rhs.value[i]);
+				break;
+			case TYPE_STRING:
+				this->value[i] = new mg_str(*(mg_str *) rhs.value[i]);
+				break;
+			case TYPE_FLOAT:
+				this->value[i] = new mg_flt(*(mg_flt *) rhs.value[i]);
+				break;
+			case TYPE_LIST:
+				this->value[i] = new mg_list(*(mg_list *) rhs.value[i]);
+				break;
+		}
+	}
 }
 
 // default constructor
@@ -146,13 +168,9 @@ mg_list::mg_list(void) {
 
 // destructor
 mg_list::~mg_list(void) {
-	cout << "destruct " << this << endl;
-	unsigned c = 0;
 	for (auto it = value.begin(); it != value.end(); it++) {
 		delete *it;
 	}
-	cout << endl;
-	value.clear();
 }
 
 
@@ -186,7 +204,12 @@ std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
 			os << "(function object at " << &obj << ")";
 			break;
 		default:
-			os << obj.type << " : " << &obj;
+			if (obj.type == TYPE_LIST) {
+				os << * (mg_list *) &obj;
+			} else {
+				os << obj.type << " : " << &obj;
+				os << " | HELP ME?";
+			}
 			break;
 	}
 	return os;

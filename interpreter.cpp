@@ -49,7 +49,6 @@ const unsigned GLOBAL = 0;
 	parser.y before program exit)
 */
 void cleanup() {
-	cout << endl;
 	int x = 0;
 	for (auto it = scope[GLOBAL].begin(); it != scope[GLOBAL].end(); ++it){
 		delete scope[GLOBAL][it->first];
@@ -231,13 +230,14 @@ mg_obj * eval_func(struct node * node) {
 mg_obj * lookup(string id) {
 	auto local_iter = scope[current_scope].find(id);
 	auto global_iter = scope[GLOBAL].find(id);
-	
+	mg_obj * out;
 	if (local_iter != scope[current_scope].end()) {
-		return scope[current_scope][id];
+		out = scope[current_scope][id];
 	}
 	if (global_iter != scope[GLOBAL].end()) {
-		return scope[GLOBAL][id];
+		out = scope[GLOBAL][id];
 	}
+	return out;
 }
 
 mg_obj * get_value(string id) {
@@ -271,7 +271,7 @@ mg_obj * get_value(string id) {
 			break;
 		case TYPE_LIST:
 			result = (mg_obj *) new mg_list(
-				((mg_list *)variable)->value
+				* (mg_list *) variable
 			);
 			break;
 	}
