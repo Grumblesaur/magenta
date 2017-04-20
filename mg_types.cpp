@@ -107,9 +107,8 @@ mg_func::mg_func(struct node * start) {
 	this->value = start->children[start->num_children-1];
 	this->return_type = (
 		start->num_children == 4 
-			? start->children[2]->token
-			: start->children[1]->token
-		);
+			? start->children[2]->token : start->children[1]->token
+	);
 	
 	node * n = start->children[1];
 	while (n->token == PARAM) {
