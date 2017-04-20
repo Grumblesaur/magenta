@@ -130,13 +130,6 @@ mg_func::~mg_func() {
 mg_list::mg_list(std::vector<mg_obj *> objs) {
 	this->type = TYPE_LIST;
 	this->value = std::vector<mg_obj *>(objs);
-	cout << "this = " << this << endl;
-	cout << "compare `this` with `objs` in primary constructor" << endl;
-	for (int i = 0; i < this->value.size(); i++) {
-		cout << "\tthis[" << i << "] = " << this->value[i];
-		cout << "; objs[" << i << "] = " << objs[i];
-		cout << endl;
-	}
 }
 
 // copy constructor
@@ -156,9 +149,6 @@ mg_list::~mg_list(void) {
 	cout << "destruct " << this << endl;
 	unsigned c = 0;
 	for (auto it = value.begin(); it != value.end(); it++) {
-		c++;
-		cout << "\t" << *it;
-		if (!(c % 4)) cout << endl;
 		delete *it;
 	}
 	cout << endl;

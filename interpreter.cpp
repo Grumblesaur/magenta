@@ -290,8 +290,6 @@ mg_obj * eval_expr(struct node * node) {
 		case IDENTIFIER: {
 			id = string((char *) node->value);
 			result = get_value(id);
-			cout << endl << "copy of " << id << " : " << result << endl;
-			cout << "stored : " << scope[current_scope][id] << endl;
 		} break;
 		case INTEGER_LITERAL:
 			result = new mg_int(*(int *)node->value);
@@ -434,10 +432,7 @@ mg_obj * eval_expr(struct node * node) {
 	if (left == right && left) {
 		delete left;
 	} else if (left != right) {
-		cout << endl << "delete both" << endl;
-		cout << "left   : " << left << endl;
 		delete left;
-		cout << "right  : " << right << endl;
 		delete right;
 	} 
 	return result;
