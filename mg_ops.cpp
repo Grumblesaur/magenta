@@ -299,6 +299,12 @@ bool eval_bool(mg_obj * o) {
 			return  ((mg_int *) o)->value != 0;
 		case TYPE_FLOAT:
 			return  ((mg_flt *) o)->value != 0.0;
+		case TYPE_FUNCTION:
+			return true;
+		case TYPE_TYPE:
+			return true;
+		case INSTANCE:
+			return true;
 		default: // for non-primitive types XXX this may change later
 			return false;
 	}

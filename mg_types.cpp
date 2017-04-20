@@ -33,7 +33,7 @@ mg_str::mg_str(std::string value) {
 
 mg_str::~mg_str() { }
 
-mg_func::mg_func(struct node * start) {
+mg_func::mg_func(struct node * start, std::unordered_map<string, int> &custom_types) {
 	this->type = TYPE_FUNCTION;
 	this->value = start->children[start->num_children-1];
 	this->return_type = (
@@ -44,8 +44,13 @@ mg_func::mg_func(struct node * start) {
 	
 	node * n = start->children[1];
 	while (n->token == PARAM) {
+	if (n->children[0]->token == IDENTIFIER) {
+		string type_name = string((char*)n->children[0]->value);
+		this->param_types.push_back(custom_types[type_name]);
+	} else {
 		this->param_types.push_back(n->children[0]->token);
-		this->param_names.push_back(
+	}		
+	this->param_names.push_back(
 			std::string((char*)n->children[1]->value)
 		);
 		n = n->children[n->num_children-1];
@@ -86,8 +91,9 @@ mg_instance::mg_instance(mg_type * type_def, std::vector<mg_obj *> * args) {
 	delete args;
 }
 
-mg_instance::mg_instance(std::unordered_map<string, mg_obj *> u) {
+mg_instance::mg_instance(int magenta_type, std::unordered_map<string, mg_obj *> u) {
 	this->type = INSTANCE;
+	this->magenta_type = magenta_type;
 	this->fields = u;
 }
 

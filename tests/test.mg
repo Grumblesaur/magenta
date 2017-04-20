@@ -1,24 +1,24 @@
-type poo{
-	int r
+type node {
+	int value, node left, node right
 }
 
-type point {
-	int a, int b, str c, flt d, poo e
+func attach(node parent, node child) : node {
+	print parent.value;
+	print child.value;
+	if not parent.left {
+		node x = {parent.value, child, parent.right};
+		print 1;
+		return x;
+	}
+	print 2;
+	return nil;
 }
 
-func at(): int {
-	return 7;
-}
+node root = {0, nil, nil};
+print root.value;
+print root.left;
+print root.right;
 
-print at();
+node leaf = {-1, nil, nil};
 
-poo t = {5};
-
-point x = {0, 1, 'taylor', 7.654321, nil};
-
-print x.a;
-print x.b;
-print x.c[5];
-print x.d;
-print x.e;
-print t.r;
+node y = attach(root, leaf);

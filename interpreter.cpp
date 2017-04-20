@@ -82,6 +82,24 @@ void view_map(unsigned stack_frame) {
 	cout << endl;
 }
 
+mg_obj * copy(mg_obj * o) {
+	switch(o->type) {
+		case TYPE_INTEGER:
+			return (mg_obj*) new mg_int(((mg_int*)o)->value);
+		case TYPE_FLOAT:
+			return (mg_obj*) new mg_flt(((mg_flt*)o)->value);
+		case TYPE_STRING:
+			return (mg_obj*) new mg_str(((mg_str*)o)->value);
+		case TYPE_FUNCTION:
+			return (mg_obj*) new mg_func(((mg_func*)o)->value, custom_types);
+		case INSTANCE:
+			return (mg_obj*) new mg_instance(((mg_instance*)o)->magenta_type,
+											((mg_instance*)o)->fields);
+		case NIL:
+			return (mg_obj*) new mg_nil();
+	}
+}
+
 // given the first argument node in an argument chain,
 // returns vector<mg_obj *> which are the evaluated arguments
 vector<mg_obj *> * eval_args(struct node * n) {
@@ -101,9 +119,6 @@ bool structure_matches(mg_type * type, vector<mg_obj *> * object) {
 		return false;
 	}
 	for (int i = 0; i < object->size(); i++) {
-		if (object->at(i) == NULL && type->field_types[i] > 999) {
-			continue;
-		}
 		int o_type = object->at(i)->type == INSTANCE ?
 					((mg_instance*)object->at(i))->magenta_type :
 					object->at(i)->type;
@@ -128,7 +143,7 @@ void assign_type(struct node * n) {
 		if (!is_type(type_name)) {
 			error("Unknown type declartion", linecount);
 		}
-		type_def = (mg_type*)scope[current_scope][type_name];
+		type_def = (mg_type*)lookup(type_name);
 		if (n->children[2]->token == OBJECT) {
 			args = eval_args(n->children[2]->children[0]);
 		} else if (n->children[2]->token == NIL) {
@@ -137,7 +152,8 @@ void assign_type(struct node * n) {
 			mg_obj * expr = eval_expr(n->children[2]);
 			if (expr->type == INSTANCE && type == ((mg_instance*)expr)->magenta_type) {
 				delete scope[current_scope][id];
-				scope[current_scope][id] = (mg_obj*)new mg_instance(((mg_instance*)expr)->fields);
+				scope[current_scope][id] = (mg_obj*)new mg_instance(type_def->magenta_type,
+											((mg_instance*)expr)->fields);
 				return;
 			}
 		}
@@ -288,19 +304,23 @@ mg_obj * eval_func(struct node * node) {
 		unordered_map<string, mg_obj *> u;
 		scope.push_back(u);
 	}
-
 	if (variable->param_types.size() == arg_count) {
 		for (int i = 0; i < arg_count; i++) {
-			if (variable->param_types[i] == args->at(i)->type) {
-				scope[current_scope][(variable->param_names)[i]] = args->at(i);
-			} else {
+			int o_type = args->at(i)->type == INSTANCE ?
+					((mg_instance*)args->at(i))->magenta_type :
+					args->at(i)->type;
+			if (variable->param_types[i] != o_type && 
+				variable->param_types[i] < 1000 && o_type != NIL) {
 				error("wrong arg type for func `" + id + "'", linecount);
+			} else {
+				scope[current_scope][(variable->param_names)[i]] = args->at(i);
 			}
 		}
 		try {
 			eval_stmt(variable->value);
 		} catch (return_except &e) {
-			if (return_address->type != f->return_type) {
+			if (return_address->type != f->return_type && f->return_type < 100
+				&& return_address->type != NIL) {
 				error("wrong return type in func `" + id + "'", linecount);
 			}
 			return return_address;
@@ -388,7 +408,7 @@ mg_obj * eval_access(mg_obj * object, string field_name) {
 	if (!has_field(instance, field_name)) {
 		error("field" + field_name + " not found in object", linecount);
 	}
-	return instance->fields[field_name];
+	return copy(instance->fields[field_name]);
 }
 
 mg_obj * eval_expr(struct node * node) {
@@ -628,7 +648,7 @@ void eval_stmt(struct node * node) {
 
 		case TYPE_FUNCTION: { // Function definition
 			string id = string((char *)node->children[0]->value);
-			temp = new mg_func(node);
+			temp = new mg_func(node, custom_types);
 			scope[current_scope][id] = temp;
 		} break;
 		

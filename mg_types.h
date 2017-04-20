@@ -39,7 +39,7 @@ class mg_str : public mg_obj {
 
 class mg_func : public mg_obj {
 	public:
-		mg_func(struct node * start);
+		mg_func(struct node * start, std::unordered_map<string, int> &custom_types);
 		~mg_func();
 
 		// a pointer to a subtree of the syntax tree where the code for the
@@ -65,7 +65,7 @@ class mg_type : public mg_obj {
 class mg_instance : public mg_obj {
 	public:
 		mg_instance(mg_type * type_def, std::vector<mg_obj *> * args);
-		mg_instance(std::unordered_map<string, mg_obj *> u);
+		mg_instance(int type, std::unordered_map<string, mg_obj *> u);
 		~mg_instance();
 		int magenta_type;
 		std::unordered_map< string, mg_obj *> fields;
