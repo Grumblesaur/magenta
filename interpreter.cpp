@@ -93,8 +93,10 @@ mg_obj * copy(mg_obj * o) {
 		case TYPE_FUNCTION:
 			return (mg_obj*) new mg_func(((mg_func*)o)->value, custom_types);
 		case INSTANCE:
-			return (mg_obj*) new mg_instance(((mg_instance*)o)->magenta_type,
-											((mg_instance*)o)->fields);
+			return (mg_obj*) new mg_instance(
+				((mg_instance*)o)->magenta_type,
+				((mg_instance*)o)->fields
+			);
 		case NIL:
 			return (mg_obj*) new mg_nil();
 	}
@@ -103,7 +105,6 @@ mg_obj * copy(mg_obj * o) {
 // given the first argument node in an argument chain,
 // returns vector<mg_obj *> which are the evaluated arguments
 vector<mg_obj *> * eval_args(struct node * n) {
-
 	vector<mg_obj *> * args = new vector<mg_obj*>();
 	do {
 		mg_obj * arg = eval_expr(n->children[0]);
@@ -113,15 +114,16 @@ vector<mg_obj *> * eval_args(struct node * n) {
 	return args;
 }
 
-// returns whether an the structure of a given type_def and anonymouse object match
+// returns whether an the structure of a given type_def
+// and anonymouse object match
 bool structure_matches(mg_type * type, vector<mg_obj *> * object) {
 	if (type->field_names.size() != object->size()) {
 		return false;
 	}
 	for (int i = 0; i < object->size(); i++) {
-		int o_type = object->at(i)->type == INSTANCE ?
-					((mg_instance*)object->at(i))->magenta_type :
-					object->at(i)->type;
+		int o_type = object->at(i)->type == INSTANCE
+			? ((mg_instance*)object->at(i))->magenta_type
+			: object->at(i)->type;
 		if (type->field_types[i] != o_type && 
 			type->field_types[i] < 1000 && o_type != NIL) {
 			return false;
@@ -150,10 +152,13 @@ void assign_type(struct node * n) {
 			args = NULL;
 		} else {
 			mg_obj * expr = eval_expr(n->children[2]);
-			if (expr->type == INSTANCE && type == ((mg_instance*)expr)->magenta_type) {
+			if (expr->type == INSTANCE
+				&& type == ((mg_instance*)expr)->magenta_type) {
 				delete scope[current_scope][id];
-				scope[current_scope][id] = (mg_obj*)new mg_instance(type_def->magenta_type,
-											((mg_instance*)expr)->fields);
+				scope[current_scope][id] = (mg_obj*) new mg_instance(
+					type_def->magenta_type,
+					((mg_instance*)expr)->fields
+				);
 				return;
 			}
 		}
@@ -176,7 +181,6 @@ void assign_type(struct node * n) {
 // 3 throw a type mismatch error
 // 4 throw a multiple initialization error
 void assign(struct node * n) {
-
 	if ( n->children[0]->token == IDENTIFIER) {
 		assign_type(n);
 		return;
@@ -642,7 +646,9 @@ void eval_stmt(struct node * node) {
 		case TYPE_TYPE: {
 			string type_name = string((char *)node->children[0]->value);
 			custom_types[type_name] = next_type;
-			scope[current_scope][type_name] = new mg_type(node, next_type, custom_types);
+			scope[current_scope][type_name] = new mg_type(
+				node, next_type, custom_types
+			);
 			next_type++;
 		} break;
 
