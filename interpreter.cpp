@@ -49,8 +49,14 @@ const unsigned GLOBAL = 0;
 	parser.y before program exit)
 */
 void cleanup() {
+	cout << endl;
+	int x = 0;
 	for (auto it = scope[GLOBAL].begin(); it != scope[GLOBAL].end(); ++it){
-		delete scope[GLOBAL][it->first];
+		cout << "cleanup: " << it->first << " : " << it->second << endl;
+		cout << "scope[GLOBAL][" << it->first << "]: ";
+		cout << scope[GLOBAL][it->first] << endl;
+		if (!x) delete scope[GLOBAL][it->first];
+		x++;
 	}
 	scope[GLOBAL].clear();
 }
@@ -288,7 +294,7 @@ mg_obj * eval_expr(struct node * node) {
 		case IDENTIFIER: {
 			id = string((char *) node->value);
 			result = get_value(id);
-			cout << endl << id << " : " << result << endl;
+			cout << endl << "copy of " << id << " : " << result << endl;
 			cout << "stored : " << scope[current_scope][id] << endl;
 		} break;
 		case INTEGER_LITERAL:
@@ -433,9 +439,9 @@ mg_obj * eval_expr(struct node * node) {
 		delete left;
 	} else if (left != right) {
 		cout << endl << "delete both" << endl;
-		cout << "left : " << left << endl;
-		cout << "right : " << right << endl;
+		cout << "left   : " << left << endl;
 		delete left;
+		cout << "right  : " << right << endl;
 		delete right;
 	} 
 	return result;
@@ -675,16 +681,7 @@ void eval_stmt(struct node * node) {
 					cout << *(mg_func *)temp << endl;
 					break;
 				case TYPE_LIST:
-					cout << "[";
-					auto it = ((mg_list *)temp)->value.begin();
-					while (it != ((mg_list *)temp)->value.end()) {
-						cout << **it;
-						if (it + 1 != ((mg_list *)temp)->value.end()) {
-							cout << ", ";
-						}
-						it++;
-					}
-					cout << "]" << endl;
+					cout << *(mg_list *)temp << endl;
 					break;
 			}
 		} break;

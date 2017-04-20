@@ -4,11 +4,15 @@
 #include <iostream>
 #include <string>
 #include <cassert>
+#include <cstdlib>
 #include "mg_types.h"
 #include "tree.h"
 #include "parser.tab.h"
 
 extern unsigned linecount;
+
+using std::cout;
+using std::endl;
 
 mg_obj::~mg_obj() {
 }
@@ -126,6 +130,13 @@ mg_func::~mg_func() {
 mg_list::mg_list(std::vector<mg_obj *> objs) {
 	this->type = TYPE_LIST;
 	this->value = std::vector<mg_obj *>(objs);
+	cout << "this = " << this << endl;
+	cout << "compare `this` with `objs` in primary constructor" << endl;
+	for (int i = 0; i < this->value.size(); i++) {
+		cout << "\tthis[" << i << "] = " << this->value[i];
+		cout << "; objs[" << i << "] = " << objs[i];
+		cout << endl;
+	}
 }
 
 // copy constructor
@@ -142,13 +153,32 @@ mg_list::mg_list(void) {
 
 // destructor
 mg_list::~mg_list(void) {
-	std::cout << "destruct " << this << std::endl;
+	cout << "destruct " << this << endl;
+	unsigned c = 0;
 	for (auto it = value.begin(); it != value.end(); it++) {
+		c++;
+		cout << "\t" << *it;
+		if (!(c % 4)) cout << endl;
 		delete *it;
 	}
+	cout << endl;
 	value.clear();
 }
 
+
+std::ostream & operator<<(std::ostream & os, const mg_list & obj) {
+	cout << "[";
+	auto it = obj.value.begin();
+	while (it != obj.value.end()) {
+		cout << **it;
+		if (it+1 != obj.value.end()) {
+			cout << ", ";
+		}
+		it++;
+	}
+	cout << "]";
+	return os;
+}
 
 // helper print function
 std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
@@ -165,10 +195,6 @@ std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
 		case TYPE_FUNCTION:
 			os << "(function object at " << &obj << ")";
 			break;
-		case TYPE_LIST: {
-			throw "operator << should not be called with objects of "
-				"TYPE_LIST due to scoping and memory management issues";
-		} break;
 		default:
 			os << obj.type << " : " << &obj;
 			break;
