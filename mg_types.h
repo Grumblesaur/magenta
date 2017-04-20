@@ -71,6 +71,12 @@ class mg_instance : public mg_obj {
 		std::unordered_map< string, mg_obj *> fields;
 };
 
+class mg_nil : public mg_obj { 
+	public:
+		mg_nil();
+		~mg_nil();
+};
+
 std::ostream & operator<<(std::ostream &, const mg_obj &);
 
 #endif

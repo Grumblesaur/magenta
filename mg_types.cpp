@@ -94,7 +94,14 @@ mg_instance::mg_instance(std::unordered_map<string, mg_obj *> u) {
 mg_instance::~mg_instance() {
 }
 
+mg_nil::mg_nil() {
+	this->type = NIL;
+}
+
+mg_nil::~mg_nil() { }
+
 std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
+
 	switch (obj.type) {
 		case TYPE_INTEGER:
 			os << ((mg_int &)obj).value;
@@ -113,6 +120,9 @@ std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
 			break;
 		case INSTANCE:
 			os << "instance object at " << &obj;
+			break;
+		case NIL:
+			os << "nil";
 			break;
 		default:
 			os << obj.type << " : " << &obj;

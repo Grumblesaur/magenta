@@ -101,10 +101,14 @@ bool structure_matches(mg_type * type, vector<mg_obj *> * object) {
 		return false;
 	}
 	for (int i = 0; i < object->size(); i++) {
+		if (object->at(i) == NULL && type->field_types[i] > 999) {
+			continue;
+		}
 		int o_type = object->at(i)->type == INSTANCE ?
 					((mg_instance*)object->at(i))->magenta_type :
 					object->at(i)->type;
-		if (type->field_types[i] != o_type) {
+		if (type->field_types[i] != o_type && 
+			type->field_types[i] < 1000 && o_type != NIL) {
 			return false;
 		}
 	}
@@ -430,7 +434,9 @@ mg_obj * eval_expr(struct node * node) {
 			id = string((char *)(node->children[1]->value));
 			result = eval_access(temp, id);
 		} break;
-		case NIL: break;	
+		case NIL: 
+			result = new mg_nil();
+			break;	
 		case LOG_NOT:
 			right = eval_expr(node->children[0]);
 			t_val = !eval_bool(right);
@@ -776,6 +782,15 @@ void eval_stmt(struct node * node) {
 					break;
 				case TYPE_FUNCTION:
 					cout << *(mg_func *)temp << endl;
+					break;
+				case TYPE_TYPE:
+					cout << *(mg_type *)temp << endl;
+					break;
+				case INSTANCE:
+					cout << *(mg_instance *)temp << endl;
+					break;
+				case NIL:
+					cout << *(mg_nil *)temp << endl;
 					break;
 			}
 			delete temp;
