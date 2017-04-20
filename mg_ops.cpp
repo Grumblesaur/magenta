@@ -14,6 +14,43 @@ using std::cerr;
 using std::endl;
 using std::string;
 
+// list bracket operations
+mg_obj * list_index(mg_list * list, mg_int * index) {
+	mg_obj * val = list->value[index->value];
+	mg_obj * out;
+	switch (val->type) {
+		case TYPE_FUNCTION:
+			out = val;
+			break;
+		case TYPE_INTEGER:
+			out = new mg_int(*(mg_int *) val);
+			break;
+		case TYPE_STRING:
+			out = new mg_str(*(mg_str *) val);
+			break;
+		case TYPE_FLOAT:
+			out = new mg_flt(*(mg_flt *) val);
+			break;
+		case TYPE_LIST:
+			out = new mg_list(*(mg_list *) val);
+			break;
+		}
+	return out;
+}
+
+// string bracket operations
+mg_obj * str_index(mg_str * str, mg_int * index) {
+	string text = str->value;
+	unsigned length = text.length();
+	int position = index->value;
+	string out;
+	if (abs(position) >= length) {
+		error("index out of bounds", linecount);
+	}
+	out = position < 0 ? text[length + position] : text[position];
+	return new mg_str(out);
+}
+
 
 // Handle computation of expressions of the form x ** y where x and y are
 // numeric types.

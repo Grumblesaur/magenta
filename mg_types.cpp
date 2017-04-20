@@ -195,7 +195,7 @@ std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
 			os << ((mg_int &)obj).value;
 			break;
 		case TYPE_STRING:
-			os << "'" << ((mg_str &)obj).value << "'";
+			os << ((mg_str &)obj).value;
 			break;
 		case TYPE_FLOAT:
 			os << ((mg_flt &)obj).value;

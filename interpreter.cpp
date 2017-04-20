@@ -138,25 +138,19 @@ void assign(struct node * n) {
 
 mg_obj * eval_index(mg_obj * left, mg_obj * right) {
 	// TODO: amend this later when we support vector types
-	if (!(left->type == TYPE_STRING && right->type == TYPE_INTEGER)) {
+	mg_obj * out;
+	if (right->type != TYPE_INTEGER) {
 		error("unsupported index operation", linecount);
 	}
 	
-	string text = ((mg_str *)left)->value;
-	int length = text.length();
-	string out;
-	int position = ((mg_int *)right)->value;
-	
-	if (abs(position) >= length) {
-		error("index out of bounds", linecount);
-	}
-	
-	if (position < 0) {
-		out = text[length + position];
+	if (left->type == TYPE_LIST) {
+		out = list_index((mg_list*) left, (mg_int*) right);
+	} else if (left->type == TYPE_STRING) {
+		out = str_index((mg_str *) left, (mg_int *) right);
 	} else {
-		out = text[position];
+		error("unsupported index operation", linecount);
 	}
-	return new mg_str(out);
+	return out;
 }
 
 mg_obj * eval_math(mg_obj * left, int token, mg_obj * right) {
@@ -660,19 +654,19 @@ void eval_stmt(struct node * node) {
 			switch (temp->type) {
 				// operator<< is overloaded in mg_types.cpp
 				case TYPE_INTEGER:
-					cout << *(mg_int *)temp << endl;
+					cout << *(mg_int *)temp;
 					break;
 				case TYPE_FLOAT:
-					cout << *(mg_flt *)temp << endl;
+					cout << *(mg_flt *)temp;
 					break;
 				case TYPE_STRING:
-					cout << *(mg_str *)temp << endl;
+					cout << *(mg_str *)temp;
 					break;
 				case TYPE_FUNCTION:
-					cout << *(mg_func *)temp << endl;
+					cout << *(mg_func *)temp;
 					break;
 				case TYPE_LIST:
-					cout << *(mg_list *)temp << endl;
+					cout << *(mg_list *)temp;
 					break;
 			}
 		} break;
