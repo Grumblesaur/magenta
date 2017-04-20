@@ -672,6 +672,7 @@ void eval_stmt(struct node * node) {
 						break;
 				}
 				n = n->num_children == 2 ? n->children[1] : NULL;
+				delete temp;
 			}
 		} break;
 		case BREAK:
