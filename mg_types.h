@@ -67,5 +67,5 @@ class mg_func : public mg_obj {
 };
 
 std::ostream & operator<<(std::ostream &, const mg_obj &);
-
+std::ostream & operator<<(std::ostream &, const mg_list &);
 #endif

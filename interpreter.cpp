@@ -52,11 +52,7 @@ void cleanup() {
 	cout << endl;
 	int x = 0;
 	for (auto it = scope[GLOBAL].begin(); it != scope[GLOBAL].end(); ++it){
-		cout << "cleanup: " << it->first << " : " << it->second << endl;
-		cout << "scope[GLOBAL][" << it->first << "]: ";
-		cout << scope[GLOBAL][it->first] << endl;
-		if (!x) delete scope[GLOBAL][it->first];
-		x++;
+		delete scope[GLOBAL][it->first];
 	}
 	scope[GLOBAL].clear();
 }
