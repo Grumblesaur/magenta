@@ -650,24 +650,28 @@ void eval_stmt(struct node * node) {
 				cout << endl;
 				break;
 			}
-			temp = eval_expr(node->children[0]);
-			switch (temp->type) {
-				// operator<< is overloaded in mg_types.cpp
-				case TYPE_INTEGER:
-					cout << *(mg_int *)temp;
-					break;
-				case TYPE_FLOAT:
-					cout << *(mg_flt *)temp;
-					break;
-				case TYPE_STRING:
-					cout << *(mg_str *)temp;
-					break;
-				case TYPE_FUNCTION:
-					cout << *(mg_func *)temp;
-					break;
-				case TYPE_LIST:
-					cout << *(mg_list *)temp;
-					break;
+			struct node * n = node->children[0];
+			while (n) {
+				temp = eval_expr(n);
+				switch (temp->type) {
+					// operator<< is overloaded in mg_types.cpp
+					case TYPE_INTEGER:
+						cout << *(mg_int *)temp;
+						break;
+					case TYPE_FLOAT:
+						cout << *(mg_flt *)temp;
+						break;
+					case TYPE_STRING:
+						cout << *(mg_str *)temp;
+						break;
+					case TYPE_FUNCTION:
+						cout << *(mg_func *)temp;
+						break;
+					case TYPE_LIST:
+						cout << *(mg_list *)temp;
+						break;
+				}
+				n = n->num_children == 2 ? n->children[1] : NULL;
 			}
 		} break;
 		case BREAK:

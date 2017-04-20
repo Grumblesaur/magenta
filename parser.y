@@ -217,11 +217,11 @@ statement: type id ASSIGN expression SEMICOLON { // declare a var w/value
 	} | expression SEMICOLON {
 		$$ = make_node(STATEMENT, NULL);
 		attach($$, $1);
-	} | PRINT expression SEMICOLON {
-		$$ = make_node(PRINT, NULL);
-		attach($$, $2);
 	} | PRINT SEMICOLON {
 		$$ = make_node(PRINT, NULL);
+	} | PRINT element {
+		$$ = make_node(PRINT, NULL);
+		attach($$, $2);
 	} | BREAK SEMICOLON{ 
 		$$ = make_node(BREAK, NULL);
 	} | NEXT SEMICOLON {
