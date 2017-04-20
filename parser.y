@@ -388,6 +388,10 @@ imp_bit: imp_bit LESS_THAN relation {
 		$$ = make_node(NOT_EQUAL, NULL);
 		attach($$, $1);
 		attach($$, $3);
+	} | imp_bit IN relation {
+		$$ = make_node(IN, NULL);
+		attach($$, $1);
+		attach($$, $3);
 	} | relation { }
 
 relation: relation PLUS shift {

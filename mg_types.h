@@ -10,6 +10,7 @@
 class mg_obj {
 	public:
 		int type;
+		bool operator==(const mg_obj &) const;
 		virtual ~mg_obj();
 };
 

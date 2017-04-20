@@ -14,6 +14,19 @@ using std::cerr;
 using std::endl;
 using std::string;
 
+mg_obj * element_of(mg_obj * left, mg_obj * right) {
+	bool found = false;
+	if (right->type != TYPE_LIST) {
+		error("right operand is not a list", linecount);
+	}
+	auto it = ((mg_list *)right)->value.begin();
+	while (!found && it != ((mg_list *)right)->value.end()) {
+		found = *left == **it;
+		++it;
+	}
+	return new mg_int(found);
+}
+
 // list bracket operations
 mg_obj * list_index(mg_list * list, mg_int * index) {
 	mg_obj * val = list->value[index->value];

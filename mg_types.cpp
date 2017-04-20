@@ -14,6 +14,34 @@ extern unsigned linecount;
 using std::cout;
 using std::endl;
 
+bool mg_obj::operator==(const mg_obj & that) const {
+	if (this->type != that.type) {
+		return false;
+	}
+	switch (this->type) {
+		case TYPE_FUNCTION:
+			return this == &that;
+		case TYPE_INTEGER:
+			return ((mg_int *)this)->value == ((mg_int *)&that)->value;
+		case TYPE_STRING:
+			return ((mg_str *)this)->value == ((mg_str *)&that)->value;
+		case TYPE_FLOAT:
+			return ((mg_flt *)this)->value == ((mg_flt *)&that)->value;
+		case TYPE_LIST: {
+			unsigned llen = ((mg_list *)this)->value.size();
+			unsigned rlen = ((mg_list *)&that)->value.size();
+			if (llen != rlen) return false;
+			bool matching = true;;
+			for (int i = 0; i < llen; i++) {
+				matching = ((mg_list *)this)->value[i]
+					== ((mg_list *)&that)->value[i];
+				if (!matching) return false;
+			}
+		} break;
+	}
+	return true;
+}
+
 mg_obj::~mg_obj() {
 
 }

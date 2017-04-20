@@ -384,6 +384,11 @@ mg_obj * eval_expr(struct node * node) {
 				result = new mg_int(((mg_list *)left)->value.size());
 			}
 			break;
+		case IN:
+			left = eval_expr(node->children[0]);
+			right = eval_expr(node->children[1]);
+			result = element_of(left, right);
+			break;
 		case QUESTION: { // ternary and elvis operators
 			int nodes = node->num_children;
 			mg_obj * test;

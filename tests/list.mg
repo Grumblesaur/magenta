@@ -10,3 +10,6 @@ for x to len(c) {
 	print c[x], " ";
 }
 print "\n";
+
+print ('easy' in second) * "easy in second", "\n";
+print ('hard' in second) * "hard in second\n";
