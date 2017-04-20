@@ -51,4 +51,4 @@ a = a + 3;
 NUM = NUM + a;
 }
 
-print NUM + (6 - 1 - 1) + .5;
+print NUM + (6 - 1 - 1) + .5, "\n";

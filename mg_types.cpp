@@ -173,22 +173,26 @@ mg_list::~mg_list(void) {
 	}
 }
 
-
+/* mg_list `<<` overload for boxing string elements neatly in '' */
 std::ostream & operator<<(std::ostream & os, const mg_list & obj) {
-	cout << "[";
+	os << "[";
 	auto it = obj.value.begin();
 	while (it != obj.value.end()) {
-		cout << **it;
+		if ((**it).type == TYPE_STRING) {
+			os << "'" << **it << "'";
+		} else {
+			os << **it;
+		}
 		if (it+1 != obj.value.end()) {
-			cout << ", ";
+			os << ", ";
 		}
 		it++;
 	}
-	cout << "]";
+	os << "]";
 	return os;
 }
 
-// helper print function
+/* Generic mg_obj `<<` overload */
 std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
 	switch (obj.type) {
 		case TYPE_INTEGER:
@@ -203,13 +207,11 @@ std::ostream & operator<<(std::ostream & os, const mg_obj & obj) {
 		case TYPE_FUNCTION:
 			os << "(function object at " << &obj << ")";
 			break;
+		case TYPE_LIST:
+			os << * (mg_list *) &obj;
+			break;
 		default:
-			if (obj.type == TYPE_LIST) {
-				os << * (mg_list *) &obj;
-			} else {
-				os << obj.type << " : " << &obj;
-				os << " | HELP ME?";
-			}
+			os << "type = " << obj.type << "; value = " << &obj;
 			break;
 	}
 	return os;
