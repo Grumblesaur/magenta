@@ -31,10 +31,10 @@ using std::endl;
 using std::vector;
 using std::unordered_map;
 
-void eval_stmt(struct node * node);
+void eval_stmt(struct node *);
 void view_map(unsigned);
-mg_obj * eval_expr(struct node * node);
-mg_obj * lookup(string id);
+mg_obj * eval_expr(struct node *);
+mg_obj * lookup(string);
 
 /* the stack of different scopes, with scope[0] being global */
 vector<unordered_map<string, mg_obj *> > scope(16);
@@ -57,7 +57,7 @@ void cleanup() {
 }
 
 
-/* This contains the output of the current mg_func call. */
+/* This contains the output of the most recent mg_func call. */
 mg_obj * return_address;
 
 
@@ -69,12 +69,10 @@ bool declared(string id) {
 
 // view all variables in the provided scope
 void view_map(unsigned stack_frame) {
-	for (
-		auto it = scope[stack_frame].begin();
-		it != scope[stack_frame].end();
-		++it
-	) {
+	auto it = scope[stack_frame].begin();
+	while (it != scope[stack_frame].end()) {
 		cout << " " << it->first << " : " << *it->second;
+		++it;
 	}
 	cout << endl;
 }
@@ -102,7 +100,7 @@ void assign(struct node * n) {
 			}
 			scope[current_scope][id] = value;
 		} else {
-			error("multiple declaration", linecount);
+			error("multiple declaration of `" + id + "'", linecount);
 		}
 	} else {
 		// reassignment
@@ -118,7 +116,6 @@ void assign(struct node * n) {
 				(double)((mg_int *)value)->value
 			);
 			delete value;
-			
 			value = (mg_obj *) temp;
 		} else if (type == TYPE_INTEGER && value->type == TYPE_FLOAT) {
 			mg_int * temp = new mg_int(
@@ -126,7 +123,6 @@ void assign(struct node * n) {
 			);
 			delete value;
 			value = (mg_obj *) temp;
-	
 		} else if (type != value->type) {
 			error("type mismatch", linecount);
 		}
@@ -137,17 +133,18 @@ void assign(struct node * n) {
 
 
 mg_obj * eval_index(mg_obj * left, mg_obj * right) {
-	// TODO: amend this later when we support vector types
 	mg_obj * out;
 	if (right->type != TYPE_INTEGER) {
 		error("unsupported index operation", linecount);
 	}
 	
-	if (left->type == TYPE_LIST) {
-		out = list_index((mg_list*) left, (mg_int*) right);
-	} else if (left->type == TYPE_STRING) {
-		out = str_index((mg_str *) left, (mg_int *) right);
-	} else {
+	out = left->type == TYPE_LIST
+		? list_index((mg_list *) left, (mg_int *) right)
+		: left->type == TYPE_STRING
+			? str_index((mg_str *) left, (mg_int *) right)
+			: NULL;
+	
+	if (!out) {
 		error("unsupported index operation", linecount);
 	}
 	return out;
@@ -156,27 +153,13 @@ mg_obj * eval_index(mg_obj * left, mg_obj * right) {
 mg_obj * eval_math(mg_obj * left, int token, mg_obj * right) {
 	mg_obj * out;
 	switch (token) {
-		case TIMES:
-			out = multiply(left, right);
-			break;
-		case DIVIDE:
-			out = divide(left, right);
-			break;
-		case INT_DIVIDE:
-			out = int_divide(left, right);
-			break;
-		case MODULO:
-			out = mod(left, right);
-			break;
-		case PLUS:
-			out = add(left, right);
-			break;
-		case POWER:
-			out = power(left, right);
-			break;
-		case LOG:
-			out = logarithm(left, right);
-			break;
+		case TIMES:      out = multiply(left, right);   break;
+		case DIVIDE:     out = divide(left, right);     break;
+		case INT_DIVIDE: out = int_divide(left, right); break;
+		case MODULO:     out = mod(left, right);        break;
+		case PLUS:       out = add(left, right);        break;
+		case POWER:      out = power(left, right);      break;
+		case LOG:        out = logarithm(left, right);  break;
 	}
 	return out;
 }
@@ -191,12 +174,10 @@ mg_obj * eval_func(struct node * node) {
 			linecount
 		);
 	}
-	
 	// evaluate arguments
 	vector<mg_obj *> args;
 	if (node->num_children > 1) {
 		struct node * n = node->children[1];
-
 		do {
 			mg_obj * arg = eval_expr(n->children[0]);
 			args.push_back(arg);
@@ -216,15 +197,14 @@ mg_obj * eval_func(struct node * node) {
 		}
 		eval_stmt(variable->value);
 		return return_address;
-	} else {
-		error("invalid arg count for func `" + id + "'", linecount);
 	}
+	error("invalid arg count for func `" + id + "'", linecount);
 }
 
 mg_obj * lookup(string id) {
 	auto local_iter = scope[current_scope].find(id);
 	auto global_iter = scope[GLOBAL].find(id);
-	mg_obj * out;
+	mg_obj * out = NULL;
 	if (local_iter != scope[current_scope].end()) {
 		out = scope[current_scope][id];
 	}
@@ -236,7 +216,6 @@ mg_obj * lookup(string id) {
 
 mg_obj * get_value(string id) {
 	mg_obj * variable = lookup(id);
-			
 	if (!variable) {
 		error("var `" + id + "' not in local or global scope", linecount);
 	}
@@ -274,8 +253,8 @@ mg_obj * get_value(string id) {
 
 mg_obj * eval_expr(struct node * node) {
 	bool t_val;
-	mg_obj * left = NULL;
-	mg_obj * right = NULL;
+	mg_obj * left   = NULL;
+	mg_obj * right  = NULL;
 	mg_obj * result = NULL;
 	string id;
 	int token = node->token;
@@ -305,6 +284,7 @@ mg_obj * eval_expr(struct node * node) {
 					n = n->num_children == 2 ? n->children[1] : NULL;
 				}
 				result = new mg_list(ptrs);
+				ptrs.clear();
 			}
 		} break;
 		case ELEMENT:
@@ -404,7 +384,7 @@ mg_obj * eval_expr(struct node * node) {
 				result = new mg_int(((mg_list *)left)->value.size());
 			}
 			break;
-		case QUESTION: {
+		case QUESTION: { // ternary and elvis operators
 			int nodes = node->num_children;
 			mg_obj * test;
 			if (nodes == 3) {
@@ -444,33 +424,32 @@ bool eval_case(struct node * n, mg_obj * option, int option_type) {
 		error("case type and option type do not match", linecount);
 	}
 	
-	mg_int * i_option, * i_c;
-	mg_flt * d_option, * d_c;
-	mg_str * s_option, * s_c;
 	bool match = false;
-	
 	switch (option_type) {
-		case TYPE_INTEGER:
+		case TYPE_INTEGER: {
+			mg_int * i_option, * i_c;
 			i_option = (mg_int *) option;
 			i_c = (mg_int *) c;
 			if (i_c->value == i_option->value) {
 				match = true;
 			}
-			break;
-		case TYPE_FLOAT:
+		} break;
+		case TYPE_FLOAT: {
+			mg_flt * d_option, * d_c;
 			d_option = (mg_flt *) option;
 			d_c = (mg_flt *) c;
 			if (d_c->value == d_option->value) {
 				match = true;
 			}
-			break;
-		case TYPE_STRING:
+		} break;
+		case TYPE_STRING: {
+			mg_str * s_option, * s_c;
 			s_option = (mg_str *) option;
 			s_c = (mg_str *) c;
 			if (s_c->value == s_option->value) {
 				match = true;
 			}
-			break;
+		} break;
 	}
 	delete c;
 	if (match) {
@@ -577,7 +556,7 @@ void eval_stmt(struct node * node) {
 			// a "do what I mean" feature; looping from x to y where x > y
 			// with a negative number will work the same as a positive one
 			// (i.e. no going for ages by looping around past the overflow
-			// point
+			// point)
 			by = abs(by);
 			
 			// initialize the iterator variable of the for-loop
