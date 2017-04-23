@@ -4,29 +4,29 @@ int x = 0;
 #true
 option x {
 	case 0:
-		print "false";
+		print "false\n";
 	case 0:
-		print "true";
+		print "true\n";
 		break;
 }
 
 #false
 option x {
 	case 0:
-		print "false";
+		print "false\n";
 		break;
 	case 0:
-		print "true";
+		print "true\n";
 		break;
 }
 
 #true
 option x {
 	case 100000:
-		print "false";
+		print "false\n";
 		break;
 	case 0:
-		print "true";
+		print "true\n";
 		break;
 }
 
@@ -41,7 +41,7 @@ option x {
 	case 4-4:
 		print 4;
 	case 3:
-		print "nope";
+		print "nope\n";
 }
 
 option x {

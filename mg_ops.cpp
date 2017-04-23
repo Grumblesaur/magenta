@@ -4,6 +4,7 @@
 #include "mg_error.h"
 #include "mg_ops.h"
 #include "mg_string.h"
+#include "mg_list.h"
 #include "mg_types.h"
 #include "parser.tab.h"
 
@@ -12,6 +13,47 @@ extern unsigned linecount;
 using std::cerr;
 using std::endl;
 using std::string;
+
+mg_obj * element_of(mg_obj * left, mg_obj * right) {
+	bool found = false;
+	if (right->type != TYPE_LIST) {
+		error("right operand is not a list", linecount);
+	}
+	auto it = ((mg_list *)right)->value.begin();
+	while (!found && it != ((mg_list *)right)->value.end()) {
+		found = *left == **it;
+		++it;
+	}
+	return new mg_int(found);
+}
+
+// list bracket operations
+mg_obj * list_index(mg_list * list, mg_int * index) {
+	mg_obj * val = list->value[index->value];
+	mg_obj * out;
+	switch (val->type) {
+		// functions pass by reference, since you can't mutate them
+		case TYPE_FUNCTION: out = val;                           break;
+		case TYPE_INTEGER:  out = new mg_int(*(mg_int *) val);   break;
+		case TYPE_STRING:   out = new mg_str(*(mg_str *) val);   break;
+		case TYPE_FLOAT:    out = new mg_flt(*(mg_flt *) val);   break;
+		case TYPE_LIST:     out = new mg_list(*(mg_list *) val); break;
+		}
+	return out;
+}
+
+// string bracket operations
+mg_obj * str_index(mg_str * str, mg_int * index) {
+	string text = str->value;
+	unsigned length = text.length();
+	int position = index->value;
+	string out;
+	if (abs(position) >= length) {
+		error("index out of bounds", linecount);
+	}
+	out = position < 0 ? text[length + position] : text[position];
+	return new mg_str(out);
+}
 
 
 // Handle computation of expressions of the form x ** y where x and y are
@@ -56,61 +98,64 @@ mg_obj * multiply(mg_obj * left, mg_obj * right) {
 	double d_product;
 	int repeats;
 	string text;
-	
+	mg_obj * out;
 	if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
 		i_product = ((mg_int *)left)->value * ((mg_int *)right)->value;
-		return new mg_int(i_product);
+		out = new mg_int(i_product);
 
 	} else if (left->type == TYPE_INTEGER && right->type == TYPE_FLOAT) {
 		d_product = ((mg_int *)left)->value * ((mg_flt *)right)->value;
-		return new mg_flt(d_product);
+		out = new mg_flt(d_product);
 
 	} else if (left->type == TYPE_FLOAT && right->type == TYPE_INTEGER) {
 		d_product = ((mg_flt *)left)->value * ((mg_int *)right)->value;
-		return new mg_flt(d_product);
+		out = new mg_flt(d_product);
 
 	} else if (left->type == TYPE_FLOAT && right->type == TYPE_FLOAT) {
 		d_product = ((mg_flt *)left)->value * ((mg_flt *)right)->value;
-		return new mg_flt(d_product);
+		out = new mg_flt(d_product);
 
 	} else if (left->type == TYPE_INTEGER && right->type == TYPE_STRING) {
 		repeats = ((mg_int *)left)->value;
 		text = ((mg_str *)right)->value;
 		string str_product = str_multiply(text, repeats);
-		return new mg_str(str_product);
+		out = new mg_str(str_product);
 
 	} else if (left->type == TYPE_STRING && right->type == TYPE_INTEGER) {
 		repeats = ((mg_int *)right)->value;
 		text = ((mg_str *)left)->value;
 		string str_product = str_multiply(text, repeats);
-		return new mg_str(str_product);
+		out = new mg_str(str_product);
 
 	} else {
 		cerr << left->type << " ; " << right->type << endl;
 		error("unsupported multiplication operation", linecount);
 	}
+	return out;
 }
 
 mg_obj * divide(mg_obj * left, mg_obj * right) {
 	int i_quotient;
 	double d_quotient;
+	mg_obj * out;
 	
 	if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
 		d_quotient = (double)((mg_int *)left)->value
 			/ (double)((mg_int *)right)->value;
-		return new mg_flt(d_quotient);
+		out = new mg_flt(d_quotient);
 	} else if (left->type == TYPE_INTEGER && right->type == TYPE_FLOAT) {
 		d_quotient = ((mg_int *)left)->value / ((mg_flt *)right)->value;
-		return new mg_flt(d_quotient);
+		out = new mg_flt(d_quotient);
 	} else if (left->type == TYPE_FLOAT && right->type == TYPE_INTEGER) {
 		d_quotient = ((mg_flt *)left)->value / ((mg_int *)right)->value;
-		return new mg_flt(d_quotient);
+		out = new mg_flt(d_quotient);
 	} else if (left->type == TYPE_FLOAT && right->type == TYPE_FLOAT) {
 		d_quotient = ((mg_flt *)left)->value / ((mg_flt *)right)->value;
-		return new mg_flt(d_quotient);
+		out = new mg_flt(d_quotient);
 	} else {
 		error("unsupported division operation", linecount);
 	}
+	return out;
 }
 
 // divide two numbers after coercing them to integers
@@ -130,18 +175,19 @@ mg_obj * int_divide(mg_obj * left, mg_obj * right) {
 }
 
 mg_obj * mod(mg_obj * left, mg_obj * right) {
-	if (left->type != TYPE_INTEGER && left->type != TYPE_INTEGER) {
-		error("unsupported modulus operation", linecount);
-	} else if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
+	if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
 		int i_mod = ((mg_int *)left)->value % ((mg_int *)right)->value;
 		return new mg_int(i_mod);
 	}
+	error("unsupported modulus operation", linecount);
 }
 
 mg_obj * add(mg_obj * left, mg_obj * right) {
 	if (left->type == TYPE_STRING && right->type == TYPE_STRING) {
 		string concat = ((mg_str *)left)->value + ((mg_str *)right)->value;
 		return new mg_str(concat);
+	} else if (left->type == TYPE_LIST && right->type == TYPE_LIST) {
+		return combine((mg_list *) left, (mg_list *)right);
 	} else if (left->type == TYPE_STRING && right->type != TYPE_STRING
 		|| left->type != TYPE_STRING && right->type == TYPE_STRING) {
 		error("unsupported addition operation", linecount);
@@ -175,7 +221,7 @@ mg_obj * subtract(mg_obj * left, mg_obj * right) {
 		((mg_flt *)right)->value : ((mg_int *)right)->value;
 	
 	// handle unary minus first
-	if (left == NULL && right->type != TYPE_STRING) {
+	if (!left && right->type != TYPE_STRING) {
 		if (right_is_float) { 
 			return new mg_flt(-rval);
 		} else {
@@ -204,19 +250,14 @@ mg_obj * eval_logical(mg_obj * left, int token, mg_obj * right) {
 	bool bleft = eval_bool(left);
 	bool bright = eval_bool(right);
 	switch (token) {
-		case LOG_OR:
-			out = new mg_int(bleft || bright);
-			break;
-		case LOG_XOR:
-			out = new mg_int((bleft || bright) && !(bleft && bright));
-			break;
-		case LOG_AND:
-			out = new mg_int(bleft && bright);
-			break;
-		case LOG_IMPLIES:
-			out = new mg_int(!bleft && bright);
-			break;
-		}
+		case LOG_OR:      out = new mg_int(bleft || bright);  break;
+		case LOG_AND:     out = new mg_int(bleft && bright);  break;
+		case LOG_IMPLIES: out = new mg_int(!bleft && bright); break;
+		case LOG_XOR:     out = new mg_int(
+			(bleft || bright) && !(bleft && bright)
+		); break;
+
+	}
 	return out;
 }
 
@@ -293,13 +334,12 @@ mg_obj * eval_bitwise(mg_obj * left, int token, mg_obj * right) {
 // return the boolean value of that pointer's actual value
 bool eval_bool(mg_obj * o) {
 	switch(o->type) {
-		case TYPE_STRING:
-			return ((mg_str *) o)->value != "";
-		case TYPE_INTEGER:
-			return  ((mg_int *) o)->value != 0;
-		case TYPE_FLOAT:
-			return  ((mg_flt *) o)->value != 0.0;
-		default: // for non-primitive types XXX this may change later
+		case TYPE_STRING:   return ((mg_str *) o)->value != "";
+		case TYPE_INTEGER:  return ((mg_int *) o)->value != 0;
+		case TYPE_FLOAT:    return ((mg_flt *) o)->value != 0.0;
+		case TYPE_FUNCTION: return !((mg_func *) o)->param_types.empty();
+		case TYPE_LIST:     return !((mg_list *) o)->value.empty();
+		default:
 			return false;
 	}
 }

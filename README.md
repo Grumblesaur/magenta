@@ -11,9 +11,6 @@ https://trello.com/b/LEAOTeYg/magenta
   str s = "hello world!";
   str z = 'single quotes are also legal';
 
-  # type
- 
-  # this is a feature yet to be implemented
   type Person {
     str name;
     int age;
@@ -24,16 +21,8 @@ https://trello.com/b/LEAOTeYg/magenta
   
 ### func & meth
   ```
-  # this is a feature yet to be implemented
-  
   # func-declared procedures have no side effects
   func add(int a, int b) : int {
-    return a + b;
-  }
-  
-  # meth-declared procedures can have side effects
-  meth add_debug(int a, int b) : int {
-    print(a + b);
     return a + b;
   }
   
@@ -49,7 +38,8 @@ https://trello.com/b/LEAOTeYg/magenta
     str   declare a string
     flt   declare a floating point number
     type  describe a new data structure
-    
+    list  declare a container which may hold any of the above
+
     if
     else
     option
@@ -120,4 +110,7 @@ https://trello.com/b/LEAOTeYg/magenta
 ```
     # This will be implemented with containers
     []   element access
+    in   element presence
+     *   list repetition
+     +   list concatenation
 ```
