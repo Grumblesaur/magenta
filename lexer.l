@@ -29,6 +29,7 @@ unsigned int linecount = 1;
 "str"      {return TYPE_STRING;   }
 "flt"      {return TYPE_FLOAT;    }
 "type"     {return TYPE_TYPE;     }
+"list"     {return TYPE_LIST;     }
 
 "option"   {return OPTION;        }
 "case"     {return CASE;          }
