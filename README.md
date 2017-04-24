@@ -11,10 +11,7 @@ https://trello.com/b/LEAOTeYg/magenta
   str s = "hello world!";
   str z = 'single quotes are also legal';
 
-  type Person {
-    str name;
-    int age;
-  }
+  list x = ['abc', 1, 3.6, [1, 3, 4], 5];
   
   ```
   
@@ -75,7 +72,7 @@ https://trello.com/b/LEAOTeYg/magenta
     ?:    ternary or null-coalescing
 ```
  
-## bool
+## bool (applicable to any types)
 ```
     and   conjunction
     or    disjunction
@@ -84,7 +81,7 @@ https://trello.com/b/LEAOTeYg/magenta
     then  material implication
 ```
 
-## bitwise
+## bitwise (applicable to integers only)
 ```
     !   bitwise not
     &   bitwise and
@@ -99,16 +96,9 @@ https://trello.com/b/LEAOTeYg/magenta
     []    character access (substring of length 1 at a character index)
            (slice operations to come later?)
 ```
-
-# Compounds
-```
-     # This will be implemented with user-defined types
-     .    member access (e.g. x.y S.T. y belongs to x)
-```
  
 # arrays
 ```
-    # This will be implemented with containers
     []   element access
     in   element presence
      *   list repetition
