@@ -31,20 +31,32 @@ bool mg_obj::operator>(const mg_obj & that) const {
 }
 
 bool mg_obj::operator<(const mg_obj & that) const {
-	if (this->type < that.type) {
+	double fleft, fright;
+	bool is_numeric =
+		this->type == TYPE_INTEGER
+		|| this->type == TYPE_FLOAT
+		&& that.type == TYPE_INTEGER
+		|| that.type == TYPE_FLOAT;
+	
+	if (!is_numeric && this->type < that.type) {
 		return true;
-	} else if (this->type > that.type) {
+	} else if (!is_numeric && this->type > that.type) {
 		return false;
 	} else switch (this->type) {
 		case TYPE_FUNCTION:
 			return ((mg_func *)this)->param_names.size()
 				< ((mg_func *)&that)->param_names.size();
-		case TYPE_INTEGER:
-			return ((mg_int *)this)->value < ((mg_int *)&that)->value;
 		case TYPE_STRING:
 			return ((mg_str *)this)->value < ((mg_str *)&that)->value;
+		case TYPE_INTEGER:
 		case TYPE_FLOAT:
-			return ((mg_str *)this)->value < ((mg_str *)&that)->value;
+			fleft = this->type == TYPE_INTEGER
+				? ((mg_int *)this)->value
+				: ((mg_flt *)this)->value;
+			fright = that.type == TYPE_INTEGER
+				? ((mg_int *)&that)->value
+				: ((mg_flt *)&that)->value;
+			return fleft < fright;
 		case TYPE_LIST: {
 			unsigned llen = ((mg_list *)this)->value.size();
 			unsigned rlen = ((mg_list *)&that)->value.size();
@@ -68,18 +80,30 @@ bool mg_obj::operator<(const mg_obj & that) const {
 	
 
 bool mg_obj::operator==(const mg_obj & that) const {
-	if (this->type != that.type) {
+	bool is_numeric =
+		this->type == TYPE_INTEGER
+		|| this->type == TYPE_FLOAT
+		&& that.type == TYPE_INTEGER
+		|| that.type == TYPE_FLOAT;
+	
+	if (!is_numeric && this->type != that.type) {
 		return false;
 	}
+	double fleft, fright;
 	switch (this->type) {
 		case TYPE_FUNCTION:
 			return this == &that;
-		case TYPE_INTEGER:
-			return ((mg_int *)this)->value == ((mg_int *)&that)->value;
 		case TYPE_STRING:
 			return ((mg_str *)this)->value == ((mg_str *)&that)->value;
-		case TYPE_FLOAT:
-			return ((mg_flt *)this)->value == ((mg_flt *)&that)->value;
+		case TYPE_INTEGER:
+		case TYPE_FLOAT: 
+			fleft = this->type == TYPE_INTEGER
+				? ((mg_int *)this)->value
+				: ((mg_flt *)this)->value;
+			fright = that.type == TYPE_INTEGER
+				? ((mg_int *)&that)->value
+				: ((mg_flt *)&that)->value;
+			return fleft == fright;
 		case TYPE_LIST: {
 			unsigned llen = ((mg_list *)this)->value.size();
 			unsigned rlen = ((mg_list *)&that)->value.size();
