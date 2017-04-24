@@ -2,6 +2,9 @@
 #include <string>
 #include <cstdlib>
 #include "mg_string.h"
+#include "mg_error.h"
+
+extern unsigned linecount;
 
 using std::cerr;
 using std::endl;
@@ -28,9 +31,10 @@ char ascii_lookup(char escaped) {
 		case '\\': return 92; // backslash
 		// for now, there will be no support for octal or hex escapes
 		default:
-			cerr << "unsupported escape sequence: `\\'" << escaped << "`.";
-			cerr << endl;
-			exit(EXIT_FAILURE);
+			error(
+				"unsupported escape sequence `\\'" + string(1, escaped),
+				linecount
+			);
 	}
 }
 

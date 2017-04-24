@@ -126,36 +126,47 @@ mg_obj * multiply(mg_obj * left, mg_obj * right) {
 	} else if (left->type = TYPE_INTEGER && right->type == TYPE_LIST) {
 		out = repeat((mg_list *) right, (mg_int *) left);
 	} else {
-		cerr << left->type << " ; " << right->type << endl;
 		error("unsupported multiplication operation", linecount);
 	}
 	return out;
 }
 
 mg_obj * divide(mg_obj * left, mg_obj * right) {
-	int i_quotient;
-	double d_quotient;
+	bool is_numeric =
+		left->type == TYPE_INTEGER
+		|| left->type == TYPE_FLOAT
+		&& right->type == TYPE_INTEGER
+		|| right->type == TYPE_FLOAT;
 	
-	if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
-		d_quotient = (double)((mg_int *)left)->value
-			/ (double)((mg_int *)right)->value;
-	} else if (left->type == TYPE_INTEGER && right->type == TYPE_FLOAT) {
-		d_quotient = ((mg_int *)left)->value / ((mg_flt *)right)->value;
-	} else if (left->type == TYPE_FLOAT && right->type == TYPE_INTEGER) {
-		d_quotient = ((mg_flt *)left)->value / ((mg_int *)right)->value;
-	} else if (left->type == TYPE_FLOAT && right->type == TYPE_FLOAT) {
-		d_quotient = ((mg_flt *)left)->value / ((mg_flt *)right)->value;
-	} else {
-		error("unsupported division operation", linecount);
+	if (!is_numeric) {
+		if (left->type == TYPE_LIST) {
+			return remove((mg_list *) left, right);
+		} else {
+			error("invalid division operation", linecount);
+		}
 	}
-	return new mg_flt(d_quotient);
+	double dividend, divisor;
+	dividend = left->type == TYPE_INTEGER
+		? ((mg_int *)left)->value
+		: ((mg_flt *)left)->value;
+	divisor = right->type == TYPE_INTEGER
+		? ((mg_int *)right)->value
+		: ((mg_flt *)right)->value;
+	return new mg_flt(dividend / divisor);
 }
 
 // divide two numbers after coercing them to integers
 mg_obj * int_divide(mg_obj * left, mg_obj * right) {
-	if (left->type == TYPE_STRING || right->type == TYPE_STRING) {
-		error("unsupported division operation", linecount);
+	bool is_numeric =
+		left->type == TYPE_INTEGER
+		|| left->type == TYPE_FLOAT
+		&& right->type == TYPE_INTEGER
+		|| right->type == TYPE_FLOAT;
+	if (!is_numeric) {
+		error("invalid integer division operation", linecount);
 	}
+	
+	
 	bool left_is_float = left->type == TYPE_FLOAT;
 	bool right_is_float = right->type == TYPE_FLOAT;
 	double lval, rval, result;

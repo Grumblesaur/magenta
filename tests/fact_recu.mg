@@ -6,5 +6,6 @@ func fact (int x) : int {
 	}
 }
 
-int x = 5;
-print fact(x);
+int z = 5;
+
+print fact(z), "\n";
