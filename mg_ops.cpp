@@ -163,10 +163,10 @@ mg_obj * int_divide(mg_obj * left, mg_obj * right) {
 		((mg_flt *)left)->value : ((mg_int *)left)->value;
 	rval = right_is_float ?
 		((mg_flt *)right)->value : ((mg_int *)right)->value;
-	
 	return new mg_int((int) lval / (int) rval);
 }
 
+// remainder output of remainder division for integers only
 mg_obj * mod(mg_obj * left, mg_obj * right) {
 	if (left->type == TYPE_INTEGER && right->type == TYPE_INTEGER) {
 		int i_mod = ((mg_int *)left)->value % ((mg_int *)right)->value;
@@ -196,14 +196,11 @@ mg_obj * add(mg_obj * left, mg_obj * right) {
 	rval = right_is_float ?
 		((mg_flt *)right)->value : ((mg_int *)right)->value;
 	
-	mg_obj * out;
 	result = lval + rval;
-	if (!left_is_float && !right_is_float) {
-		out = (mg_obj *) new mg_int(result);
-	} else {
-		out = (mg_obj *) new mg_flt(result);
-	}
-	return out;
+	return ((!left_is_float && !right_is_float)
+		? (mg_obj *) new mg_int(result)
+		: (mg_obj *) new mg_flt(result)
+	);
 }
 
 mg_obj * subtract(mg_obj * left, mg_obj * right) {
@@ -256,42 +253,15 @@ mg_obj * eval_logical(mg_obj * left, int token, mg_obj * right) {
 
 // returns the boolean evaluation of a comparison between the values of
 // two mg_objs
-// Throws error if str is compared to non-str
 mg_obj * eval_comp(mg_obj * left, int op, mg_obj * right) {
-	if (left->type == TYPE_STRING && left->type != right->type
-		|| right->type == TYPE_STRING && left->type != right->type) {
-		error("comparison type mismatch", linecount);
-	}
-	
-	bool numeric = left->type != TYPE_STRING && right->type != TYPE_STRING;
-	double lfloat, rfloat;
-	string lstr, rstr;
-	
-	bool out;
-	if (numeric) {
-		lfloat = (left->type == TYPE_INTEGER) ? 
-			(double) ((mg_int *)left)->value : ((mg_flt *)left)->value;
-		rfloat = (right->type == TYPE_INTEGER) ? 
-			(double) ((mg_int *)right)->value : ((mg_flt *)right)->value;
-		switch (op) {
-			case LESS_THAN:     out = lfloat <  rfloat; break;
-			case LESS_EQUAL:    out = lfloat <= rfloat; break;
-			case EQUAL:         out = lfloat == rfloat; break;
-			case NOT_EQUAL:     out = lfloat != rfloat; break;
-			case GREATER_EQUAL: out = lfloat >= rfloat; break;
-			case GREATER_THAN:  out = lfloat >  rfloat; break;
-		}
-	} else {
-		lstr = ((mg_str *)left)->value;
-		rstr = ((mg_str *)right)->value;
-		switch (op) {
-			case LESS_THAN:     out = lstr <  rstr; break;
-			case LESS_EQUAL:    out = lstr <= rstr; break;
-			case EQUAL:         out = lstr == rstr; break;
-			case NOT_EQUAL:     out = lstr != rstr; break;
-			case GREATER_EQUAL: out = lstr >= rstr; break;
-			case GREATER_THAN:  out = lstr >  rstr; break;
-		}
+	bool out = 0;
+	switch (op) {
+		case EQUAL:         out = *left == *right; break;
+		case NOT_EQUAL:     out = *left == *right; break;
+		case GREATER_THAN:  out = *left > *right;  break;
+		case GREATER_EQUAL: out = *left >= *right; break;
+		case LESS_THAN:     out = *left < *right;  break;
+		case LESS_EQUAL:    out = *left <= *right; break;
 	}
 	return new mg_int(out);
 }

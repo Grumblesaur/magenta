@@ -14,6 +14,59 @@ extern unsigned linecount;
 using std::cout;
 using std::endl;
 
+bool mg_obj::operator<=(const mg_obj & that) const {
+	return *this < that || *this == that;
+}
+
+bool mg_obj::operator!=(const mg_obj & that) const {
+	return !(*this == that);
+}
+
+bool mg_obj::operator>=(const mg_obj & that) const {
+	return !(*this < that);
+}
+
+bool mg_obj::operator>(const mg_obj & that) const {
+	return !(*this < that && *this == that);
+}
+
+bool mg_obj::operator<(const mg_obj & that) const {
+	if (this->type < that.type) {
+		return true;
+	} else if (this->type > that.type) {
+		return false;
+	} else switch (this->type) {
+		case TYPE_FUNCTION:
+			return ((mg_func *)this)->param_names.size()
+				< ((mg_func *)&that)->param_names.size();
+		case TYPE_INTEGER:
+			return ((mg_int *)this)->value < ((mg_int *)&that)->value;
+		case TYPE_STRING:
+			return ((mg_str *)this)->value < ((mg_str *)&that)->value;
+		case TYPE_FLOAT:
+			return ((mg_str *)this)->value < ((mg_str *)&that)->value;
+		case TYPE_LIST: {
+			unsigned llen = ((mg_list *)this)->value.size();
+			unsigned rlen = ((mg_list *)&that)->value.size();
+			if (llen < rlen)
+				return true;
+			else if (llen > rlen)
+				return false;
+			bool less = true;
+			mg_obj * left, * right;
+			for (int i = 0; i < rlen; i++) {
+				left = ((mg_list *)this)->value[i];
+				right = ((mg_list *)&that)->value[i];
+				less = *left < *right;
+				if (!less) return false;
+			}
+			
+		} break;
+	}
+	return true;
+}
+	
+
 bool mg_obj::operator==(const mg_obj & that) const {
 	if (this->type != that.type) {
 		return false;
@@ -31,10 +84,10 @@ bool mg_obj::operator==(const mg_obj & that) const {
 			unsigned llen = ((mg_list *)this)->value.size();
 			unsigned rlen = ((mg_list *)&that)->value.size();
 			if (llen != rlen) return false;
-			bool matching = true;;
+			bool matching = true;
 			for (int i = 0; i < llen; i++) {
-				matching = ((mg_list *)this)->value[i]
-					== ((mg_list *)&that)->value[i];
+				matching = *(((mg_list *)this)->value[i])
+					== *(((mg_list *)&that)->value[i]);
 				if (!matching) return false;
 			}
 		} break;
