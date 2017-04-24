@@ -13,3 +13,9 @@ print "\n";
 
 print ('easy' in second) * "easy in second", "\n";
 print ('hard' in second) * "hard in second\n";
+
+print [['a'], ['b', 'd'], ['c', 'e', 'f']], "\n";
+
+print ['a'] * 5, "\n";
+print 3 * ['b'], "\n";
+print ['abc', '123'][true], '\n';

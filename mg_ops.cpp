@@ -126,7 +126,10 @@ mg_obj * multiply(mg_obj * left, mg_obj * right) {
 		text = ((mg_str *)left)->value;
 		string str_product = str_multiply(text, repeats);
 		out = new mg_str(str_product);
-
+	} else if (left->type = TYPE_LIST && right->type == TYPE_INTEGER) {
+		out = repeat((mg_list *) left, (mg_int *) right);
+	} else if (left->type = TYPE_INTEGER && right->type == TYPE_LIST) {
+		out = repeat((mg_list *) right, (mg_int *) left);
 	} else {
 		cerr << left->type << " ; " << right->type << endl;
 		error("unsupported multiplication operation", linecount);
