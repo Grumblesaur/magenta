@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include "parser.tab.h"
 #include "mg_types.h"
 #include "mg_list.h"
@@ -10,8 +11,11 @@ using std::endl;
 
 mg_list * repeat(const mg_list * left, const mg_int * right) {
 	vector<mg_obj *> repetition = vector<mg_obj *>();
+	int reps = right->value;
+	bool reverse = reps < 0;
+	reps = abs(reps);
 	mg_obj * temp;
-	for (int reps = 0; reps < right->value; reps++) {
+	for (int i = 0; i < reps; i++) {
 		for (auto it = left->value.begin(); it != left->value.end(); it++) {
 			switch ((*it)->type) {
 				case TYPE_FUNCTION:
@@ -28,6 +32,7 @@ mg_list * repeat(const mg_list * left, const mg_int * right) {
 			repetition.push_back(temp);
 		}
 	}
+	if (reverse) std::reverse(repetition.begin(), repetition.end());
 	return new mg_list(repetition);
 }
 

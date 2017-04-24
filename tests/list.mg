@@ -19,3 +19,5 @@ print [['a'], ['b', 'd'], ['c', 'e', 'f']], "\n";
 print ['a'] * 5, "\n";
 print 3 * ['b'], "\n";
 print ['abc', '123'][true], '\n';
+
+print second, '\n', second * -1, '\n';
