@@ -424,6 +424,7 @@ mg_obj * eval_expr(struct node * node) {
 				result = eval_bool(left) ? left : right;
 			}
 		}
+		// handle deletion and return separately from binary operators
 		delete (mg_obj *) (result == left ? right : left);
 		return result;
 	}
