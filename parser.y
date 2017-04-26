@@ -457,8 +457,11 @@ term: PAREN_OPEN expression PAREN_CLOSE {
 	} | MINUS term { 
 		$$ = make_node(MINUS, NULL);
 		attach($$, $2);
-	} | INPUT {
+	} | INPUT PAREN_OPEN PAREN_CLOSE {
 		$$ = make_node(INPUT, NULL);
+	} | INPUT PAREN_OPEN expression PAREN_CLOSE {
+		$$ = make_node(INPUT, NULL);
+		attach($$, $3);
 	} | id { } | function_call { } | list_literal { }
 
 element: expression COMMA element {

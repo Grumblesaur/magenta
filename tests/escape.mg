@@ -1,8 +1,8 @@
-print "hello\nworld";
-print "hello\rworld";
-print "hello\fworld";
-print "hello\tworld";
-print "hello\"world";
-print 'hello\'world';
-print "hello\\world";
-print "\\\\\\\\\\\\";
+print "hello\nworld\n";
+print "hello\rworld\n";
+print "hello\fworld\n";
+print "hello\tworld\n";
+print "hello\"world\n";
+print 'hello\'world\n';
+print "hello\\world\n";
+print "\\\\\\\\\\\\\n";

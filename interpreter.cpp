@@ -321,6 +321,12 @@ mg_obj * eval_expr(struct node * node) {
 			func_cleanup();
 		} break;
 		case INPUT: {
+			mg_obj * prompt;
+			if (node->num_children) {
+				prompt = eval_expr(node->children[0]);
+				cout << *prompt;
+				delete prompt;
+			}
 			string buffer;
 			getline(cin, buffer);
 			result = new mg_str(buffer);
