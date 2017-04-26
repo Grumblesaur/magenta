@@ -24,34 +24,71 @@ https://trello.com/b/LEAOTeYg/magenta
   }
   
 ```
-
-###type
   
 
-# Keywords
+# Types
 ```
-	func  declare a function
+    func  declare a function
     int   declare an integer
     str   declare a string
     flt   declare a floating point number
     type  describe a new data structure
     list  declare a container which may hold any of the above
+```
 
-    if
-    else
-    option
-    case
+
+# flow control
+```
+    # conditionals which only execute a single statement don't
+    # require curly braces
+    if (condition)
+        print "success";
+
     
-    while
-    for
+    if (condition) {
+        # statement(s)
+    } else if (other_condition) {
+        # statement(s)
+    } else {
+        # statement(s)
+    }
+
+    # case expressions don't have to be constants, so the option-case block
+    # can be used as a more condensed if-else if-else block
+    option (expression) {
+        # use "break" keyword to avoid fallthrough
+        case expression1:
+            # statement(s)
+        case expression2:
+            # statement(s)
+            break;
+        case expression3:
+            # statement(s)
+            break;
+    }
     
-    return
+    while (condition) {
+        # statement(s)
+    }
+    
+    # when a from-clause is not specified, "var" begins at 0
+    # when a to-clause is not specified, "var" will have no upper bound
+    # when a by-clause is not specified, "var" will increment by 1
+    # "var" is local to the for-loop block, and is removed after execution
+    for var [from x] [to y] [by z] {
+        # statements
+    }
+    
+    break   # exits the current loop or breaks out of a switch statement
+    next    # skips to the next iteration of the current loop
+    
+    return  # outputs a value from a function
 ```
 
 
 # Operators:
   
-# num
+# numeric
 ```
     ()    grouping,
     **    exponentiation,
@@ -62,7 +99,16 @@ https://trello.com/b/LEAOTeYg/magenta
     %     modulo,
     +     addition,
     -     subtraction,
-    
+```
+
+# any types
+```
+    and   conjunction
+    or    disjunction
+    not   negation
+    xor   exclusive disjunction
+    then  material implication
+
     >     greater than,
     <     less than,
     ==    equal,
@@ -70,15 +116,6 @@ https://trello.com/b/LEAOTeYg/magenta
     >=    greater equal,
     <=    less equal,
     ?:    ternary or null-coalescing
-```
- 
-## bool (applicable to any types)
-```
-    and   conjunction
-    or    disjunction
-    not   negation
-    xor   exclusive disjunction
-    then  material implication
 ```
 
 ## bitwise (applicable to integers only)
@@ -91,16 +128,16 @@ https://trello.com/b/LEAOTeYg/magenta
 
 # str
 ```
-     +    concatenation,
-     *    string multiplication (with an integer),
-    []    character access (substring of length 1 at a character index)
-           (slice operations to come later?)
+     +    string concatenation: combines left operand and right head-to-tail
+     *    string repetition: combines left operand with itself right times
+    []    character access: returns string of length one with char at index
 ```
  
 # arrays
 ```
-    []   element access
-    in   element presence
-     *   list repetition
-     +   list concatenation
+    []   element access: returns object with value of element at index
+    in   element presence: true if value of left operand present in right
+     *   list repetition: combines left operand with itself right times
+     +   list concatenation: combines left operand with right head-to-tail
+     /   element removal: removes first element with value of right operand
 ```
