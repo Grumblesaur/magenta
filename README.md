@@ -90,19 +90,19 @@ https://trello.com/b/LEAOTeYg/magenta
   
 # numeric
 ```
-    ()    grouping,
     **    exponentiation,
-    ~     logarithm (e.g. log base 2 of 3 is 2~3),
+     ~    logarithm (e.g. log base 2 of 3 is 2~3),
     //    integer division,
-    *     multiplication,
-    /     division,
-    %     modulo,
-    +     addition,
-    -     subtraction,
+     *    multiplication,
+     /    division,
+     %    modulo,
+     +    addition,
+     -    subtraction,
 ```
 
 # any types
 ```
+    ()    grouping,
     and   conjunction
     or    disjunction
     not   negation
